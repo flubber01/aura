@@ -1,0 +1,42 @@
+[
+  {
+    "path": ".env.example",
+    "size_bytes": 127
+  },
+  {
+    "path": ".firebaserc.example",
+    "size_bytes": 65
+  },
+  {
+    "path": ".gitignore",
+    "size_bytes": 73
+  },
+  {
+    "path": "Dockerfile",
+    "size_bytes": 160
+  },
+  {
+    "path": "README.md",
+    "size_bytes": 2012
+  },
+  {
+    "path": "deploy/nginx.conf",
+    "size_bytes": 459
+  },
+  {
+    "path": "docs/INTEGRATION-INVENTORY.md",
+    "size_bytes": 1919
+  },
+  {
+    "path": "firebase.json",
+    "size_bytes": 703
+  },
+  {
+    "path": "public/data/integrations.json",
+    "size_bytes": 2947
+  },
+  {
+    "path": "public/index.html",
+    "size_bytes": 209750
+  }
+]

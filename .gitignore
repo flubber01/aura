@@ -1,0 +1,13 @@
+# runtime churn — regenerated/rotated at boot, never commit
+backend/src/data/aura.log.jsonl*
+backend/src/data/checkpoints/
+backend/src/data/autosave/
+backend/src/data/backups/
+*.log
+
+# secrets — never commit (deploy/.env.example IS tracked)
+.env
+deploy/.env
+
+# tooling
+node_modules/

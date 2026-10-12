@@ -1,0 +1,36 @@
+# AURA deployment — static frontend (nginx) + Node backend API.
+# Healthchecks, least privilege (non-root nginx image variant), no privileged
+# mounts, no /dev/shm remounts (per bootstrap review notes).
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: extracted/AURA-Web-Deploy/Dockerfile
+    ports: ["8080:8080"]
+    read_only: true
+    tmpfs: ["/tmp", "/var/cache/nginx", "/var/run"]
+    depends_on: [backend]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    image: node:22-alpine
+    working_dir: /app
+    volumes:
+      - ../backend:/app:ro
+    command: ["node", "src/../server.js"]
+    environment:
+      - PORT=8090
+      - NODE_ENV=production
+    # OPENROUTER_API_KEY comes from a secret manager, never from this file.
+    ports: ["8090:8090"]
+    read_only: true
+    tmpfs: ["/tmp"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8090/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

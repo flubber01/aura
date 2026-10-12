@@ -1,0 +1,1143 @@
+{
+  "tasks": [],
+  "audit": [
+    {
+      "at": "2026-10-10T14:33:49.583Z",
+      "area": "49",
+      "event": "self_heal",
+      "finding": "heartbeat_stale"
+    },
+    {
+      "at": "2026-10-10T14:33:49.595Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791642829595.json"
+    },
+    {
+      "at": "2026-10-10T14:34:49.605Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791642889605.json"
+    },
+    {
+      "at": "2026-10-10T14:35:49.625Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791642949625.json"
+    },
+    {
+      "at": "2026-10-10T14:38:15.064Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791643095064.json"
+    },
+    {
+      "at": "2026-10-10T14:39:15.085Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791643155085.json"
+    },
+    {
+      "at": "2026-10-10T14:40:15.105Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791643215105.json"
+    },
+    {
+      "at": "2026-10-10T14:41:15.125Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791643275125.json"
+    },
+    {
+      "at": "2026-10-10T14:42:12.517Z",
+      "area": "WF-7",
+      "event": "social_chain_configured",
+      "platform": "Mastodon"
+    },
+    {
+      "at": "2026-10-10T14:44:19.647Z",
+      "area": "49",
+      "event": "self_heal",
+      "finding": "heartbeat_stale"
+    },
+    {
+      "at": "2026-10-10T14:44:29.649Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791643469649.json"
+    },
+    {
+      "at": "2026-10-10T14:46:00.296Z",
+      "area": "49",
+      "event": "self_heal",
+      "finding": "heartbeat_stale"
+    },
+    {
+      "at": "2026-10-10T14:46:20.303Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791643580303.json"
+    },
+    {
+      "at": "2026-10-10T14:47:20.324Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791643640323.json"
+    },
+    {
+      "at": "2026-10-10T14:48:49.490Z",
+      "area": "49",
+      "event": "self_heal",
+      "finding": "heartbeat_stale"
+    },
+    {
+      "at": "2026-10-10T14:49:19.501Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791643759501.json"
+    },
+    {
+      "at": "2026-10-10T14:50:19.523Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791643819523.json"
+    },
+    {
+      "at": "2026-10-10T14:51:59.092Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791643919092.json"
+    },
+    {
+      "at": "2026-10-10T14:52:59.113Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791643979112.json"
+    },
+    {
+      "at": "2026-10-10T14:53:59.134Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791644039134.json"
+    },
+    {
+      "at": "2026-10-10T14:54:59.153Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791644099153.json"
+    },
+    {
+      "at": "2026-10-10T14:55:59.173Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791644159172.json"
+    },
+    {
+      "at": "2026-10-10T14:56:59.194Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791644219193.json"
+    },
+    {
+      "at": "2026-10-10T14:57:59.220Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791644279220.json"
+    },
+    {
+      "at": "2026-10-10T14:58:31.177Z",
+      "area": "TERM",
+      "event": "exec",
+      "cmd": "ls backend/src/lib | head -3"
+    },
+    {
+      "at": "2026-10-10T14:58:31.188Z",
+      "area": "CFG",
+      "event": "config_uploaded",
+      "target": "teams"
+    },
+    {
+      "at": "2026-10-10T14:58:31.195Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "test"
+    },
+    {
+      "at": "2026-10-10T14:58:31.209Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T14:58:31.209Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: test done"
+    },
+    {
+      "at": "2026-10-10T14:59:12.132Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791644352132.json"
+    },
+    {
+      "at": "2026-10-10T15:09:49.670Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791644989669.json"
+    },
+    {
+      "at": "2026-10-10T15:10:33.951Z",
+      "area": "49",
+      "event": "self_heal",
+      "finding": "heartbeat_stale"
+    },
+    {
+      "at": "2026-10-10T15:11:23.965Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791645083964.json"
+    },
+    {
+      "at": "2026-10-10T15:12:23.986Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791645143986.json"
+    },
+    {
+      "at": "2026-10-10T15:13:24.006Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791645204006.json"
+    },
+    {
+      "at": "2026-10-10T15:14:24.026Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791645264026.json"
+    },
+    {
+      "at": "2026-10-10T15:15:15.627Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:15:32.333Z",
+      "area": "58",
+      "event": "route_decision",
+      "lane": "unsloth_local"
+    },
+    {
+      "at": "2026-10-10T15:15:33.642Z",
+      "area": "WATCH",
+      "event": "hot_reload_ok",
+      "file": "schedule.json"
+    },
+    {
+      "at": "2026-10-10T15:16:15.628Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791645375628.json"
+    },
+    {
+      "at": "2026-10-10T15:16:33.000Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "critical error: listen EADDRINUSE: address already in use 0.0.0.0:8080"
+    },
+    {
+      "at": "2026-10-10T15:17:58.449Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:18:07.458Z",
+      "area": "WATCH",
+      "event": "syntax_error_rollback",
+      "file": "teams.json",
+      "error": "Unexpected non-whitespace character after JSON at position 2365 (line 36 column 1)"
+    },
+    {
+      "at": "2026-10-10T15:18:58.464Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791645538463.json"
+    },
+    {
+      "at": "2026-10-10T15:19:58.455Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791645598455.json"
+    },
+    {
+      "at": "2026-10-10T15:23:15.001Z",
+      "area": "49",
+      "event": "self_heal",
+      "finding": "heartbeat_stale"
+    },
+    {
+      "at": "2026-10-10T15:23:35.002Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791645815001.json"
+    },
+    {
+      "at": "2026-10-10T15:24:35.005Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791645875004.json"
+    },
+    {
+      "at": "2026-10-10T15:25:35.010Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791645935009.json"
+    },
+    {
+      "at": "2026-10-10T15:26:35.012Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791645995012.json"
+    },
+    {
+      "at": "2026-10-10T15:27:35.016Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646055016.json"
+    },
+    {
+      "at": "2026-10-10T15:28:35.021Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646115020.json"
+    },
+    {
+      "at": "2026-10-10T15:29:35.025Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646175024.json"
+    },
+    {
+      "at": "2026-10-10T15:30:33.906Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:31:12.538Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:31:20.530Z",
+      "area": "58",
+      "event": "route_decision",
+      "lane": "ollama_local"
+    },
+    {
+      "at": "2026-10-10T15:31:20.531Z",
+      "area": "58",
+      "event": "route_decision",
+      "lane": "ollama_local"
+    },
+    {
+      "at": "2026-10-10T15:31:20.531Z",
+      "area": "58",
+      "event": "route_decision",
+      "lane": "ollama_local"
+    },
+    {
+      "at": "2026-10-10T15:31:20.531Z",
+      "area": "58",
+      "event": "route_decision",
+      "lane": "ollama_local"
+    },
+    {
+      "at": "2026-10-10T15:32:12.546Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646332545.json"
+    },
+    {
+      "at": "2026-10-10T15:32:34.126Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:32:58.141Z",
+      "area": "WATCH",
+      "event": "syntax_error_rollback",
+      "file": "teams.json",
+      "error": "Unexpected non-whitespace character after JSON at position 2365 (line 36 column 1)"
+    },
+    {
+      "at": "2026-10-10T15:33:01.143Z",
+      "area": "WATCH",
+      "event": "syntax_error_rollback",
+      "file": "teams.json",
+      "error": "Unexpected token 'G', \"GARBAGE\n\" is not valid JSON"
+    },
+    {
+      "at": "2026-10-10T15:33:02.873Z",
+      "area": "WATCH",
+      "event": "restored_from_backup",
+      "file": "departments.json",
+      "backup": "departments.2026-10-10T15-32-34-128Z.json"
+    },
+    {
+      "at": "2026-10-10T15:33:34.128Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646414127.json"
+    },
+    {
+      "at": "2026-10-10T15:34:34.130Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646474129.json"
+    },
+    {
+      "at": "2026-10-10T15:35:34.132Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646534131.json"
+    },
+    {
+      "at": "2026-10-10T15:36:34.136Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646594135.json"
+    },
+    {
+      "at": "2026-10-10T15:37:34.141Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646654141.json"
+    },
+    {
+      "at": "2026-10-10T15:38:55.435Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646735434.json"
+    },
+    {
+      "at": "2026-10-10T15:39:55.436Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646795436.json"
+    },
+    {
+      "at": "2026-10-10T15:40:55.441Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646855441.json"
+    },
+    {
+      "at": "2026-10-10T15:41:55.448Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791646915447.json"
+    },
+    {
+      "at": "2026-10-10T15:42:45.056Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:43:45.058Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647025057.json"
+    },
+    {
+      "at": "2026-10-10T15:44:17.389Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validate"
+    },
+    {
+      "at": "2026-10-10T15:44:45.058Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647085058.json"
+    },
+    {
+      "at": "2026-10-10T15:45:48.563Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:46:48.614Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647208613.json"
+    },
+    {
+      "at": "2026-10-10T15:47:48.645Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647268644.json"
+    },
+    {
+      "at": "2026-10-10T15:48:48.649Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647328649.json"
+    },
+    {
+      "at": "2026-10-10T15:49:16.256Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:49:22.867Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T15:49:35.770Z",
+      "area": "WATCH",
+      "event": "syntax_error_rollback",
+      "file": "teams.json",
+      "error": "Unexpected token 'T', \"TOTALLY CORRUPT {{{\n\" is not valid JSON"
+    },
+    {
+      "at": "2026-10-10T15:50:16.260Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647416260.json"
+    },
+    {
+      "at": "2026-10-10T15:50:55.010Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:51:05.521Z",
+      "area": "WATCH",
+      "event": "syntax_error_rollback",
+      "file": "schedule.json",
+      "error": "Unexpected token 'K', \"KAPUTT\n\" is not valid JSON"
+    },
+    {
+      "at": "2026-10-10T15:51:22.888Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T15:51:55.013Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647515012.json"
+    },
+    {
+      "at": "2026-10-10T15:52:59.855Z",
+      "area": "49",
+      "event": "self_heal",
+      "finding": "heartbeat_stale"
+    },
+    {
+      "at": "2026-10-10T15:53:29.857Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647609857.json"
+    },
+    {
+      "at": "2026-10-10T15:54:29.864Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647669864.json"
+    },
+    {
+      "at": "2026-10-10T15:55:29.868Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647729868.json"
+    },
+    {
+      "at": "2026-10-10T15:56:45.641Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:57:57.756Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647877756.json"
+    },
+    {
+      "at": "2026-10-10T15:58:30.562Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T15:58:30.572Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T15:58:30.574Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:58:30.574Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T15:59:11.699Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791647951697.json"
+    },
+    {
+      "at": "2026-10-10T15:59:48.822Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:59:54.940Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T15:59:54.950Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T15:59:54.953Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T15:59:54.953Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T16:02:04.835Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648124834.json"
+    },
+    {
+      "at": "2026-10-10T16:03:04.834Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648184833.json"
+    },
+    {
+      "at": "2026-10-10T16:04:04.840Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648244840.json"
+    },
+    {
+      "at": "2026-10-10T16:05:04.842Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648304842.json"
+    },
+    {
+      "at": "2026-10-10T16:06:04.844Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648364844.json"
+    },
+    {
+      "at": "2026-10-10T16:07:04.847Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648424847.json"
+    },
+    {
+      "at": "2026-10-10T16:08:04.897Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648484896.json"
+    },
+    {
+      "at": "2026-10-10T16:08:37.849Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T16:08:47.132Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T16:08:51.685Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T16:08:51.688Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T16:08:51.689Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T16:09:15.564Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T16:09:20.140Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T16:09:20.143Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T16:09:20.143Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T16:09:33.788Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T16:09:37.850Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648577849.json"
+    },
+    {
+      "at": "2026-10-10T16:09:38.325Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T16:09:38.327Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T16:09:38.328Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T16:10:37.852Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648637852.json"
+    },
+    {
+      "at": "2026-10-10T16:12:49.841Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648769841.json"
+    },
+    {
+      "at": "2026-10-10T16:13:49.854Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648829853.json"
+    },
+    {
+      "at": "2026-10-10T16:14:49.858Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791648889857.json"
+    },
+    {
+      "at": "2026-10-10T16:15:46.829Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T16:16:07.870Z",
+      "area": "WATCH",
+      "event": "syntax_error_rollback",
+      "file": "teams.json",
+      "error": "Unexpected non-whitespace character after JSON at position 2365 (line 36 column 1)"
+    },
+    {
+      "at": "2026-10-10T16:16:10.874Z",
+      "area": "WATCH",
+      "event": "syntax_error_rollback",
+      "file": "teams.json",
+      "error": "Unexpected non-whitespace character after JSON at position 2365 (line 36 column 1)"
+    },
+    {
+      "at": "2026-10-10T16:16:24.101Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T16:16:28.664Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T16:16:28.667Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T16:16:28.667Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T16:16:46.831Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791649006831.json"
+    },
+    {
+      "at": "2026-10-10T16:17:46.831Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791649066830.json"
+    },
+    {
+      "at": "2026-10-10T16:18:39.225Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T16:18:43.774Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T16:18:43.776Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T16:18:43.776Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T16:19:17.006Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791649157006.json"
+    },
+    {
+      "at": "2026-10-10T16:20:17.008Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791649217008.json"
+    },
+    {
+      "at": "2026-10-10T16:20:38.630Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T16:20:52.244Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T16:20:56.818Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T16:20:56.820Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T16:20:56.821Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T16:21:38.633Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791649298632.json"
+    },
+    {
+      "at": "2026-10-10T16:22:00.769Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T16:22:12.668Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T16:22:17.230Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T16:22:17.232Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T16:22:17.233Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T18:13:14.758Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T21:59:15.336Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T22:00:15.853Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791669615852.json"
+    },
+    {
+      "at": "2026-10-10T22:01:15.815Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791669675815.json"
+    },
+    {
+      "at": "2026-10-10T22:02:15.817Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791669735817.json"
+    },
+    {
+      "at": "2026-10-10T22:03:15.818Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791669795818.json"
+    },
+    {
+      "at": "2026-10-10T22:03:26.215Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T22:03:40.898Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T22:03:45.479Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T22:03:45.481Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T22:03:45.482Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T22:03:49.718Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T22:03:54.261Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T22:03:54.263Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T22:03:54.263Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T22:04:26.215Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791669866215.json"
+    },
+    {
+      "at": "2026-10-10T22:04:41.710Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T22:04:46.265Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T22:04:46.268Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T22:04:46.268Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-10T22:05:26.219Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791669926218.json"
+    },
+    {
+      "at": "2026-10-10T22:06:26.219Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791669986218.json"
+    },
+    {
+      "at": "2026-10-10T22:07:26.219Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791670046219.json"
+    },
+    {
+      "at": "2026-10-10T22:08:26.222Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791670106222.json"
+    },
+    {
+      "at": "2026-10-10T22:09:26.226Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791670166225.json"
+    },
+    {
+      "at": "2026-10-10T22:10:26.227Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791670226227.json"
+    },
+    {
+      "at": "2026-10-10T22:11:26.231Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791670286231.json"
+    },
+    {
+      "at": "2026-10-10T22:12:26.233Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791670346233.json"
+    },
+    {
+      "at": "2026-10-10T22:13:28.134Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T22:13:37.241Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-10T22:13:41.787Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-10T22:13:41.789Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-10T22:13:41.790Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-12T03:46:59.728Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-12T03:47:12.333Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep"
+    },
+    {
+      "at": "2026-10-12T03:47:16.871Z",
+      "area": "OPS",
+      "event": "KILL_SWITCH_ENGAGED",
+      "reason": "validation sweep: engage"
+    },
+    {
+      "at": "2026-10-12T03:47:16.873Z",
+      "area": "OPS",
+      "event": "autosave_other_dbs"
+    },
+    {
+      "at": "2026-10-12T03:47:16.873Z",
+      "area": "OPS",
+      "event": "kill_switch_revived",
+      "reason": "revived: validation sweep: revive"
+    }
+  ],
+  "created_at": "2026-10-10T14:29:54.647Z"
+}

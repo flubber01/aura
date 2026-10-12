@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "project": "AURA Agent Command Center",
+  "note": "Katalog/Setup-Status; keine Live-Verbindung wird hiermit behauptet oder eingerichtet.",
+  "integrations": [
+    {
+      "name": "Google Cloud / Firebase Hosting",
+      "category": "hosting",
+      "status": "setup_required",
+      "purpose": "Statisches Frontend hosten",
+      "docs": "https://firebase.google.com/docs/hosting"
+    },
+    {
+      "name": "Google Drive / Google Docs",
+      "category": "documents",
+      "status": "not_connected",
+      "purpose": "Dokumente und Projektunterlagen speichern; Verbindung benötigt autorisierten Account",
+      "docs": "https://developers.google.com/drive/api/guides/about-sdk"
+    },
+    {
+      "name": "OpenRouter API",
+      "category": "ai",
+      "status": "setup_required",
+      "purpose": "Modell-Gateway; API-Key nur serverseitig als Secret ablegen",
+      "docs": "https://openrouter.ai/docs/quick-start"
+    },
+    {
+      "name": "Ollama",
+      "category": "ai",
+      "status": "not_connected",
+      "purpose": "Lokale Modell-Ausführung",
+      "docs": "https://ollama.com/library"
+    },
+    {
+      "name": "Hugging Face / vLLM",
+      "category": "ai",
+      "status": "setup_required",
+      "purpose": "Modell-Registry und optionales Serving",
+      "docs": "https://huggingface.co/docs"
+    },
+    {
+      "name": "PostgreSQL",
+      "category": "database",
+      "status": "backend_required",
+      "purpose": "Persistente Datenbank; nicht im statischen Frontend enthalten",
+      "docs": "https://www.postgresql.org/docs/"
+    },
+    {
+      "name": "Docker",
+      "category": "deployment",
+      "status": "optional",
+      "purpose": "Containerisiertes statisches Frontend",
+      "docs": "https://docs.docker.com/"
+    },
+    {
+      "name": "n8n",
+      "category": "automation",
+      "status": "not_connected",
+      "purpose": "Workflows nach eigener Installation und Authentifizierung",
+      "docs": "https://docs.n8n.io/"
+    },
+    {
+      "name": "Model Context Protocol (MCP)",
+      "category": "agents",
+      "status": "backend_required",
+      "purpose": "Tool-Server/Client; benötigt explizite Server-Konfiguration",
+      "docs": "https://modelcontextprotocol.io/"
+    },
+    {
+      "name": "GitHub",
+      "category": "source_control",
+      "status": "setup_required",
+      "purpose": "Versionsverwaltung und CI/CD",
+      "docs": "https://docs.github.com/"
+    },
+    {
+      "name": "NotebookLM",
+      "category": "knowledge",
+      "status": "manual_workflow",
+      "purpose": "Wissensnotebooks manuell verwalten; keine automatische Synchronisierung behauptet",
+      "docs": "https://notebooklm.google.com/"
+    },
+    {
+      "name": "Telemetry demo",
+      "category": "observability",
+      "status": "simulation_only",
+      "purpose": "Demo-Metriken sind Simulationen, bis eine echte autorisierte Datenquelle eingerichtet ist",
+      "docs": ""
+    },
+    {
+      "name": "HyperFrames (HeyGen)",
+      "category": "skill",
+      "status": "setup_required",
+      "purpose": "HTML->video rendering for areas 08/09; original scripts only",
+      "docs": "https://github.com/heygen-com/hyperframes"
+    },
+    {
+      "name": "Impeccable design language",
+      "category": "skill",
+      "status": "setup_required",
+      "purpose": "Design-quality gate for agent-built UI (pairs with UI/UX Pro Max)",
+      "docs": "https://github.com/pbakaus/impeccable"
+    },
+    {
+      "name": "Agent-Reach",
+      "category": "skill",
+      "status": "setup_required",
+      "purpose": "Sanctioned read-only 'agent eyes' for areas 37/21/19; official APIs only, no stealth",
+      "docs": "https://github.com/Panniantong/Agent-Reach"
+    },
+    {
+      "name": "NVIDIA OpenShell",
+      "category": "skill",
+      "status": "setup_required",
+      "purpose": "Safe private runtime for areas 29/01/20; least privilege, egress allowlist",
+      "docs": "https://github.com/NVIDIA/OpenShell"
+    },
+    {
+      "name": "Hindsight agent memory",
+      "category": "skill",
+      "status": "setup_required",
+      "purpose": "Learning memory for areas 03/22/23; retention + deletion policy",
+      "docs": "https://github.com/vectorize-io/hindsight"
+    },
+    {
+      "name": "VoiceBox voice studio",
+      "category": "skill",
+      "status": "setup_required",
+      "purpose": "Local TTS/narration for areas 09/08/17; consent-only voice cloning",
+      "docs": "https://github.com/jamiepine/voicebox"
+    },
+    {
+      "name": "Unsloth",
+      "category": "skill",
+      "status": "setup_required",
+      "purpose": "Local LLM fine-tune lane for areas 06/27; authorized own hardware only",
+      "docs": "https://github.com/unslothai/unsloth"
+    },
+    {
+      "name": "UI/UX Pro Max skill",
+      "category": "skill",
+      "status": "setup_required",
+      "purpose": "Design intelligence for frontend work; accessibility + licensing checks",
+      "docs": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill"
+    }
+  ]
+}
