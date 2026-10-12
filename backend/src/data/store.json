@@ -1137,6 +1137,18 @@
       "area": "OPS",
       "event": "kill_switch_revived",
       "reason": "revived: validation sweep: revive"
+    },
+    {
+      "at": "2026-10-12T03:47:59.718Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791776879718.json"
+    },
+    {
+      "at": "2026-10-12T04:04:42.386Z",
+      "area": "49",
+      "event": "swarm_checkpoint",
+      "name": "checkpoint-1791777882385.json"
     }
   ],
   "created_at": "2026-10-10T14:29:54.647Z"
