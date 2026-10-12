@@ -1,0 +1,45 @@
+[Unit]
+Description=AURA Agent Command Center (hardened)
+Documentation=https://github.com/flubber01/aura
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=aura
+Group=aura
+WorkingDirectory=/opt/aura
+EnvironmentFile=-/opt/aura/deploy/.env
+ExecStart=/usr/bin/node backend/server.js
+Restart=always
+RestartSec=3
+TimeoutStopSec=15
+
+# ---- hardening ----
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native
+# AURA writes only its own data dirs (runtime state + vault + logs)
+ReadWritePaths=/opt/aura/backend/src/data
+# AURA needs outbound HTTPS only (GitHub API, optional OpenRouter)
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+# resources
+LimitNOFILE=4096
+MemoryMax=1G
+CPUQuota=150%
+
+[Install]
+WantedBy=multi-user.target

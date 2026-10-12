@@ -1,0 +1,13 @@
+[
+  {
+    "id": "a7bd7ab5-5e68-4bee-a10d-8bc5eda1f0ef",
+    "owner_label": "cust-1",
+    "purpose": "knowledge base",
+    "data": {
+      "plan": "pro"
+    },
+    "retention_days": 365,
+    "created_at": "2026-10-10T14:58:31.157Z",
+    "consent": true
+  }
+]

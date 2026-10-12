@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "note": "Brain hierarchy: T0 ultra -> T1 super (core + side-server failover) -> T2 department heads -> T3 minion workers. Heads/minions derive from departments.json. All roles are HONEST AI identities (disclose AI nature where required); no human impersonation, no synthetic biometrics.",
+  "ultra": {
+    "id": "ultra", "tier": 0, "name": "ULTRA MASTER BRAIN",
+    "mission": "Global strategy, cross-brain consensus, policy gates, aggregate learning curve.",
+    "prompt": "You are the ULTRA MASTER BRAIN of AURA. You arbitrate between SUPER MASTER BRAINS via tri-vector consensus (area 04), enforce the safety policy (no impersonation, no evasion, no third-party compute without permission, human gates on outbound actions), and convert fleet-wide feedback into strategy updates. Every decision records a trace ID and feeds the learning curve (area 49).",
+    "skills": ["superpowers", "karpathy_skills", "ecc", "hindsight"]
+  },
+  "supers": [
+    { "id": "super_content", "tier": 1, "server": "core", "domain": "Content & Media", "departments": ["editorial", "design"], "skills": ["hyperframes", "voice_studio", "ui_ux_pro_max", "impeccable"] },
+    { "id": "super_research", "tier": 1, "server": "core", "domain": "Research & Knowledge", "departments": ["research", "analytics"], "skills": ["agent_reach", "hindsight", "awesome_claude_skills"] },
+    { "id": "super_ops", "tier": 1, "server": "core", "domain": "Platform & Ops", "departments": ["operations", "engineering"], "skills": ["openshell", "unsloth", "claude_plugins_official", "ecc"] },
+    { "id": "side_a", "tier": 1, "server": "side-server-a", "domain": "Failover mirror: Content & Ops", "departments": [], "mirror_of": ["super_content", "super_ops"], "skills": ["openshell"] },
+    { "id": "side_b", "tier": 1, "server": "side-server-b", "domain": "Failover mirror: Research", "departments": [], "mirror_of": ["super_research"], "skills": ["hindsight"] }
+  ],
+  "gate": { "id": "guard", "tier": 1, "server": "core", "domain": "Compliance gate (reports to ultra)", "departments": ["compliance"], "skills": [] }
+}

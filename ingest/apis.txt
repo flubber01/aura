@@ -1,0 +1,27 @@
+# AURA catalog ingestor input — public tool/API links
+# Format: name | url | category
+# The ingestor normalizes and dedupes ONLY; it never fetches or executes these.
+OpenRouter | https://openrouter.ai/docs | ai
+Ollama | https://ollama.com/library | ai
+Hugging Face | https://huggingface.co/docs | ai
+PostgreSQL | https://www.postgresql.org/docs/ | database
+Firebase Hosting | https://firebase.google.com/docs/hosting | hosting
+n8n | https://docs.n8n.io/ | automation
+Model Context Protocol | https://modelcontextprotocol.io/ | agents
+WordPress REST API | https://developer.wordpress.org/rest-api/ | publishing
+GitHub Docs | https://docs.github.com/ | source_control
+Docker | https://docs.docker.com/ | deployment
+Node.js | https://nodejs.org/docs/latest/api/ | runtime
+FFmpeg | https://ffmpeg.org/documentation.html | media
+HyperFrames | https://github.com/heygen-com/hyperframes | skill
+Impeccable | https://github.com/pbakaus/impeccable | skill
+Agent-Reach | https://github.com/Panniantong/Agent-Reach | skill
+OpenShell | https://github.com/NVIDIA/OpenShell | skill
+Hindsight | https://github.com/vectorize-io/hindsight | skill
+VoiceBox Voice Studio | https://github.com/jamiepine/voicebox | skill
+Unsloth | https://github.com/unslothai/unsloth | skill
+UI-UX Pro Max | https://github.com/nextlevelbuilder/ui-ux-pro-max-skill | skill
+# POLICY-EXCLUDED (documented, never ingested or executed):
+# agentreach_mux BROADCAST_OUT — multi-account stealth outreach / personas / SOCKS5 eSIM rotation: synthetic engagement + platform evasion prohibited
+# hindsight bypass-generation via uncensored model — rewriting platform security parameters prohibited
+# OSINT token harvesting / validation ledgers — credential abuse prohibited

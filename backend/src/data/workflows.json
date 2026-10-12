@@ -1,0 +1,31 @@
+{
+  "workflows": [
+    {
+      "id": "WF-Cb0be40",
+      "name": "Content-Pipeline DE",
+      "kind": "custom",
+      "steps": [
+        {
+          "role": "Senior Web Developer",
+          "task": "Baue Landingpage mit SEO-Meta"
+        },
+        {
+          "role": "Fact Checker",
+          "task": "Pruefe alle Aussagen der Seite"
+        },
+        {
+          "role": "Marketing Strategist",
+          "task": "Formuliere Kampagnen-Teaser"
+        }
+      ],
+      "gates": {
+        "minApprovals": 2,
+        "integrityAudit": true,
+        "humanSignoff": true,
+        "dataPrivate": false
+      },
+      "createdAt": "2026-10-10T15:31:20.501Z",
+      "runs": 1
+    }
+  ]
+}

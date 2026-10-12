@@ -1,0 +1,282 @@
+[
+  {
+    "state": "backend",
+    "module": "01 · Bootstrap & container runtime",
+    "files": "start_swarm.sh; docker-compose.yml; tmp/setup_jarvis_v3.sh; tmp/setup_jarvis_v4.sh",
+    "purpose": "Bring up services, apply schema migrations and expose the control panel.",
+    "notes": "Validate Compose healthchecks, least privilege, safe shutdown, database readiness and idempotent boot. No root-level /dev/shm remount as a generic startup step."
+  },
+  {
+    "state": "ui",
+    "module": "02 · Role registry / department templates",
+    "files": "ingest/identities.txt; identities.txt; role/department definitions",
+    "purpose": "Catalog internal task roles, capabilities, prompt versions and workload limits.",
+    "notes": "Agent Fleet / Role Lab is interactive. Persist roles with schemas and version IDs; do not turn templates into fictitious external platform accounts."
+  },
+  {
+    "state": "backend",
+    "module": "03 · Cognitive Learning Core",
+    "files": "src/lib/cognitive_learning_core.js; brain task endpoint",
+    "purpose": "Receive tasks, select a role, route execution and retain traceable results.",
+    "notes": "Requires authenticated task API, schema validation, bounded concurrency, trace IDs and permission checks."
+  },
+  {
+    "state": "ui",
+    "module": "04 · Tri-Vector Consensus Engine",
+    "files": "consensus_logic_core.js; src/lib/consensus_logic_core.js",
+    "purpose": "Generate three candidate plans and evaluate evidence, safety, cost and task fit.",
+    "notes": "The A/B/C panel is visible, but scores are static. Backend needs parallel responses, JSON validation, independent judging and safe fallback rules."
+  },
+  {
+    "state": "backend",
+    "module": "05 · Multi-response / integrity control",
+    "files": "src/lib/multi_response_controller.js; master_integrity_controller.js",
+    "purpose": "Compare responses, check consistency and reject invalid or incomplete output.",
+    "notes": "Add evidence checks, deterministic validators, confidence labels, request budgets and audit trail before output can trigger a task."
+  },
+  {
+    "state": "backend",
+    "module": "06 · OpenRouter provider pinger",
+    "files": "openrouter_pinger_daemon.js; src/lib/openrouter_pinger_daemon.js",
+    "purpose": "Probe configured inference routes and control prioritized fallback.",
+    "notes": "Probe configured model endpoints server-side; model latency, errors, rate limits and budget are real metrics only after connection."
+  },
+  {
+    "state": "backend",
+    "module": "07 · Media metadata privacy pipeline",
+    "files": "metadata_shredder.js; src/lib/metadata_shredder.js",
+    "purpose": "Remove GPS/device metadata from assets before approved publication.",
+    "notes": "Implement privacy-preserving EXIF scrub with format validation, temporary-file cleanup and verification. Do not erase source attribution or rights evidence."
+  },
+  {
+    "state": "ui",
+    "module": "08 · Kids Story Pipeline",
+    "files": "kids_story_pipeline.js; src/lib/kids_story_pipeline.js; jarvis-story-factory.tsx",
+    "purpose": "Create original age-aware story drafts from an editorial brief.",
+    "notes": "Story Studio creates a local template draft. Real generation requires a provider, age/content validation, revision history and review before release."
+  },
+  {
+    "state": "backend",
+    "module": "09 · Kids Media / mimetic video pipeline",
+    "files": "kids_media_pipeline.js; mimetic_video_pipeline.js; jarvis-video-factory.tsx",
+    "purpose": "Turn original scripts into illustration prompts, scenes, narration and rendered video.",
+    "notes": "Need image/TTS/video provider adapters, FFmpeg worker, artifact storage and render verification. Inspiration may guide themes, not copy another creator’s expression."
+  },
+  {
+    "state": "backend",
+    "module": "10 · Content incubation engine",
+    "files": "content_incubation_engine.js; jarvis-incubation-hud.tsx",
+    "purpose": "Turn approved ideas into a reusable content pipeline and editorial queue.",
+    "notes": "Define content briefs, lifecycle stages, duplicate checks, outcomes and manual review."
+  },
+  {
+    "state": "backend",
+    "module": "11 · Editorial incubation",
+    "files": "editorial_incubation_engine.js; jarvis-editorial-hud.tsx",
+    "purpose": "Editorial planning, writing assignments, revisions and approval workflows.",
+    "notes": "Share a durable content model with role ownership, version history, sources and sign-off."
+  },
+  {
+    "state": "backend",
+    "module": "12 · Community incubation",
+    "files": "community_incubation_engine.js; jarvis-community-hud.tsx",
+    "purpose": "Plan community updates and schedule authorized responses.",
+    "notes": "Use official platform APIs, rate limits, moderation and human approval; no synthetic engagement or account farms."
+  },
+  {
+    "state": "backend",
+    "module": "13 · Omnichannel dispatcher",
+    "files": "omnichannel_dispatcher.js; jarvis-omnichannel-hud.tsx",
+    "purpose": "Adapt reviewed assets for supported social channels and keep a publication ledger.",
+    "notes": "Official adapters, platform-specific payload validation, consent, retry/idempotency and explicit publish approval required."
+  },
+  {
+    "state": "backend",
+    "module": "14 · WordPress Gutenberg / REST",
+    "files": "WordPress REST draft references; Gutenberg linker",
+    "purpose": "Convert approved story/media packages into WordPress drafts.",
+    "notes": "The current button simulates a queue only. Add a server-side draft connector with a dedicated account and duplicate-post protection."
+  },
+  {
+    "state": "backend",
+    "module": "15 · n8n secure dispatch / Kaggle relay",
+    "files": "n8n_secure_dispatcher.js; n8n_kaggle_relay.js; n8n_wf_kaggle_relay.json; jarvis_kaggle_worker.py",
+    "purpose": "Dispatch render/sync work asynchronously and receive verified completion callbacks.",
+    "notes": "Add HMAC, timestamp freshness, idempotency, payload allowlist, job TTL, result checks and an explicit opt-in remote compute policy."
+  },
+  {
+    "state": "ui",
+    "module": "16 · Self-healing logger",
+    "files": "self_healing_logger.js; src/lib/self_healing_logger.js; jarvis-healing-terminal.tsx",
+    "purpose": "Cluster errors, propose fixes, retry transient failures and quarantine bad routes.",
+    "notes": "Logs and fixes are sample entries. Auto-heal only bounded retries/circuit breakers; code/schema patches require tests, branch review and rollback."
+  },
+  {
+    "state": "backend",
+    "module": "17 · Daily report daemon",
+    "files": "daily_report_daemon.js; src/lib/daily_report_daemon.js",
+    "purpose": "Summarize jobs, incidents, sync state and review items on a schedule.",
+    "notes": "Use a real scheduler, time-zone-aware timestamps, delivery status and persisted report history."
+  },
+  {
+    "state": "backend",
+    "module": "18 · GitHub / NotebookLM knowledge sync",
+    "files": "notebooklm_github_sync.js; src/lib/notebooklm_github_sync.js",
+    "purpose": "Collect repository metadata and source notes for grounded research.",
+    "notes": "GitHub is a configured source link only. NotebookLM has no verified automated connector here; use supported/manual workflows and cite source revision IDs."
+  },
+  {
+    "state": "backend",
+    "module": "19 · Yellow Pages / catalog ingestor",
+    "files": "catalog_ingestor.js; src/lib/catalog_ingestor.js; ingest/apis.txt",
+    "purpose": "Normalize public tool/API links, categorize records and detect duplicates.",
+    "notes": "Validate URLs, schemas, licenses and source provenance; never execute scripts just because a catalog listed them."
+  },
+  {
+    "state": "backend",
+    "module": "20 · MCP ingestion core",
+    "files": "mcp_ingestion_core.js; src/lib/mcp_ingestion_core.js; jarvis-mcp-hud.tsx",
+    "purpose": "Register tool connectors and validate their manifests/permissions.",
+    "notes": "Implement explicit tool grants, schema-bound arguments, timeouts, sandboxing, audit logs and connector disable switches."
+  },
+  {
+    "state": "backend",
+    "module": "21 · Daily news / algorithm analyzer",
+    "files": "news_algorithm_analyzer.js; jarvis-predictive-shield.tsx",
+    "purpose": "Monitor approved release notes, changelogs and security advisories.",
+    "notes": "Use curated RSS/API sources, publish dates, links and human-reviewable summaries. Do not auto-mutate browser stealth or access-control evasion logic."
+  },
+  {
+    "state": "backend",
+    "module": "22 · Local edge cache",
+    "files": "local_edge_cache.js; src/lib/local_edge_cache.js",
+    "purpose": "Cache local state and support bounded offline work.",
+    "notes": "Define cache invalidation, TTL, conflict rules and encryption needs; volatile RAM is not durable storage."
+  },
+  {
+    "state": "backend",
+    "module": "23 · Swarm / cross-platform sync",
+    "files": "swarm_sync_daemon.js; cross_platform_sync.js; src/components/jarvis-sync-hud.tsx",
+    "purpose": "Replicate checkpoints and approved records across configured nodes.",
+    "notes": "Requires database schema, idempotent batches, conflict resolution, checksums and restore drills. No DB is connected in preview."
+  },
+  {
+    "state": "backend",
+    "module": "24 · Chrono backup / SQL snapshots",
+    "files": "chrono_backup_daemon.js; quantum_state_snap_init.sql; chrono_snap_04AM_17621.sql; chrono_snap_04AM_stable.sql",
+    "purpose": "Schedule snapshots and recover from a verified known-good state.",
+    "notes": "Do not trust SQL snippets as applied migrations. Backups need retention, restricted access, checksum and an actual restore test."
+  },
+  {
+    "state": "backend",
+    "module": "25 · Synaptic heartbeat bridge",
+    "files": "synaptic_heartbeat_bridge.js; jarvis-synaptic-hud.tsx",
+    "purpose": "Track service heartbeats and detect stale workers.",
+    "notes": "Use a real health endpoint and last-seen timestamp, plus missed-heartbeat thresholds and alert deduplication."
+  },
+  {
+    "state": "backend",
+    "module": "26 · Master hardware router",
+    "files": "master_hardware_router.js; jarvis-hardware-telemetry",
+    "purpose": "Assign authorized tasks by available CPU/GPU/memory capability.",
+    "notes": "Require opt-in agents, actual metrics, resource quotas and load shedding; no hardware values are live in this UI."
+  },
+  {
+    "state": "backend",
+    "module": "27 · Intranet compute router",
+    "files": "intranet_compute_router.js; jarvis-intranet-hud.tsx",
+    "purpose": "Route jobs to explicitly enrolled nodes on a trusted network.",
+    "notes": "Mutual authentication, node allowlisting, health checks, job budgets and outbound firewall rules are required."
+  },
+  {
+    "state": "backend",
+    "module": "28 · Cloud environment connector",
+    "files": "cloud_env_connector.js; src/lib/cloud_env_connector.js",
+    "purpose": "Connect approved cloud resources and read available capacity/quotas.",
+    "notes": "Use provider IAM roles, budget alerts and policy-compliant workloads. Cloud credits are not permission for unrelated compute/mining."
+  },
+  {
+    "state": "backend",
+    "module": "29 · Sandbox mesh engine",
+    "files": "sandbox_mesh_engine.js; jarvis-sandbox-hud.tsx",
+    "purpose": "Run risky imports/tests in isolated, resource-limited environments.",
+    "notes": "Containers need read-only mounts, no ambient credentials, network restrictions, process limits and destruction after task completion."
+  },
+  {
+    "state": "backend",
+    "module": "30 · Streaming telemetry / remote workers",
+    "files": "stream_mining_telemetry.py; stream.py; jarvis-stream-hud.tsx",
+    "purpose": "Display authorized worker/job state through a streaming channel.",
+    "notes": "Build authenticated SSE/WebSocket telemetry with backpressure and redaction. Mining-specific automation is separately gated below."
+  },
+  {
+    "state": "review",
+    "module": "31 · OmniRoute financial engine",
+    "files": "omniroute_fin_engine.js; jarvis-omniroute-hud.tsx",
+    "purpose": "Concept for routing financial operations and monitoring balances.",
+    "notes": "No profit/yield is demonstrated. Any finance integration needs explicit scope, read-only defaults, real quotes, risk disclosure and human authorization for transactions."
+  },
+  {
+    "state": "restricted",
+    "module": "32 · Crypto faucet engines / brokers",
+    "files": "crypto_faucet_engine.js; maximized_faucet_engine.js; maximized_faucet_broker.js; adaptive_faucet_pipeline.js",
+    "purpose": "Automated faucet/link discovery and payout collection concept.",
+    "notes": "Not built as claim automation or anti-bot evasion. Safe alternative: a reviewed directory of legitimate reward programs and manual, terms-compliant tracking."
+  },
+  {
+    "state": "restricted",
+    "module": "33 · Mining / unMineable control",
+    "files": "unmineable_orchestrator.js; miner_control.py; jarvis-mining-hud.tsx",
+    "purpose": "Mining-worker management and telemetry concept.",
+    "notes": "No silent mining or use of third-party/cloud credits without authorization. Any later authorized lab requires cost caps, explicit opt-in and clear stop controls."
+  },
+  {
+    "state": "review",
+    "module": "34 · Proxy / gateway health monitor",
+    "files": "notrack_gateway.js; proxy_health_monitor.js; rotate_cgnat_ips.sh; docker-compose.proxy.yml",
+    "purpose": "Network reachability, proxy diagnostics and fallback routing.",
+    "notes": "Implement observable health checks and normal retry/backoff. IP rotation to evade bans, rate limits or access controls is excluded."
+  },
+  {
+    "state": "review",
+    "module": "35 · Shadow-ban sentinel",
+    "files": "shadow_ban_sentinel.js; jarvis-immunity-hud.tsx",
+    "purpose": "Original text describes platform enforcement/detection monitoring.",
+    "notes": "Replace evasion with platform-policy compliance metrics, account health alerts, appeal guidance and conservative rate limits."
+  },
+  {
+    "state": "restricted",
+    "module": "36 · CAPTCHA learning / bypass hub",
+    "files": "captcha_learning_core.js; bypass_hub_v2_patch.ts",
+    "purpose": "Source describes solving or bypassing third-party access challenges.",
+    "notes": "No CAPTCHA bypass or anti-bot circumvention. Support accessible, authorized UI testing and official API routes instead."
+  },
+  {
+    "state": "review",
+    "module": "37 · Visual agent eyes / MCP Vision",
+    "files": "visual_agent_eyes.js; mcp_vision_router.js; layout_decoder.js",
+    "purpose": "Visual UI inspection and layout/control recognition.",
+    "notes": "Can help inspect owned/authorized interfaces, visual regressions and accessibility. No CAPTCHA solving, stealth clicking or protected-flow automation."
+  },
+  {
+    "state": "review",
+    "module": "38 · Identity vault / inbox orchestration",
+    "files": "jarvis-identity-vault.tsx; ingest/identities.txt; persona/inbox snippets",
+    "purpose": "Identity/persona configuration and email-validation ideas.",
+    "notes": "Use service-account references and role profiles; do not generate fake platform personas, intercept third-party OTPs or evade account verification."
+  },
+  {
+    "state": "backend",
+    "module": "39 · Algorithm matrix / A/B testing",
+    "files": "camofox_algorithmic_matrix.js; camofox_ab_tester.js",
+    "purpose": "Compare variants and learn from controlled task outcomes.",
+    "notes": "Use ethical experiments, approved test accounts/data and transparent metrics. Do not mutate fingerprints to defeat platform detection."
+  },
+  {
+    "state": "backend",
+    "module": "40 · Variance lifecycle / swarm evolution",
+    "files": "variance_lifecycle_engine.js; swarm_evolution_controller.js",
+    "purpose": "Manage controlled version changes to role templates and agent strategies.",
+    "notes": "Version, diff, test and review every strategy update; no unreviewed self-modification or deployment into production."
+  }
+]

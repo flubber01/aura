@@ -1,0 +1,8 @@
+# AURA role registry / department templates
+# Format: role | department | description
+# NO credentials, tokens or personal data in this file (see inventory safety rules).
+researcher | Research | Collects and summarizes approved sources with citations
+editor | Editorial | Turns approved material into reviewed, publishable drafts
+analyst | Analytics | Validates metrics and flags anomalies for human review
+operator | Operations | Executes approved maintenance tasks with audit trail
+reviewer | Compliance | Final human sign-off before any publication or external action

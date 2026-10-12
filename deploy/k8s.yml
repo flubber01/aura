@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: aura-backend }
+spec:
+  replicas: 3   # bundled across the collective
+  selector: { matchLabels: { app: aura-backend } }
+  template:
+    metadata: { labels: { app: aura-backend } }
+    spec:
+      containers:
+        - name: backend
+          image: node:22-alpine
+          command: ["node", "backend/server.js"]
+          workingDir: /app
+          ports: [{ containerPort: 8080 }]
+          readinessProbe: { httpGet: { path: /api/health, port: 8080 }, periodSeconds: 10 }
+          resources:
+            limits: { cpu: "1", memory: 512Mi }
+          volumeMounts: [{ name: app, mountPath: /app, readOnly: true }]
+      volumes:
+        - name: app
+          emptyDir: {}   # replace with your image/GitRepo source in production
+---
+apiVersion: v1
+kind: Service
+metadata: { name: aura-backend }
+spec:
+  selector: { app: aura-backend }
+  ports: [{ port: 8080, targetPort: 8080 }]

@@ -1,0 +1,84 @@
+{
+  "failures": {
+    "syntax:teams.json": {
+      "fingerprint": "syntax:teams.json",
+      "first_at": "2026-10-10T16:16:07.871Z",
+      "last_at": "2026-10-10T16:16:10.874Z",
+      "occurrences": 2,
+      "strategy": "rollback_last_good",
+      "resolved": true,
+      "blocked": 1,
+      "context": {
+        "error": "Unexpected non-whitespace character after JSON at position 2365 (line 36 column 1)"
+      }
+    },
+    "drill:simulated_fault_1": {
+      "fingerprint": "drill:simulated_fault_1",
+      "first_at": "2026-10-10T16:16:28.628Z",
+      "last_at": "2026-10-12T03:47:16.854Z",
+      "occurrences": 5,
+      "strategy": "log_and_audit",
+      "resolved": true,
+      "blocked": 4,
+      "context": {
+        "drill": true
+      }
+    },
+    "drill:simulated_fault_0": {
+      "fingerprint": "drill:simulated_fault_0",
+      "first_at": "2026-10-10T16:22:17.193Z",
+      "last_at": "2026-10-10T22:13:41.760Z",
+      "occurrences": 3,
+      "strategy": "log_and_audit",
+      "resolved": true,
+      "blocked": 2,
+      "context": {
+        "drill": true
+      }
+    },
+    "drill:simulated_fault_2": {
+      "fingerprint": "drill:simulated_fault_2",
+      "first_at": "2026-10-10T22:04:46.233Z",
+      "last_at": "2026-10-10T22:04:46.233Z",
+      "occurrences": 1,
+      "strategy": "log_and_audit",
+      "resolved": true,
+      "blocked": 0,
+      "context": {
+        "drill": true
+      }
+    }
+  },
+  "curve": [],
+  "generation": 0,
+  "event_count": 11,
+  "weights": {
+    "restore_from_vault": {
+      "uses": 0,
+      "ok": 0
+    },
+    "rollback_last_good": {
+      "uses": 2,
+      "ok": 2
+    },
+    "quarantine_module": {
+      "uses": 0,
+      "ok": 0
+    },
+    "log_and_audit": {
+      "uses": 9,
+      "ok": 9
+    },
+    "cache_drop_retry": {
+      "uses": 0,
+      "ok": 0
+    }
+  },
+  "totals": {
+    "occurrences": 11,
+    "novel": 4,
+    "recurrences": 7,
+    "blocked": 7,
+    "fixes_applied": 11
+  }
+}
