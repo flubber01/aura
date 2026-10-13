@@ -396,6 +396,7 @@ function consolePageHtml() {
 ${rows}
 </tbody></table>
 <p class="sub">Restricted modules (32, 33, 36) refuse every call with 403 — policy block, not a missing implementation.</p>
+${require('./pages/ext_modules_block')()}
 </div></body></html>`;
 }
 
@@ -798,6 +799,49 @@ const server = http.createServer(async (req, res) => {
         counts: { modules: modules.length, integrations: integrations.integrations.length, artifacts: Object.keys(ARTIFACTS).length },
         endpoints: ['/api/health', '/api/integrations', '/api/modules', '/api/modules/live', '/api/modules/:area/action/:name', '/api/report', '/api/types', '/api/skills', '/api/departments', '/api/roles', '/api/prompts', '/api/workflows', '/api/xrefs', '/api/brain', '/api/master', '/api/downloads', '/api/download/:name', '/console', '/brain', '/master', '/skills', '/downloads'],
       }));
+    }
+    // ---- Erweiterungsmodule (Manifest, Freigabe, Lebenszyklus). Schreibend nur mit Admin-Token. ----
+    if (p === '/api/modules/ext' && req.method === 'GET') {
+      return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/module_loader').list(), null, 2));
+    }
+    if (p.startsWith('/api/modules/ext')) {
+      const L = require('./src/lib/module_loader');
+      const extSend = (r) => send(res, r.status || (r.ok ? 200 : 400), 'application/json', JSON.stringify(r, null, 2));
+      const adminOk = () => { const t = process.env.AURA_ADMIN_TOKEN || ''; return !!t && req.headers['x-aura-token'] === t; };
+      const deny = () => send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig (AURA_ADMIN_TOKEN gesetzt und Header x-aura-token)' }));
+      if (p === '/api/modules/ext/discover' && req.method === 'POST') {
+        if (!adminOk()) return deny();
+        return extSend(await L.reload());
+      }
+      const em = p.match(/^\/api\/modules\/ext\/([a-z][a-z0-9-]{1,40})(\/[a-z_]+(?:\/[a-z][a-z0-9_]{1,40})?)?$/);
+      if (!em) return send(res, 404, 'application/json', JSON.stringify({ ok: false, error: 'unbekannter Modul-Endpunkt' }));
+      const id = em[1];
+      const sub = (em[2] || '').slice(1);
+      if (!sub) {
+        if (req.method !== 'GET') return send(res, 405, 'application/json', JSON.stringify({ ok: false, error: 'nur GET' }));
+        const v = L.get(id);
+        return v ? send(res, 200, 'application/json', JSON.stringify(v, null, 2)) : send(res, 404, 'application/json', JSON.stringify({ ok: false, error: 'Modul nicht gefunden' }));
+      }
+      if (req.method !== 'POST') return send(res, 405, 'application/json', JSON.stringify({ ok: false, error: 'nur POST' }));
+      if (!adminOk()) return deny();
+      let body = {};
+      try { body = JSON.parse((await readBody(req, 1e5)) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      if (sub === 'approve') return extSend(L.approve(id, body));
+      if (sub === 'enable') return extSend(await L.enable(id, body));
+      if (sub === 'disable') return extSend(await L.disable(id, body));
+      if (sub === 'config') {
+        const r = L.setConfig(id, body);
+        if (r.ok && L.get(id) && L.get(id).enabled) await L.start(id);
+        const fresh = L.get(id);
+        return extSend({ ...r, status_detail: fresh ? fresh.status : r.status_detail });
+      }
+      if (sub === 'health') return extSend(await L.health(id));
+      const am = sub.match(/^action\/([a-z][a-z0-9_]{1,40})$/);
+      if (am) {
+        if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ ok: false, error: 'KILL SWITCH ENGAGED — Modul-Aktionen gesperrt' }));
+        return extSend(await L.execute(id, am[1], body.input));
+      }
+      return send(res, 404, 'application/json', JSON.stringify({ ok: false, error: 'unbekannter Endpunkt' }));
     }
     if (p === '/api/modules/live') {
       return send(res, 200, 'application/json', JSON.stringify({ counts: registry.counts(), modules: registry.status() }, null, 2));
@@ -1408,6 +1452,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => { try { require('./src/lib/ultra_scout').startDaily(); } catch (e) { console.error('ultra_scout: ' + e.message); }
+  try { const L = require('./src/lib/module_loader'); L.discover(); L.startEnabled().catch((e) => console.error('module start: ' + e.message)); } catch (e) { console.error('module loader: ' + e.message); }
   require('./src/lib/escalation').setNotifier(require('./src/lib/notify').notifyEmergency); // Notfall: Telegram/SMS/Anruf, nur wenn konfiguriert
   require('./src/lib/autonomy_loop').start(); // self-healing loop + swarm strategy + learning curve
   ops.startScheduler(); // 12h super-brain autosave · 4h others · 24h full sync

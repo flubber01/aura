@@ -103,6 +103,8 @@ async function main() {
   await checkApi('/api/health', j((d) => d.status === 'ok' || 'health.status missing'));
   await checkApi('/api/modules', j((d) => Array.isArray(d) || 'not array'));
   await checkApi('/api/modules/live');
+  await checkApi('/api/modules/ext', (j) => Array.isArray(j.modules) || 'modules');
+  await checkApi('/api/channels', (j) => Array.isArray(j.channels) || 'channels');
   await checkApi('/api/integrations');
   await checkApi('/api/types');
   await checkApi('/api/skills');

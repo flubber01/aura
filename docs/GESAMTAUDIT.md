@@ -431,3 +431,13 @@ Weitere Detaildokumente: `ARCHITECTURE.md`, `SETUP.md`, `DEPLOYMENT.md`, `CONFIG
 - **Abschalten**: `AURA_ULTRA_SCOUT=0`. Optionaler Token: `GITHUB_TOKEN`, sonst gelten die niedrigen unauthentifizierten Limits.
 - **Routen**: `GET /api/ultra/proposals`, `POST /api/ultra/scout/run` (Admin), `POST /api/ultra/proposals/UP-xxxxxx/decide` (Admin, Body `{decision: approve|reject, by}`).
 - **Tests**: `test/channel_ultra.test.js` 11/11, `youtube_pipeline` 11/11, `creator_import` 11/11, `validate.js` 135/0.
+
+### Modul-Schnittstelle (Erweiterungen)
+
+- Vollständige Spezifikation: `docs/MODULE_SPEC.md` (Manifest, Lebenszyklus, Vertrag, Rechte, Konfiguration, API, Grenzen).
+- Loader: `backend/src/lib/module_loader.js`, Manifest-Prüfung: `backend/src/lib/module_manifest.js`.
+- Module liegen unter `backend/modules/<ordner>/`. Beispiele: `example-hello`, `example-echo-integration`.
+- Registry: Erweiterungen werden ergänzt (`registry.status()` mit `mode: module`). Die 40 bestehenden Bereiche bleiben unverändert.
+- Routen: `GET /api/modules/ext`, `POST /api/modules/ext/...` (Admin-Token). Oberfläche: Block „Erweiterungsmodule“ in `/console`.
+- Tests: `test/module_loader.test.js` 21/21. `validate.js` 137/0.
+- Offen: echte Prozess-Isolation, Netzwerksperre, Signaturprüfung, Paket-Updates.
