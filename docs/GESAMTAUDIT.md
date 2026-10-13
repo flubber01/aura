@@ -401,3 +401,12 @@ Basis `main`: `2e407b0` (Merge von PR #1).
 - Alte Routen `/api/skills` (13 Einträge, Registry) und neue `/api/skill-catalog` (232 Einträge) stehen nebeneinander. Die Konsole nutzt `/api/skills`.
 
 Weitere Detaildokumente: `ARCHITECTURE.md`, `SETUP.md`, `DEPLOYMENT.md`, `CONFIGURATION.md`, `RUNBOOK.md`, `BOARD-JARVIS.md`, `CONTROL.md`, `UPLOAD.md`, `SKILLS.md`, `GROWTH.md`, `INTEGRATIONS.md`, `DATABASE.md`, `MODULES.md` (im Ordner `docs/`).
+
+## YouTube-Pipeline und Creator-Beobachtung (Task 34)
+
+- **Creator-Liste**: `backend/data/creators.json` (modular, von Hand erweiterbar). Felder: `id`, `name`, `platform` (youtube, x, tiktok, instagram, website, newsletter, telegram, other), `url` (nur https), `website`, `topics`, `enabled`, `watch`, `note`. Prüfung in `backend/src/lib/creator_watch.js`. Es gibt keinen automatischen Abruf. Beobachtung nur öffentlich über offizielle API oder RSS, nie per Login, nie mit Umgehung.
+- **Pipeline**: `backend/src/lib/youtube_pipeline.js`. Stufen: Recherche, Skript, Produktion, Metadaten, Thumbnail-Brief, Freigabe (Mensch), Upload als privat, Veröffentlichung (Mensch), Auswertung.
+- **Prüfregeln**: Titel 1–100 Zeichen, Beschreibung höchstens 5000 Bytes, Tags höchstens 500 Zeichen, KI-Kennzeichnung bei synthetischen Inhalten, keine Angebote für gekaufte Views, Abos oder Likes, keine Werbung für Mod-Apps. Uploads ohne menschliche Freigabe werden abgelehnt.
+- **Routen**: `GET /api/creators?platform&topic&enabled`, `GET /api/youtube/plan?topic&creators=a,b`, `POST /api/youtube/check` (Admin-Token nötig, `mode: "check"` oder `"upload"`). Der Upload-Modus baut nur den Körper für `videos.insert` und sendet nichts.
+- **Offen**: Echte Anbindung an die YouTube Data API (OAuth-Zugang), automatischer Creator-Abruf, KI-Kennzeichnungsfeld gegen aktuelle API-Doku prüfen. Eine Seite im Browser fehlt noch.
+- **Tests**: `test/youtube_pipeline.test.js` 11/11.

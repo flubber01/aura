@@ -858,6 +858,24 @@ const server = http.createServer(async (req, res) => {
       const results = require('./src/lib/music_studio').skills(sp.get('q') || '', sp.get('limit') || 20);
       return send(res, 200, 'application/json', JSON.stringify({ q: sp.get('q') || '', results }, null, 2));
     }
+    if (p === '/api/creators' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      const cw = require('./src/lib/creator_watch');
+      return send(res, 200, 'application/json', JSON.stringify({ platform: sp.get('platform') || '', topic: sp.get('topic') || '', creators: cw.list({ platform: sp.get('platform') || '', topic: sp.get('topic') || '', enabled: sp.get('enabled') || '' }), check: cw.check() }, null, 2));
+    }
+    if (p === '/api/youtube/plan' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/youtube_pipeline').plan({ topic: sp.get('topic') || '', creator_ids: (sp.get('creators') || '').split(',').filter(Boolean) }), null, 2));
+    }
+    if (p === '/api/youtube/check' && req.method === 'POST') {
+      // Trockenlauf: Metadaten prüfen oder Upload-Körper bauen. Sendet nie etwas an YouTube.
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (!adminToken || req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig (Header x-aura-token, AURA_ADMIN_TOKEN muss gesetzt sein)' }));
+      let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const yt = require('./src/lib/youtube_pipeline');
+      const out = body.mode === 'upload' ? yt.uploadBody(body.meta || {}, { approvedBy: body.approved_by || '' }) : yt.checkMeta(body.meta || {});
+      return send(res, 200, 'application/json', JSON.stringify(out, null, 2));
+    }
     if (p === '/yellowpages') return send(res, 200, 'text/html; charset=utf-8', pages.yellowpages());
     if (p === '/deploy') return send(res, 200, 'text/html; charset=utf-8', pages.deploy());
     if (p === '/cluster') return send(res, 200, 'text/html; charset=utf-8', pages.cluster());
