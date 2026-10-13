@@ -11,3 +11,15 @@ deploy/.env
 
 # tooling
 node_modules/
+
+# Phase 2 growth runtime (WF-18 / WF-19 / analytics) — never commit
+backend/src/data/growth.json
+backend/src/data/growth.json.tmp
+
+# Agent Board runtime (stored in growth.json) — never commit
+
+# Steuerzentrale (Schalter, Freigaben) — Laufzeit, never commit
+backend/src/data/control.json
+backend/data/ultra_proposals.json
+backend/data/module_state.json
+backend/data/module_config.json

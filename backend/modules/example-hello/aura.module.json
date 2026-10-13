@@ -1,0 +1,31 @@
+{
+  "id": "example-hello",
+  "name": "Beispiel: Hallo-Modul",
+  "version": "1.0.0",
+  "description": "Minimales Beispielmodul für die Modul-Schnittstelle. Zeigt Manifest, Konfiguration, Aktion, Rechte und Health-Check.",
+  "author": "AURA",
+  "type": "module",
+  "entry": "index.js",
+  "permissions": ["registry:read", "audit:write"],
+  "configSchema": {
+    "greeting": { "type": "string", "default": "Hallo", "description": "Begrüßungstext" },
+    "shout": { "type": "boolean", "default": false, "description": "In Großbuchstaben ausgeben" }
+  },
+  "capabilities": [
+    {
+      "name": "greet",
+      "description": "Gibt eine Begrüßung zurück und protokolliert sie im Audit.",
+      "permissions": ["audit:write"],
+      "input": { "name": { "type": "string", "required": true } }
+    },
+    {
+      "name": "count_modules",
+      "description": "Zählt die Einträge in der Registry (nur lesen).",
+      "permissions": ["registry:read"],
+      "input": {}
+    }
+  ],
+  "dependencies": [{ "service": "registry" }],
+  "healthCheck": true,
+  "timeoutMs": 5000
+}

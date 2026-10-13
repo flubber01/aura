@@ -1,0 +1,264 @@
+{
+  "services": [
+    {
+      "id": "area-71-imagegen",
+      "name": "area-71-imagegen",
+      "kind": "internal",
+      "installed": true,
+      "enabled": true,
+      "addedBy": "system",
+      "url": ""
+    },
+    {
+      "id": "area-62-research",
+      "name": "area-62-research",
+      "kind": "internal",
+      "installed": true,
+      "enabled": true,
+      "addedBy": "system",
+      "url": ""
+    },
+    {
+      "id": "area-63-seo",
+      "name": "area-63-seo",
+      "kind": "internal",
+      "installed": true,
+      "enabled": true,
+      "addedBy": "system",
+      "url": ""
+    },
+    {
+      "id": "area-73-forge",
+      "name": "area-73-forge",
+      "kind": "internal",
+      "installed": true,
+      "enabled": true,
+      "addedBy": "system",
+      "url": "",
+      "last_probe": {
+        "at": "2026-10-12T11:16:16.210Z",
+        "up": true,
+        "detail": "3 content items"
+      }
+    },
+    {
+      "id": "area-72-mcp",
+      "name": "area-72-mcp",
+      "kind": "internal",
+      "installed": true,
+      "enabled": true,
+      "addedBy": "system",
+      "url": ""
+    },
+    {
+      "id": "area-70-modulehub",
+      "name": "area-70-modulehub",
+      "kind": "internal",
+      "installed": true,
+      "enabled": true,
+      "addedBy": "system",
+      "url": ""
+    },
+    {
+      "id": "area-08-kids-story",
+      "name": "area-08-kids-story",
+      "kind": "internal",
+      "installed": true,
+      "enabled": true,
+      "addedBy": "system",
+      "url": ""
+    },
+    {
+      "id": "area-17-report",
+      "name": "area-17-report",
+      "kind": "internal",
+      "installed": true,
+      "enabled": true,
+      "addedBy": "system",
+      "url": ""
+    },
+    {
+      "id": "anythingllm-local-rag-",
+      "name": "AnythingLLM (local RAG)",
+      "kind": "http",
+      "url": "http://127.0.0.1:3001",
+      "health_path": "",
+      "installed": false,
+      "enabled": false,
+      "addedBy": "user",
+      "addedAt": "2026-10-12T08:38:23.777Z"
+    },
+    {
+      "id": "aio-sandbox-container",
+      "name": "aio-sandbox Container",
+      "kind": "http",
+      "url": "http://127.0.0.1:10000",
+      "health_path": "",
+      "installed": false,
+      "enabled": false,
+      "addedBy": "user",
+      "addedAt": "2026-10-12T08:38:23.779Z"
+    },
+    {
+      "id": "excalidraw-self-host-",
+      "name": "Excalidraw (self-host)",
+      "kind": "http",
+      "url": "http://127.0.0.1:3000",
+      "health_path": "",
+      "installed": false,
+      "enabled": false,
+      "addedBy": "user",
+      "addedAt": "2026-10-12T08:38:23.780Z"
+    },
+    {
+      "id": "openmausbot-harness",
+      "name": "OpenMausBot Harness",
+      "kind": "http",
+      "url": "http://127.0.0.1:8799",
+      "health_path": "",
+      "installed": false,
+      "enabled": false,
+      "addedBy": "user",
+      "addedAt": "2026-10-12T08:38:23.781Z"
+    }
+  ],
+  "modes": {
+    "safe": false,
+    "creative": true,
+    "quiet": false
+  },
+  "usage": {
+    "area-73-forge": {
+      "calls": 21,
+      "last": "2026-10-12T11:16:16.210Z",
+      "events": [
+        {
+          "at": "2026-10-12T11:16:16.210Z",
+          "what": "probe:up"
+        },
+        {
+          "at": "2026-10-12T11:14:54.927Z",
+          "what": "probe:up"
+        },
+        {
+          "at": "2026-10-12T11:14:34.881Z",
+          "what": "probe:up"
+        },
+        {
+          "at": "2026-10-12T09:39:49.716Z",
+          "what": "probe:up"
+        },
+        {
+          "at": "2026-10-12T09:17:31.703Z",
+          "what": "probe:up"
+        },
+        {
+          "at": "2026-10-12T08:51:55.914Z",
+          "what": "probe:up"
+        },
+        {
+          "at": "2026-10-12T08:46:48.046Z",
+          "what": "probe:up"
+        },
+        {
+          "at": "2026-10-12T08:39:54.763Z",
+          "what": "probe:up"
+        },
+        {
+          "at": "2026-10-12T08:15:07.983Z",
+          "what": "probe:up"
+        },
+        {
+          "at": "2026-10-12T08:06:46.830Z",
+          "what": "probe:up"
+        }
+      ]
+    },
+    "mode:safe": {
+      "calls": 42,
+      "last": "2026-10-12T11:16:16.219Z",
+      "events": [
+        {
+          "at": "2026-10-12T11:16:16.219Z",
+          "what": "off"
+        },
+        {
+          "at": "2026-10-12T11:16:16.217Z",
+          "what": "on"
+        },
+        {
+          "at": "2026-10-12T11:14:54.937Z",
+          "what": "off"
+        },
+        {
+          "at": "2026-10-12T11:14:54.935Z",
+          "what": "on"
+        },
+        {
+          "at": "2026-10-12T11:14:34.892Z",
+          "what": "off"
+        },
+        {
+          "at": "2026-10-12T11:14:34.889Z",
+          "what": "on"
+        },
+        {
+          "at": "2026-10-12T09:39:49.724Z",
+          "what": "off"
+        },
+        {
+          "at": "2026-10-12T09:39:49.722Z",
+          "what": "on"
+        },
+        {
+          "at": "2026-10-12T09:17:31.710Z",
+          "what": "off"
+        },
+        {
+          "at": "2026-10-12T09:17:31.709Z",
+          "what": "on"
+        }
+      ]
+    },
+    "anythingllm-local-rag-": {
+      "calls": 1,
+      "last": "2026-10-12T08:38:23.777Z",
+      "events": [
+        {
+          "at": "2026-10-12T08:38:23.777Z",
+          "what": "added"
+        }
+      ]
+    },
+    "aio-sandbox-container": {
+      "calls": 1,
+      "last": "2026-10-12T08:38:23.779Z",
+      "events": [
+        {
+          "at": "2026-10-12T08:38:23.779Z",
+          "what": "added"
+        }
+      ]
+    },
+    "excalidraw-self-host-": {
+      "calls": 1,
+      "last": "2026-10-12T08:38:23.780Z",
+      "events": [
+        {
+          "at": "2026-10-12T08:38:23.780Z",
+          "what": "added"
+        }
+      ]
+    },
+    "openmausbot-harness": {
+      "calls": 1,
+      "last": "2026-10-12T08:38:23.781Z",
+      "events": [
+        {
+          "at": "2026-10-12T08:38:23.781Z",
+          "what": "added"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,1000 @@
+{
+  "items": [
+    {
+      "id": "ct-63a2d0",
+      "type": "article",
+      "brief": "[article studio] zz sweep heimserver",
+      "title": "[article studio] zz sweep heimserver",
+      "body": "# [article studio] zz sweep heimserver\n\nEinleitung: Dieser Text ist ein AUTO-DRAFT der AURA Content Forge (lokale Vorlagen-Engine, kein externes LLM verbunden). Abschnitt 1 ordnet das Thema ein, Abschnitt 2 liefert Kernpunkte, Abschnitt 3 fasst zusammen.\n\n## Kernpunkte\n- Punkt 1 zu „[article studio] zz sweep heimserver“\n- Punkt 2: Einordnung & Kontext\n- Punkt 3: Nächste Schritte\n\n## Fazit\nRedaktionelle Endprüfung durch einen Menschen erforderlich (Gate WF-7).",
+      "status": "draft",
+      "labels": [
+        "AUTO-DRAFT",
+        "LOCAL-TEMPLATE-ENGINE"
+      ],
+      "pipeline": [
+        "research_minion: brief zerlegen + Faktenlage",
+        "writer_minion: Rohfassung",
+        "editor_minion: Stil + Klarheit",
+        "qa_minion: Fakten-/Sicherheitscheck",
+        "gate: menschliche Freigabe"
+      ],
+      "workers": [
+        "minion_researcher",
+        "minion_copywriter",
+        "minion_editor",
+        "minion_qa_engineer"
+      ],
+      "versions": [],
+      "createdBy": "forge/auto",
+      "createdAt": "2026-10-12T11:16:16.235Z",
+      "updatedAt": "2026-10-12T11:16:16.235Z",
+      "workflow_ref": "WF-7"
+    },
+    {
+      "id": "ct-425445",
+      "type": "story",
+      "brief": "[book studio] zz sweep der kleine stern",
+      "title": "[book studio] zz sweep der kleine stern",
+      "body": "Es war einmal ein Team, das „[book studio] zz sweep der kleine stern“ verstehen wollte. Mit jedem Versuch lernten die kleinen Helfer mehr — und am Ende wussten sie: Ehrlichkeit macht jede Geschichte stärker.\n\n(AUTO-DRAFT · kindgerechte Vorlage · Area 08 Filter aktiv · menschliche Prüfung nötig)",
+      "status": "draft",
+      "labels": [
+        "AUTO-DRAFT",
+        "LOCAL-TEMPLATE-ENGINE"
+      ],
+      "pipeline": [
+        "research_minion: brief zerlegen + Faktenlage",
+        "writer_minion: Rohfassung",
+        "editor_minion: Stil + Klarheit",
+        "qa_minion: Fakten-/Sicherheitscheck",
+        "gate: menschliche Freigabe"
+      ],
+      "workers": [
+        "minion_researcher",
+        "minion_copywriter",
+        "minion_editor",
+        "minion_qa_engineer"
+      ],
+      "versions": [],
+      "createdBy": "forge/auto",
+      "createdAt": "2026-10-12T11:16:16.233Z",
+      "updatedAt": "2026-10-12T11:16:16.233Z",
+      "workflow_ref": "WF-1"
+    },
+    {
+      "id": "ct-146224",
+      "type": "article",
+      "brief": "[pitch studio] AURA Collective",
+      "title": "[pitch studio] AURA Collective",
+      "body": "# [pitch studio] AURA Collective\n\nEinleitung: Dieser Text ist ein AUTO-DRAFT der AURA Content Forge (lokale Vorlagen-Engine, kein externes LLM verbunden). Abschnitt 1 ordnet das Thema ein, Abschnitt 2 liefert Kernpunkte, Abschnitt 3 fasst zusammen.\n\n## Kernpunkte\n- Punkt 1 zu „[pitch studio] AURA Collective“\n- Punkt 2: Einordnung & Kontext\n- Punkt 3: Nächste Schritte\n\n## Fazit\nRedaktionelle Endprüfung durch einen Menschen erforderlich (Gate WF-7).",
+      "status": "draft",
+      "labels": [
+        "AUTO-DRAFT",
+        "LOCAL-TEMPLATE-ENGINE"
+      ],
+      "pipeline": [
+        "research_minion: brief zerlegen + Faktenlage",
+        "writer_minion: Rohfassung",
+        "editor_minion: Stil + Klarheit",
+        "qa_minion: Fakten-/Sicherheitscheck",
+        "gate: menschliche Freigabe"
+      ],
+      "workers": [
+        "minion_researcher",
+        "minion_copywriter",
+        "minion_editor",
+        "minion_qa_engineer"
+      ],
+      "versions": [],
+      "createdBy": "forge/auto",
+      "createdAt": "2026-10-12T07:00:15.507Z",
+      "updatedAt": "2026-10-12T07:00:15.507Z",
+      "workflow_ref": "WF-7"
+    }
+  ],
+  "routines": [],
+  "ledger": [
+    {
+      "at": "2026-10-12T11:16:16.235Z",
+      "event": "created",
+      "item": "ct-63a2d0",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T11:16:16.233Z",
+      "event": "created",
+      "item": "ct-425445",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T11:16:16.207Z",
+      "event": "created",
+      "item": "ct-576e64",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T11:16:16.203Z",
+      "event": "modified",
+      "item": "ct-2048b9",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T11:16:16.201Z",
+      "event": "published",
+      "item": "ct-2048b9",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T11:16:16.199Z",
+      "event": "approved",
+      "item": "ct-2048b9",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T11:16:16.197Z",
+      "event": "created",
+      "item": "ct-2048b9",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T11:14:54.953Z",
+      "event": "created",
+      "item": "ct-3da913",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T11:14:54.951Z",
+      "event": "created",
+      "item": "ct-55fbd1",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T11:14:54.923Z",
+      "event": "created",
+      "item": "ct-2af6b1",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T11:14:54.919Z",
+      "event": "modified",
+      "item": "ct-a61918",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T11:14:54.917Z",
+      "event": "published",
+      "item": "ct-a61918",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T11:14:54.916Z",
+      "event": "approved",
+      "item": "ct-a61918",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T11:14:54.914Z",
+      "event": "created",
+      "item": "ct-a61918",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T11:14:34.914Z",
+      "event": "created",
+      "item": "ct-4a336d",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T11:14:34.911Z",
+      "event": "created",
+      "item": "ct-dcc880",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T11:14:34.875Z",
+      "event": "created",
+      "item": "ct-eb5805",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T11:14:34.868Z",
+      "event": "modified",
+      "item": "ct-63086e",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T11:14:34.864Z",
+      "event": "published",
+      "item": "ct-63086e",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T11:14:34.862Z",
+      "event": "approved",
+      "item": "ct-63086e",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T11:14:34.858Z",
+      "event": "created",
+      "item": "ct-63086e",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T09:39:49.742Z",
+      "event": "created",
+      "item": "ct-b1863a",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T09:39:49.739Z",
+      "event": "created",
+      "item": "ct-1d9d59",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T09:39:49.712Z",
+      "event": "created",
+      "item": "ct-8b304d",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T09:39:49.708Z",
+      "event": "modified",
+      "item": "ct-81fcf1",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T09:39:49.706Z",
+      "event": "published",
+      "item": "ct-81fcf1",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T09:39:49.705Z",
+      "event": "approved",
+      "item": "ct-81fcf1",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T09:39:49.702Z",
+      "event": "created",
+      "item": "ct-81fcf1",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T09:17:31.728Z",
+      "event": "created",
+      "item": "ct-4cf335",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T09:17:31.725Z",
+      "event": "created",
+      "item": "ct-a21146",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T09:17:31.699Z",
+      "event": "created",
+      "item": "ct-097397",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T09:17:31.696Z",
+      "event": "modified",
+      "item": "ct-93294a",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T09:17:31.694Z",
+      "event": "published",
+      "item": "ct-93294a",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T09:17:31.692Z",
+      "event": "approved",
+      "item": "ct-93294a",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T09:17:31.690Z",
+      "event": "created",
+      "item": "ct-93294a",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:51:55.936Z",
+      "event": "created",
+      "item": "ct-925045",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:51:55.934Z",
+      "event": "created",
+      "item": "ct-deb66f",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:51:55.910Z",
+      "event": "created",
+      "item": "ct-389c19",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:51:55.907Z",
+      "event": "modified",
+      "item": "ct-eb2219",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T08:51:55.905Z",
+      "event": "published",
+      "item": "ct-eb2219",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T08:51:55.904Z",
+      "event": "approved",
+      "item": "ct-eb2219",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T08:51:55.902Z",
+      "event": "created",
+      "item": "ct-eb2219",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:46:48.072Z",
+      "event": "created",
+      "item": "ct-71e62b",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:46:48.069Z",
+      "event": "created",
+      "item": "ct-9f4947",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:46:48.042Z",
+      "event": "created",
+      "item": "ct-e99c2a",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:46:48.038Z",
+      "event": "modified",
+      "item": "ct-87a0ff",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T08:46:48.036Z",
+      "event": "published",
+      "item": "ct-87a0ff",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T08:46:48.034Z",
+      "event": "approved",
+      "item": "ct-87a0ff",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T08:46:48.032Z",
+      "event": "created",
+      "item": "ct-87a0ff",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:39:54.802Z",
+      "event": "created",
+      "item": "ct-2f2691",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:39:54.798Z",
+      "event": "created",
+      "item": "ct-47b56d",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:39:54.758Z",
+      "event": "created",
+      "item": "ct-a72acc",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:39:54.754Z",
+      "event": "modified",
+      "item": "ct-54f1f1",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T08:39:54.751Z",
+      "event": "published",
+      "item": "ct-54f1f1",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T08:39:54.750Z",
+      "event": "approved",
+      "item": "ct-54f1f1",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T08:39:54.747Z",
+      "event": "created",
+      "item": "ct-54f1f1",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:15:08.012Z",
+      "event": "created",
+      "item": "ct-a751ab",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:15:08.009Z",
+      "event": "created",
+      "item": "ct-3d9839",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:15:07.978Z",
+      "event": "created",
+      "item": "ct-f2da7e",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:15:07.975Z",
+      "event": "modified",
+      "item": "ct-8687d5",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T08:15:07.973Z",
+      "event": "published",
+      "item": "ct-8687d5",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T08:15:07.971Z",
+      "event": "approved",
+      "item": "ct-8687d5",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T08:15:07.968Z",
+      "event": "created",
+      "item": "ct-8687d5",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:06:46.856Z",
+      "event": "created",
+      "item": "ct-026436",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:06:46.854Z",
+      "event": "created",
+      "item": "ct-0f0e73",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:06:46.826Z",
+      "event": "created",
+      "item": "ct-77ea73",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T08:06:46.821Z",
+      "event": "modified",
+      "item": "ct-bae965",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T08:06:46.819Z",
+      "event": "published",
+      "item": "ct-bae965",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T08:06:46.817Z",
+      "event": "approved",
+      "item": "ct-bae965",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T08:06:46.815Z",
+      "event": "created",
+      "item": "ct-bae965",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:55:12.630Z",
+      "event": "created",
+      "item": "ct-78e7a9",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:55:12.627Z",
+      "event": "created",
+      "item": "ct-3bbfe6",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:55:12.600Z",
+      "event": "created",
+      "item": "ct-94bd47",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:55:12.596Z",
+      "event": "modified",
+      "item": "ct-84d2c2",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T07:55:12.595Z",
+      "event": "published",
+      "item": "ct-84d2c2",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T07:55:12.593Z",
+      "event": "approved",
+      "item": "ct-84d2c2",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T07:55:12.591Z",
+      "event": "created",
+      "item": "ct-84d2c2",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:53:17.411Z",
+      "event": "created",
+      "item": "ct-9f9b9b",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:53:17.409Z",
+      "event": "created",
+      "item": "ct-51cf39",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:53:17.381Z",
+      "event": "created",
+      "item": "ct-7cface",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:53:17.377Z",
+      "event": "modified",
+      "item": "ct-1eb8f5",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T07:53:17.375Z",
+      "event": "published",
+      "item": "ct-1eb8f5",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T07:53:17.374Z",
+      "event": "approved",
+      "item": "ct-1eb8f5",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T07:53:17.372Z",
+      "event": "created",
+      "item": "ct-1eb8f5",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:22:53.420Z",
+      "event": "created",
+      "item": "ct-b79836",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:22:53.416Z",
+      "event": "created",
+      "item": "ct-e7e278",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:22:53.385Z",
+      "event": "created",
+      "item": "ct-448ac8",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:22:53.381Z",
+      "event": "modified",
+      "item": "ct-49fa9b",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T07:22:53.378Z",
+      "event": "published",
+      "item": "ct-49fa9b",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T07:22:53.377Z",
+      "event": "approved",
+      "item": "ct-49fa9b",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T07:22:53.374Z",
+      "event": "created",
+      "item": "ct-49fa9b",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:19:39.625Z",
+      "event": "created",
+      "item": "ct-92bd26",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:19:39.622Z",
+      "event": "created",
+      "item": "ct-e3c93f",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:19:39.570Z",
+      "event": "created",
+      "item": "ct-916c88",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:19:39.565Z",
+      "event": "modified",
+      "item": "ct-5162fd",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T07:19:39.561Z",
+      "event": "published",
+      "item": "ct-5162fd",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T07:19:39.558Z",
+      "event": "approved",
+      "item": "ct-5162fd",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T07:19:39.553Z",
+      "event": "created",
+      "item": "ct-5162fd",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:18:27.625Z",
+      "event": "created",
+      "item": "ct-83e595",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:18:27.622Z",
+      "event": "created",
+      "item": "ct-5c6727",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:18:27.588Z",
+      "event": "created",
+      "item": "ct-dcd389",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:18:27.583Z",
+      "event": "modified",
+      "item": "ct-d581d2",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T07:18:27.581Z",
+      "event": "published",
+      "item": "ct-d581d2",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T07:18:27.579Z",
+      "event": "approved",
+      "item": "ct-d581d2",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T07:18:27.576Z",
+      "event": "created",
+      "item": "ct-d581d2",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:04:47.141Z",
+      "event": "created",
+      "item": "ct-c0f581",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:04:47.138Z",
+      "event": "created",
+      "item": "ct-be2b41",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:04:47.113Z",
+      "event": "created",
+      "item": "ct-91ee83",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:04:47.110Z",
+      "event": "modified",
+      "item": "ct-ec0b9a",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T07:04:47.108Z",
+      "event": "published",
+      "item": "ct-ec0b9a",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T07:04:47.107Z",
+      "event": "approved",
+      "item": "ct-ec0b9a",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T07:04:47.105Z",
+      "event": "created",
+      "item": "ct-ec0b9a",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:04:17.214Z",
+      "event": "created",
+      "item": "ct-09f482",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:04:17.212Z",
+      "event": "created",
+      "item": "ct-8af1a3",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:04:17.185Z",
+      "event": "created",
+      "item": "ct-507152",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:04:17.181Z",
+      "event": "modified",
+      "item": "ct-711286",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T07:04:17.180Z",
+      "event": "published",
+      "item": "ct-711286",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T07:04:17.179Z",
+      "event": "approved",
+      "item": "ct-711286",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T07:04:17.177Z",
+      "event": "created",
+      "item": "ct-711286",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:03:00.018Z",
+      "event": "created",
+      "item": "ct-6bcf16",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:03:00.016Z",
+      "event": "created",
+      "item": "ct-a01533",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:02:59.989Z",
+      "event": "created",
+      "item": "ct-b21d4d",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:02:59.985Z",
+      "event": "modified",
+      "item": "ct-85739f",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T07:02:59.983Z",
+      "event": "published",
+      "item": "ct-85739f",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T07:02:59.982Z",
+      "event": "approved",
+      "item": "ct-85739f",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T07:02:59.979Z",
+      "event": "created",
+      "item": "ct-85739f",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:02:02.847Z",
+      "event": "created",
+      "item": "ct-1ad48c",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:02:02.845Z",
+      "event": "created",
+      "item": "ct-4b54c1",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:02:02.824Z",
+      "event": "created",
+      "item": "ct-55a4db",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:02:02.821Z",
+      "event": "modified",
+      "item": "ct-2344bf",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T07:02:02.820Z",
+      "event": "published",
+      "item": "ct-2344bf",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T07:02:02.819Z",
+      "event": "approved",
+      "item": "ct-2344bf",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T07:02:02.817Z",
+      "event": "created",
+      "item": "ct-2344bf",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:01:43.387Z",
+      "event": "created",
+      "item": "ct-ba1a65",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:01:43.384Z",
+      "event": "created",
+      "item": "ct-40cb4d",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:01:43.356Z",
+      "event": "created",
+      "item": "ct-b21aaa",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:01:43.351Z",
+      "event": "modified",
+      "item": "ct-b2cf50",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T07:01:43.348Z",
+      "event": "published",
+      "item": "ct-b2cf50",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T07:01:43.346Z",
+      "event": "approved",
+      "item": "ct-b2cf50",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T07:01:43.344Z",
+      "event": "created",
+      "item": "ct-b2cf50",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:00:15.507Z",
+      "event": "created",
+      "item": "ct-146224",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T07:00:15.505Z",
+      "event": "created",
+      "item": "ct-a8d1b9",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T06:47:38.209Z",
+      "event": "created",
+      "item": "ct-9f3b5c",
+      "by": "forge/auto"
+    },
+    {
+      "at": "2026-10-12T06:47:38.204Z",
+      "event": "modified",
+      "item": "ct-cc5ef6",
+      "instruction": "kürzen auf kernpunkte"
+    },
+    {
+      "at": "2026-10-12T06:47:38.202Z",
+      "event": "published",
+      "item": "ct-cc5ef6",
+      "channel": "aura-ledger",
+      "by": "human-approved"
+    },
+    {
+      "at": "2026-10-12T06:47:38.200Z",
+      "event": "approved",
+      "item": "ct-cc5ef6",
+      "by": "human"
+    },
+    {
+      "at": "2026-10-12T06:47:38.197Z",
+      "event": "created",
+      "item": "ct-cc5ef6",
+      "by": "forge/auto"
+    }
+  ]
+}

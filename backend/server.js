@@ -34,6 +34,7 @@ const store = require('./src/lib/store');
 const pages = {
   hub: require('./pages/hub'),
   pipelines: require('./pages/pipelines'),
+  studio: require('./pages/studio'),
   yellowpages: require('./pages/yellowpages'),
   deploy: require('./pages/deploy'),
   cluster: require('./pages/cluster'),
@@ -73,6 +74,19 @@ const pageContainers = require('./pages/containers');
 const jarvis = require('./src/lib/jarvis');
 const pageJarvis = require('./pages/jarvis');
 const learningCore = require('./src/lib/learning_core');
+const repurposeEngine = require('./src/lib/repurpose_engine'); // Phase 2 · WF-18
+const crosslinkMesh = require('./src/lib/crosslink_mesh');     // Phase 2 · Traffic Mesh
+const labelPipeline = require('./src/lib/label_pipeline');     // Phase 2 · WF-19
+const analyticsHub = require('./src/lib/analytics_hub');       // Phase 2 · Unified Analytics
+const pageGrowth = require('./pages/growth');
+const agentBoard = require('./src/lib/agent_board');        // Agent Board (Kanban für Agenten)
+const pageBoard = require('./pages/board');
+const dataUpload = require('./src/lib/data_upload');          // geprüfter Upload für Link-Listen
+const pageUpload = require('./pages/upload');
+const skillCatalog = require('./src/lib/skill_catalog');   // Skill-Katalog (nur Lesen)
+const control = require('./src/lib/control_center');        // Steuerzentrale: Schalter + Freigaben
+const pageSkills = require('./pages/skills');
+const pageControl = require('./pages/control');
 const { execFile } = require('child_process');
 
 // emergency kill switch auto-engage on critical errors / syntax failures
@@ -382,6 +396,7 @@ function consolePageHtml() {
 ${rows}
 </tbody></table>
 <p class="sub">Restricted modules (32, 33, 36) refuse every call with 403 — policy block, not a missing implementation.</p>
+${require('./pages/ext_modules_block')()}
 </div></body></html>`;
 }
 
@@ -617,7 +632,37 @@ async function tick(){
  }catch(e){document.getElementById('p-core').textContent='RECONNECT…';}
 }
 tick();setInterval(tick,3000);
-</script></body></html>`;
+</script>
+<style>
+.mx-btn{position:fixed;bottom:12px;z-index:50;background:rgba(8,14,30,.9);color:#ffcf7d;border:1px solid #1d3a66;border-radius:999px;padding:4px 12px;font:12px system-ui,sans-serif;letter-spacing:1px;cursor:pointer}
+.mx-btn:hover{border-color:#ffcf7d}
+#mx-left{left:12px}#mx-right{right:12px}
+#mx-panel{display:none;position:fixed;left:12px;right:12px;bottom:46px;height:72vh;z-index:49;background:#020409;border:1px solid #1d3a66;border-radius:12px;overflow:hidden}
+#mx-panel.open{display:flex}
+#mx-list{width:190px;overflow:auto;border-right:1px solid #1d3a66;background:rgba(8,14,30,.85);padding:8px}
+#mx-list button{display:block;width:100%;text-align:left;background:none;border:0;color:#cfe6ff;padding:5px 6px;font:12px system-ui,sans-serif;cursor:pointer;border-radius:6px}
+#mx-list button:hover,#mx-list button.on{background:#14284a;color:#ffcf7d}
+#mx-frame{flex:1;border:0;background:#020409}
+#mx-close{position:absolute;top:6px;right:8px;background:none;border:0;color:#7fa6d6;font-size:16px;cursor:pointer;z-index:2}
+</style>
+<div id="mx-panel"><button id="mx-close" title="schließen (Esc)">✕</button><div id="mx-list"></div><iframe id="mx-frame" title="Zweitbildschirm"></iframe></div>
+<button class="mx-btn" id="mx-left" title="Zweitbildschirme">◀ screens</button>
+<button class="mx-btn" id="mx-right" title="3D-Gehirn">3D ▶</button>
+<script>
+(function(){
+  var SCREENS=[['Hub','/hub'],['3D Brain','/brain'],['Board','/board'],['Growth','/growth'],['JARVIS','/jarvis'],['Upload','/upload'],['Skills','/skills'],['Steuerzentrale','/control'],['Hierarchie','/hierarchy'],['Ops','/ops'],['Console','/console'],['Logs','/logs'],['Container','/containers'],['Zeitplan','/schedule'],['Research','/research'],['SEO','/seo'],['Pipelines','/pipelines'],['Yellow Pages','/yellowpages']];
+  var panel=document.getElementById('mx-panel'),list=document.getElementById('mx-list'),frame=document.getElementById('mx-frame');
+  function show(path,btn){frame.src=path;[].forEach.call(list.querySelectorAll('button'),function(b){b.classList.toggle('on',b===btn);});}
+  SCREENS.forEach(function(s){var b=document.createElement('button');b.textContent=s[0];b.onclick=function(){show(s[1],b);};list.appendChild(b);});
+  function open(path){panel.classList.add('open');show(path,null);}
+  function close(){panel.classList.remove('open');frame.src='about:blank';}
+  document.getElementById('mx-left').onclick=function(){panel.classList.contains('open')?close():open('/hub');};
+  document.getElementById('mx-right').onclick=function(){open('/brain');};
+  document.getElementById('mx-close').onclick=close;
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+})();
+</script>
+</body></html>`;
 }
 
 // ---------- skill db page ----------
@@ -755,6 +800,49 @@ const server = http.createServer(async (req, res) => {
         endpoints: ['/api/health', '/api/integrations', '/api/modules', '/api/modules/live', '/api/modules/:area/action/:name', '/api/report', '/api/types', '/api/skills', '/api/departments', '/api/roles', '/api/prompts', '/api/workflows', '/api/xrefs', '/api/brain', '/api/master', '/api/downloads', '/api/download/:name', '/console', '/brain', '/master', '/skills', '/downloads'],
       }));
     }
+    // ---- Erweiterungsmodule (Manifest, Freigabe, Lebenszyklus). Schreibend nur mit Admin-Token. ----
+    if (p === '/api/modules/ext' && req.method === 'GET') {
+      return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/module_loader').list(), null, 2));
+    }
+    if (p.startsWith('/api/modules/ext')) {
+      const L = require('./src/lib/module_loader');
+      const extSend = (r) => send(res, r.status || (r.ok ? 200 : 400), 'application/json', JSON.stringify(r, null, 2));
+      const adminOk = () => { const t = process.env.AURA_ADMIN_TOKEN || ''; return !!t && req.headers['x-aura-token'] === t; };
+      const deny = () => send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig (AURA_ADMIN_TOKEN gesetzt und Header x-aura-token)' }));
+      if (p === '/api/modules/ext/discover' && req.method === 'POST') {
+        if (!adminOk()) return deny();
+        return extSend(await L.reload());
+      }
+      const em = p.match(/^\/api\/modules\/ext\/([a-z][a-z0-9-]{1,40})(\/[a-z_]+(?:\/[a-z][a-z0-9_]{1,40})?)?$/);
+      if (!em) return send(res, 404, 'application/json', JSON.stringify({ ok: false, error: 'unbekannter Modul-Endpunkt' }));
+      const id = em[1];
+      const sub = (em[2] || '').slice(1);
+      if (!sub) {
+        if (req.method !== 'GET') return send(res, 405, 'application/json', JSON.stringify({ ok: false, error: 'nur GET' }));
+        const v = L.get(id);
+        return v ? send(res, 200, 'application/json', JSON.stringify(v, null, 2)) : send(res, 404, 'application/json', JSON.stringify({ ok: false, error: 'Modul nicht gefunden' }));
+      }
+      if (req.method !== 'POST') return send(res, 405, 'application/json', JSON.stringify({ ok: false, error: 'nur POST' }));
+      if (!adminOk()) return deny();
+      let body = {};
+      try { body = JSON.parse((await readBody(req, 1e5)) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      if (sub === 'approve') return extSend(L.approve(id, body));
+      if (sub === 'enable') return extSend(await L.enable(id, body));
+      if (sub === 'disable') return extSend(await L.disable(id, body));
+      if (sub === 'config') {
+        const r = L.setConfig(id, body);
+        if (r.ok && L.get(id) && L.get(id).enabled) await L.start(id);
+        const fresh = L.get(id);
+        return extSend({ ...r, status_detail: fresh ? fresh.status : r.status_detail });
+      }
+      if (sub === 'health') return extSend(await L.health(id));
+      const am = sub.match(/^action\/([a-z][a-z0-9_]{1,40})$/);
+      if (am) {
+        if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ ok: false, error: 'KILL SWITCH ENGAGED — Modul-Aktionen gesperrt' }));
+        return extSend(await L.execute(id, am[1], body.input));
+      }
+      return send(res, 404, 'application/json', JSON.stringify({ ok: false, error: 'unbekannter Endpunkt' }));
+    }
     if (p === '/api/modules/live') {
       return send(res, 200, 'application/json', JSON.stringify({ counts: registry.counts(), modules: registry.status() }, null, 2));
     }
@@ -798,6 +886,86 @@ const server = http.createServer(async (req, res) => {
     if (p === '/skills') return send(res, 200, 'text/html; charset=utf-8', skillsPageHtml());
     if (p === '/hub') return send(res, 200, 'text/html; charset=utf-8', pages.hub());
     if (p === '/pipelines') return send(res, 200, 'text/html; charset=utf-8', pages.pipelines());
+    if (p === '/studio') return send(res, 200, 'text/html; charset=utf-8', pages.studio());
+    if (p === '/forge') return send(res, 200, 'text/html; charset=utf-8', require('./pages/forge')());
+    if (p === '/imagegen') return send(res, 200, 'text/html; charset=utf-8', require('./pages/imagegen')());
+    if (p === '/intercom') return send(res, 200, 'text/html; charset=utf-8', require('./pages/intercom')());
+    if (p === '/models') return send(res, 200, 'text/html; charset=utf-8', require('./pages/models')());
+    if (p === '/tower') return send(res, 200, 'text/html; charset=utf-8', require('./pages/tower')());
+    if (p === '/api/studio/groove' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      try { return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/music_studio').groove({ style: sp.get('style') || 'boom-bap', bars: sp.get('bars'), swing: sp.get('swing'), humanize: sp.get('humanize'), seed: sp.get('seed') }))); }
+      catch (e) { return send(res, 422, 'application/json', JSON.stringify({ ok: false, error: e.message })); }
+    }
+    if (p === '/api/studio/orchestrate' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      try { return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/music_studio').orchestrate({ form: sp.get('form') || undefined, bars: sp.get('bars') }))); }
+      catch (e) { return send(res, 422, 'application/json', JSON.stringify({ ok: false, error: e.message })); }
+    }
+    if (p === '/api/studio/release' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      const channelIds = (sp.get('channels') || '').split(',').map((s) => s.trim()).filter(Boolean);
+      return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/studio_release').releasePlan({ channelIds }), null, 2));
+    }
+    if (p === '/api/music/skills' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      const results = require('./src/lib/music_studio').skills(sp.get('q') || '', sp.get('limit') || 20);
+      return send(res, 200, 'application/json', JSON.stringify({ q: sp.get('q') || '', results }, null, 2));
+    }
+    if (p === '/api/creators' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      const cw = require('./src/lib/creator_watch');
+      return send(res, 200, 'application/json', JSON.stringify({ platform: sp.get('platform') || '', topic: sp.get('topic') || '', creators: cw.list({ platform: sp.get('platform') || '', topic: sp.get('topic') || '', enabled: sp.get('enabled') || '', bell: sp.get('bell') || '' }), check: cw.check() }, null, 2));
+    }
+    if (p === '/api/youtube/plan' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/youtube_pipeline').plan({ topic: sp.get('topic') || '', creator_ids: (sp.get('creators') || '').split(',').filter(Boolean) }), null, 2));
+    }
+    if (p === '/api/youtube/check' && req.method === 'POST') {
+      // Trockenlauf: Metadaten prüfen oder Upload-Körper bauen. Sendet nie etwas an YouTube.
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (!adminToken || req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig (Header x-aura-token, AURA_ADMIN_TOKEN muss gesetzt sein)' }));
+      let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const yt = require('./src/lib/youtube_pipeline');
+      const out = body.mode === 'upload' ? yt.uploadBody(body.meta || {}, { approvedBy: body.approved_by || '' }) : yt.checkMeta(body.meta || {});
+      return send(res, 200, 'application/json', JSON.stringify(out, null, 2));
+    }
+    if (p === '/api/channels' && req.method === 'GET') {
+      const cp = require('./src/lib/channel_pipelines');
+      return send(res, 200, 'application/json', JSON.stringify({ channels: cp.channels().map((c) => ({ id: c.id, label: c.label, kind: c.kind, publish: c.publish, api: c.api, source: c.source })), note: cp.meta.name }, null, 2));
+    }
+    if (p === '/api/channels/plan' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/channel_pipelines').plan({ channel_ids: (sp.get('channels') || '').split(',').filter(Boolean), topic: sp.get('topic') || '' }), null, 2));
+    }
+    if ((p === '/api/channels/check' || p === '/api/channels/publish-check') && req.method === 'POST') {
+      // Trockenlauf. Sendet nie etwas. Freigabe-Prüfung verlangt Admin-Token und einen Menschen.
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (!adminToken || req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig (AURA_ADMIN_TOKEN muss gesetzt sein)' }));
+      let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const cp = require('./src/lib/channel_pipelines');
+      const out = p === '/api/channels/check'
+        ? cp.checkDraft(body.channel, body.meta || {})
+        : cp.publishAllowed(body.channel, { approvedBy: body.approved_by || '' });
+      return send(res, 200, 'application/json', JSON.stringify(out, null, 2));
+    }
+    if (p === '/api/ultra/proposals' && req.method === 'GET') {
+      return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/ultra_scout').list(), null, 2));
+    }
+    if (p === '/api/ultra/scout/run' && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (!adminToken || req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig' }));
+      try { return send(res, 200, 'application/json', JSON.stringify(await require('./src/lib/ultra_scout').runScout(), null, 2)); }
+      catch (e) { return send(res, 500, 'application/json', JSON.stringify({ ok: false, error: e.message })); }
+    }
+    const dm = p.match(/^\/api\/ultra\/proposals\/(UP-[0-9a-f]{6})\/decide$/);
+    if (dm && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (!adminToken || req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig' }));
+      let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const r = require('./src/lib/ultra_scout').decide(dm[1], { decision: body.decision, by: body.by });
+      return send(res, r.status, 'application/json', JSON.stringify(r, null, 2));
+    }
     if (p === '/yellowpages') return send(res, 200, 'text/html; charset=utf-8', pages.yellowpages());
     if (p === '/deploy') return send(res, 200, 'text/html; charset=utf-8', pages.deploy());
     if (p === '/cluster') return send(res, 200, 'text/html; charset=utf-8', pages.cluster());
@@ -858,6 +1026,123 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, 'application/json', JSON.stringify(wfBuilder.simulate(body.id), null, 2));
     }
 
+    // ---- Phase 2: Growth (WF-18 Repurposing · Traffic Mesh · WF-19 Label · Unified Analytics) ----
+    // Schreibende Routen: kill-gated (423) und nie öffentlich veröffentlichend — nur Entwürfe/Vorschläge.
+    if (p === '/growth') return send(res, 200, 'text/html; charset=utf-8', pageGrowth(analyticsHub.PLATFORMS));
+    if (p === '/api/growth/repurpose' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(repurposeEngine.list(), null, 2));
+    if (p === '/api/growth/repurpose' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' }));
+      let body; try { body = JSON.parse(await readBody(req, 2e5)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, errors: ['invalid JSON'] })); }
+      const r = repurposeEngine.repurpose(body);
+      return send(res, r.ok ? 201 : 400, 'application/json', JSON.stringify(r, null, 2));
+    }
+    if (p === '/api/growth/mesh' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(crosslinkMesh.matrix(), null, 2));
+    if (p === '/api/growth/mesh/asset' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' }));
+      let body; try { body = JSON.parse(await readBody(req, 2e5)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, errors: ['invalid JSON'] })); }
+      const r = crosslinkMesh.addAsset(body);
+      return send(res, r.ok ? 201 : 400, 'application/json', JSON.stringify(r, null, 2));
+    }
+    if (p === '/api/growth/releases' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(labelPipeline.list(), null, 2));
+    if (p === '/api/growth/releases' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' }));
+      let body; try { body = JSON.parse(await readBody(req, 2e5)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, errors: ['invalid JSON'] })); }
+      const r = labelPipeline.create(body);
+      return send(res, r.ok ? 201 : 400, 'application/json', JSON.stringify(r, null, 2));
+    }
+    if (p.startsWith('/api/growth/releases/') && p.endsWith('/advance') && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' }));
+      let body; try { body = JSON.parse(await readBody(req, 2e5)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, errors: ['invalid JSON'] })); }
+      const id = decodeURIComponent(p.split('/')[4] || '');
+      const r = labelPipeline.advance(id, body.target, body);
+      return send(res, r.ok ? 200 : (r.code || 400), 'application/json', JSON.stringify(r, null, 2));
+    }
+    // ---- Daten-Upload (Link-Listen): Vorschau schreibt nichts, Übernahme nur mit Name + Token ----
+    if (p === '/upload') return send(res, 200, 'text/html; charset=utf-8', pageUpload());
+    if (p === '/skills') return send(res, 200, 'text/html; charset=utf-8', pageSkills());
+    if (p === '/control') return send(res, 200, 'text/html; charset=utf-8', pageControl());
+    // ---- Steuerzentrale: Schalter und Freigaben (Schreiben nur mit Admin-Token, nie bei Kill-Switch) ----
+    if (p === '/api/control' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify({ actions: control.actions(), pending: control.pending() }, null, 2));
+    if (p.startsWith('/api/control/') && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token fehlt oder falsch (Header x-aura-token)' }));
+      let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const out = (r) => send(res, r.code || (r.ok ? 200 : 400), 'application/json', JSON.stringify(r, null, 2));
+      let m = p.match(/^\/api\/control\/action\/([a-z_]+)\/(enable|disable)$/);
+      if (m) return out(control.setEnabled(m[1], m[2] === 'enable', body.by));
+      m = p.match(/^\/api\/control\/run\/([a-z_]+)$/);
+      if (m) return out(control.gate(m[1], { by: body.by, args: body.args || {}, killed: ops.isKilled() }));
+      m = p.match(/^\/api\/control\/approvals\/(AP-[0-9a-f]{6})$/);
+      if (m) return out(control.decide(m[1], body.decision, body.by));
+      return send(res, 404, 'application/json', JSON.stringify({ ok: false, error: 'unknown control route' }));
+    }
+    if (p === '/api/escalations' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/escalation').status(), null, 2));
+    if (p === '/api/escalations/raise' && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token fehlt oder falsch' }));
+      let body; try { body = JSON.parse(await readBody(req, 20000) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      try { return send(res, 200, 'application/json', JSON.stringify({ ok: true, escalation: require('./src/lib/escalation').raise({ kind: body.kind, reason: body.reason }) }, null, 2)); }
+      catch (e) { return send(res, 422, 'application/json', JSON.stringify({ ok: false, error: e.message })); }
+    }
+    const escAck = p.match(/^\/api\/escalations\/(ESC-[0-9a-f]{6})\/ack$/);
+    if (escAck && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token fehlt oder falsch' }));
+      let body; try { body = JSON.parse(await readBody(req, 4000) || '{}'); } catch { body = {}; }
+      const r = require('./src/lib/escalation').ack(escAck[1], body.by || 'nutzer');
+      return send(res, r.ok ? 200 : r.code, 'application/json', JSON.stringify(r, null, 2));
+    }
+    if (p === '/api/yellowpages/help' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      return send(res, 200, 'application/json', JSON.stringify({ q: sp.get('q') || '', results: require('./src/lib/yp_help').find(sp.get('q') || '', sp.get('limit') || 5) }, null, 2));
+    }
+    if (p === '/api/skill-catalog' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      return send(res, 200, 'application/json', JSON.stringify(skillCatalog.search({ q: sp.get('q') || '', source: sp.get('source') || '', status: sp.get('status') || '', category: sp.get('category') || '', limit: sp.get('limit') || 100 }), null, 2));
+    }
+    if (p === '/api/upload/kinds' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(dataUpload.KINDS(), null, 2));
+    if (p === '/api/upload/preview' && req.method === 'POST') {
+      let body; try { body = JSON.parse(await readBody(req, 1.5e6) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const r = dataUpload.preview(body.kind, body.text);
+      return send(res, r.status, 'application/json', JSON.stringify(r, null, 2));
+    }
+    if (p === '/api/upload/commit' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED — upload locked' }));
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token fehlt oder falsch' }));
+      let body; try { body = JSON.parse(await readBody(req, 1.5e6) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const r = dataUpload.commit(body.kind, body.text, body.by);
+      return send(res, r.status, 'application/json', JSON.stringify(r, null, 2));
+    }
+
+    // ---- Agent Board (Kanban für Agenten; Freigabe nur durch Menschen) ----
+    if (p === '/board') return send(res, 200, 'text/html; charset=utf-8', pageBoard());
+    if (p === '/api/board' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(agentBoard.board(), null, 2));
+    if (p.startsWith('/api/board/') && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED — board locked' }));
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token fehlt oder falsch (Header x-aura-token)' }));
+      let body = {};
+      try { const raw = await readBody(req, 2e4); body = raw ? JSON.parse(raw) : {}; } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      if (p === '/api/board/task') {
+        const r = agentBoard.createTask(body);
+        return send(res, r.status, 'application/json', JSON.stringify(r.ok ? { ok: true, task: r.task } : { ok: false, error: r.error }, null, 2));
+      }
+      const m = p.match(/^\/api\/board\/(T-[0-9a-f]{6})\/(assign|start|request_help|handoff|submit|approve|reject)$/);
+      if (m) {
+        const r = agentBoard.act(m[1], m[2], body.by, body);
+        return send(res, r.status, 'application/json', JSON.stringify(r.ok ? { ok: true, task: r.task } : { ok: false, error: r.error }, null, 2));
+      }
+      return send(res, 404, 'application/json', JSON.stringify({ error: 'unknown board route' }));
+    }
+    if (p === '/api/growth/analytics' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(analyticsHub.dashboard(), null, 2));
+    if (p === '/api/growth/analytics/import' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' }));
+      let body; try { body = JSON.parse(await readBody(req, 2e6)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, errors: ['invalid JSON'] })); }
+      const r = analyticsHub.importRows(body.platform, body.rows);
+      return send(res, r.ok ? 201 : 400, 'application/json', JSON.stringify(r, null, 2));
+    }
+
     // ---- Area 62: Deep Research (real GitHub-API data) ----
     if (p === '/research') return send(res, 200, 'text/html; charset=utf-8', pageResearch());
     if (p === '/api/research') {
@@ -880,7 +1165,10 @@ const server = http.createServer(async (req, res) => {
     // ---- Area 64: backup vault (verified snapshots + restore) ----
     if (p === '/api/backups' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(watcher.backups(), null, 2));
     if (p === '/api/backups/restore' && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (!adminToken || req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig (AURA_ADMIN_TOKEN gesetzt und Header x-aura-token)' }));
       let body; try { body = JSON.parse(await readBody(req, 2e4)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      if (!body || typeof body.file !== 'string' || !body.file) return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'file fehlt (Name des Backups)' }));
       return send(res, 200, 'application/json', JSON.stringify(watcher.restore(body.file)));
     }
 
@@ -921,8 +1209,11 @@ const server = http.createServer(async (req, res) => {
     if (p === '/jarvis') return send(res, 200, 'text/html; charset=utf-8', pageJarvis());
     if (p === '/api/jarvis' && req.method === 'POST') {
       let body; try { body = JSON.parse(await readBody(req, 2e4)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
-      return send(res, 200, 'application/json', JSON.stringify(jarvis.ask(body.msg || body.q || body.text || body.message || ''), null, 2));
+      const out = await jarvis.askAsync(body.msg || body.q || body.text || body.message || '');
+      return send(res, 200, 'application/json', JSON.stringify(out, null, 2));
     }
+    if (p === '/api/llm/chain') return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/api_failover').status(), null, 2));
+    if (p === '/api/jarvis/llm') return send(res, 200, 'application/json', JSON.stringify(await require('./src/lib/ollama_llm').status(), null, 2));
     if (p === '/api/jarvis/memory') return send(res, 200, 'application/json', JSON.stringify(jarvis.memory(), null, 2));
 
     // ---- Area 69: recursive learning core (max 1 failure per fingerprint) ----
@@ -991,6 +1282,11 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/ops/sync' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(ops.runFullSync() || { ok: true }));
     if (p === '/api/kill' && req.method === 'POST') {
       const raw = await readBody(req); let body; try { body = JSON.parse(raw || '{}'); } catch { body = {}; }
+      // Auslösen ist immer erlaubt (sicherer Zustand). Lösen braucht den Admin-Token, wenn er gesetzt ist.
+      if (!body.arm) {
+        const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+        if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Kill-Switch lösen braucht Admin-Token (x-aura-token)' }));
+      }
       return send(res, 200, 'application/json', JSON.stringify(body.arm ? ops.kill(body.reason) : ops.revive(body.reason)));
     }
     if (p === '/api/telegram/kit') return send(res, 200, 'application/json', JSON.stringify(ops.telegramKit(), null, 2));
@@ -1010,8 +1306,13 @@ const server = http.createServer(async (req, res) => {
 
     // ---------- config upload (easy update system) ----------
     if (p === '/api/config/upload' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED — upload locked' }));
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ error: 'Admin-Token fehlt oder falsch' }));
       const raw = await readBody(req); let body;
       try { body = JSON.parse(raw || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON — upload must be a JSON file' })); }
+      if (body.target === 'yellowpages') return send(res, 410, 'application/json', JSON.stringify({ error: 'Yellow Pages laufen jetzt über /api/upload/preview und /api/upload/commit (geprüft, mit Vorschau und Backup).' }));
+
       const T = { yellowpages: (c) => Array.isArray(c.links), departments: (c) => Array.isArray(c.departments), teams: (c) => Array.isArray(c.teams), skills: (c) => Array.isArray(c.skills) };
       if (!T[body.target] || !T[body.target](body.config || {})) return send(res, 400, 'application/json', JSON.stringify({ error: 'target must be one of ' + Object.keys(T).join('/') + ' with a valid shape' }));
       const file = path.join(__dirname, 'data', body.target + '.json');
@@ -1163,7 +1464,9 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, HOST, () => {
+server.listen(PORT, HOST, () => { try { require('./src/lib/ultra_scout').startDaily(); } catch (e) { console.error('ultra_scout: ' + e.message); }
+  try { const L = require('./src/lib/module_loader'); L.discover(); L.startEnabled().catch((e) => console.error('module start: ' + e.message)); } catch (e) { console.error('module loader: ' + e.message); }
+  require('./src/lib/escalation').setNotifier(require('./src/lib/notify').notifyEmergency); // Notfall: Telegram/SMS/Anruf, nur wenn konfiguriert
   require('./src/lib/autonomy_loop').start(); // self-healing loop + swarm strategy + learning curve
   ops.startScheduler(); // 12h super-brain autosave · 4h others · 24h full sync
   watcher.start(config.get('watcher.interval_ms', 1500)); // hot-reload data files w/ rollback on syntax error

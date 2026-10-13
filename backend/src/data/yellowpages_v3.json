@@ -1,0 +1,2169 @@
+{
+  "schema_version": 3,
+  "categories": [
+    {
+      "id": "dev-freebies",
+      "name": "dev-freebies",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "ai-directory",
+      "name": "ai-directory",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "apis",
+      "name": "apis",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "models",
+      "name": "models",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "mcp",
+      "name": "mcp",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "skills",
+      "name": "skills",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "prompts",
+      "name": "prompts",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "notebooks",
+      "name": "notebooks",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "data",
+      "name": "data",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "automation",
+      "name": "automation",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "hosting",
+      "name": "hosting",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "cluster",
+      "name": "cluster",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "monitoring",
+      "name": "monitoring",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "dev-tools",
+      "name": "dev-tools",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "design",
+      "name": "design",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "learning",
+      "name": "learning",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "social",
+      "name": "social",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "privacy-audit",
+      "name": "privacy-audit",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "review",
+      "name": "review",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "image-generation",
+      "name": "image-generation",
+      "desc": "migriert aus kuratierter Liste",
+      "builtin": true
+    },
+    {
+      "id": "deep-research",
+      "name": "deep-research",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "video-automation",
+      "name": "video-automation",
+      "desc": "Video-Automation (eigene Kanäle, human gates)",
+      "builtin": false
+    },
+    {
+      "id": "ai-directories",
+      "name": "ai-directories",
+      "desc": "Free-AI-Verzeichnisse",
+      "builtin": false
+    },
+    {
+      "id": "api-lists",
+      "name": "api-lists",
+      "desc": "API-Listen & Provider",
+      "builtin": false
+    },
+    {
+      "id": "selfhost",
+      "name": "selfhost",
+      "desc": "Selfhosted Services",
+      "builtin": false
+    },
+    {
+      "id": "local-llm",
+      "name": "local-llm",
+      "desc": "Lokale LLMs & Training",
+      "builtin": false
+    },
+    {
+      "id": "security-news",
+      "name": "security-news",
+      "desc": "Security-News & Research",
+      "builtin": false
+    },
+    {
+      "id": "agent-harness",
+      "name": "agent-harness",
+      "desc": "Agent-Harness / Personal AI",
+      "builtin": false
+    },
+    {
+      "id": "diagrams",
+      "name": "diagrams",
+      "desc": "Whiteboards & Diagramme",
+      "builtin": false
+    },
+    {
+      "id": "prompt-libraries",
+      "name": "prompt-libraries",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "security-audit",
+      "name": "security-audit",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "agent-protocols",
+      "name": "agent-protocols",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-featured",
+      "name": "mega-featured",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-automation",
+      "name": "mega-automation",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-ai",
+      "name": "mega-ai",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-agents",
+      "name": "mega-agents",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-mcp",
+      "name": "mega-mcp",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-devtools",
+      "name": "mega-devtools",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-integrations",
+      "name": "mega-integrations",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-business",
+      "name": "mega-business",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-ecommerce",
+      "name": "mega-ecommerce",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-marketing",
+      "name": "mega-marketing",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-seo",
+      "name": "mega-seo",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-social",
+      "name": "mega-social",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-videos",
+      "name": "mega-videos",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-news",
+      "name": "mega-news",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-jobs",
+      "name": "mega-jobs",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-leadgen",
+      "name": "mega-leadgen",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-realestate",
+      "name": "mega-realestate",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-travel",
+      "name": "mega-travel",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-sports",
+      "name": "mega-sports",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-games",
+      "name": "mega-games",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-education",
+      "name": "mega-education",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-creators",
+      "name": "mega-creators",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-opensource",
+      "name": "mega-opensource",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "mega-other",
+      "name": "mega-other",
+      "desc": "",
+      "builtin": false
+    },
+    {
+      "id": "use-cases",
+      "name": "use-cases",
+      "desc": "",
+      "builtin": false
+    }
+  ],
+  "entries": [
+    {
+      "id": "yp-0-233691298",
+      "name": "free-for.dev",
+      "url": "https://free-for.dev",
+      "category": "dev-freebies",
+      "desc": "Massive list of free tiers: hosting, CI, APIs, DBs, monitoring.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-1-1080870512",
+      "name": "There's An AI For That",
+      "url": "https://theresanaiforthat.com",
+      "category": "ai-directory",
+      "desc": "Searchable directory of AI tools for every task.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-2-1665107231",
+      "name": "Public APIs",
+      "url": "https://github.com/public-apis/public-apis",
+      "category": "apis",
+      "desc": "Collective list of free public APIs.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-3-1215950082",
+      "name": "Hugging Face Models",
+      "url": "https://huggingface.co/models",
+      "category": "models",
+      "desc": "Model hub — search, evaluate, download weights.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-4-1388556997",
+      "name": "HF Spaces",
+      "url": "https://huggingface.co/spaces",
+      "category": "models",
+      "desc": "Hosted demos & app hosting for models.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-5-26254964",
+      "name": "Ollama Library",
+      "url": "https://ollama.com/library",
+      "category": "models",
+      "desc": "One-command local model runs.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-6-535267607",
+      "name": "Unsloth docs",
+      "url": "https://docs.unsloth.ai",
+      "category": "models",
+      "desc": "Fast local fine-tuning guides.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-7-1338412122",
+      "name": "GroqCloud",
+      "url": "https://console.groq.com",
+      "category": "models",
+      "desc": "Fast inference API (key in secret store).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-8-2114471321",
+      "name": "MCP official",
+      "url": "https://modelcontextprotocol.io",
+      "category": "mcp",
+      "desc": "Model Context Protocol spec & docs.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-9-1844257922",
+      "name": "Smithery",
+      "url": "https://smithery.ai",
+      "category": "mcp",
+      "desc": "MCP server directory.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-10-1388841663",
+      "name": "MCP.so",
+      "url": "https://mcp.so",
+      "category": "mcp",
+      "desc": "Community MCP server index.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-11-1460847772",
+      "name": "Awesome Claude Skills",
+      "url": "https://github.com/ComposioHQ/awesome-claude-skills",
+      "category": "skills",
+      "desc": "Curated agent skills list.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-12-664937096",
+      "name": "Awesome ChatGPT Prompts",
+      "url": "https://github.com/f/awesome-chatgpt-prompts",
+      "category": "prompts",
+      "desc": "Prompt library by role/task.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-13-1793474927",
+      "name": "NotebookLM",
+      "url": "https://notebooklm.google.com",
+      "category": "notebooks",
+      "desc": "Source-grounded research notebooks (manual workflow).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-14-2008896940",
+      "name": "Jupyter",
+      "url": "https://jupyter.org",
+      "category": "notebooks",
+      "desc": "Open notebook computing.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-15-1851937042",
+      "name": "Observable",
+      "url": "https://observablehq.com",
+      "category": "notebooks",
+      "desc": "Collaborative data notebooks.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-16-1225458641",
+      "name": "Kaggle",
+      "url": "https://kaggle.com",
+      "category": "data",
+      "desc": "Datasets & notebooks; relay only with opt-in compute policy (area 15).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-17-1440294980",
+      "name": "Papers with Code",
+      "url": "https://paperswithcode.com",
+      "category": "data",
+      "desc": "Research + code, grounded sourcing.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-18-1377699519",
+      "name": "n8n",
+      "url": "https://n8n.io",
+      "category": "automation",
+      "desc": "Self-hostable workflow automation; HMAC-signed dispatch (area 15).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-19-1380632900",
+      "name": "n8n templates",
+      "url": "https://n8n.io/workflows",
+      "category": "automation",
+      "desc": "Community workflow templates — review before use.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-20-2060111955",
+      "name": "Activepieces",
+      "url": "https://activepieces.com",
+      "category": "automation",
+      "desc": "Open-source Zapier alternative, self-hostable.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-21-860932198",
+      "name": "Windmill",
+      "url": "https://windmill.dev",
+      "category": "automation",
+      "desc": "Open-source developer automation & internal tools.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-22-1328982807",
+      "name": "Vercel",
+      "url": "https://vercel.com",
+      "category": "hosting",
+      "desc": "Frontend/edge deploy; `vercel deploy` one-liner.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-23-1578343441",
+      "name": "Netlify",
+      "url": "https://netlify.com",
+      "category": "hosting",
+      "desc": "Static & serverless hosting with free tier.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-24-1462671995",
+      "name": "Cloudflare Pages",
+      "url": "https://pages.cloudflare.com",
+      "category": "hosting",
+      "desc": "Edge static hosting, generous free tier.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-25-1197017104",
+      "name": "Fly.io",
+      "url": "https://fly.io",
+      "category": "hosting",
+      "desc": "Container apps close to users.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-26-1570691233",
+      "name": "Railway",
+      "url": "https://railway.app",
+      "category": "hosting",
+      "desc": "Instant infra for APIs/DBs.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-27-1968809272",
+      "name": "Render",
+      "url": "https://render.com",
+      "category": "hosting",
+      "desc": "Managed services with free tiers.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-28-1038674426",
+      "name": "Supabase",
+      "url": "https://supabase.com",
+      "category": "data",
+      "desc": "Hosted Postgres + auth (backend for area 24 schema).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-29-173492801",
+      "name": "Neon",
+      "url": "https://neon.tech",
+      "category": "data",
+      "desc": "Serverless Postgres, branchable.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-30-139389470",
+      "name": "Upstash",
+      "url": "https://upstash.com",
+      "category": "data",
+      "desc": "Serverless Redis/Kafka for edge cache (area 22).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-31-1287343416",
+      "name": "k3s",
+      "url": "https://k3s.io",
+      "category": "cluster",
+      "desc": "Lightweight Kubernetes — the 1-click root-server binder.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-32-1947016345",
+      "name": "Ansible",
+      "url": "https://docs.ansible.com",
+      "category": "cluster",
+      "desc": "Agentless orchestration for fleet installs.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-33-85391856",
+      "name": "Coolify",
+      "url": "https://coolify.io",
+      "category": "cluster",
+      "desc": "Self-hostable Heroku/Netlify alternative for your fleet.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-34-63939734",
+      "name": "CapRover",
+      "url": "https://caprover.com",
+      "category": "cluster",
+      "desc": "Simple PaaS on your own servers.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-35-1364206746",
+      "name": "Uptime Kuma",
+      "url": "https://github.com/louislam/uptime-kuma",
+      "category": "monitoring",
+      "desc": "Self-hosted health checks for the collective.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-36-1470831640",
+      "name": "Grafana",
+      "url": "https://grafana.com",
+      "category": "monitoring",
+      "desc": "Dashboards over bundled fleet metrics.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-37-7023423",
+      "name": "StackBlitz",
+      "url": "https://stackblitz.com",
+      "category": "dev-tools",
+      "desc": "Instant browser IDEs (WebContainers).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-38-821473257",
+      "name": "CodeSandbox",
+      "url": "https://codesandbox.io",
+      "category": "dev-tools",
+      "desc": "Cloud dev environments & prototypes.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-39-1765597742",
+      "name": "Gitpod",
+      "url": "https://gitpod.io",
+      "category": "dev-tools",
+      "desc": "Ephemeral dev environments from repos.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-40-1762548633",
+      "name": "ngrok",
+      "url": "https://ngrok.com",
+      "category": "dev-tools",
+      "desc": "Tunnel local previews (authorized usage).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-41-735240673",
+      "name": "shadcn/ui",
+      "url": "https://ui.shadcn.com",
+      "category": "design",
+      "desc": "Copy-in component system for dashboards.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-42-1693687537",
+      "name": "Tailwind",
+      "url": "https://tailwindcss.com",
+      "category": "design",
+      "desc": "Utility CSS for HUD builds.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-43-1597489712",
+      "name": "v0",
+      "url": "https://v0.dev",
+      "category": "design",
+      "desc": "Generative UI scaffolds (review output).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-44-764192546",
+      "name": "Uiverse",
+      "url": "https://uiverse.io",
+      "category": "design",
+      "desc": "Open-source CSS/UI elements.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-45-531883079",
+      "name": "Godly",
+      "url": "https://godly.website",
+      "category": "design",
+      "desc": "Web design inspiration index.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-46-997133836",
+      "name": "Excalidraw",
+      "url": "https://excalidraw.com",
+      "category": "design",
+      "desc": "Whiteboarding for cluster/architecture sketches.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-47-107684694",
+      "name": "Roadmap.sh",
+      "url": "https://roadmap.sh",
+      "category": "learning",
+      "desc": "Role & stack learning roadmaps.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-48-1231339335",
+      "name": "crontab.guru",
+      "url": "https://crontab.guru",
+      "category": "dev-freebies",
+      "desc": "Schedule translator for daemons (area 17).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-49-1282126419",
+      "name": "Regex101",
+      "url": "https://regex101.com",
+      "category": "dev-freebies",
+      "desc": "Regex testing & explanation.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-50-1597765497",
+      "name": "Shields.io",
+      "url": "https://shields.io",
+      "category": "dev-freebies",
+      "desc": "Badges for repo & HUD status.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-51-1321309462",
+      "name": "Bluesky API",
+      "url": "https://docs.bsky.app",
+      "category": "social",
+      "desc": "Official AT Protocol API docs.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-52-55684681",
+      "name": "Mastodon API",
+      "url": "https://docs.joinmastodon.org/api/",
+      "category": "social",
+      "desc": "Official Mastodon REST API.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-53-655087441",
+      "name": "Telegram Bot API",
+      "url": "https://core.telegram.org/bots/api",
+      "category": "social",
+      "desc": "Official bot interface.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-54-430422038",
+      "name": "YouTube Data API",
+      "url": "https://developers.google.com/youtube",
+      "category": "social",
+      "desc": "Official uploads/metadata API.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-55-835231365",
+      "name": "WordPress REST",
+      "url": "https://developer.wordpress.org/rest-api/",
+      "category": "social",
+      "desc": "Draft publishing via own site (area 14).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-56-1670487908",
+      "name": "Camoufox (privacy audit)",
+      "url": "https://camoufox.com",
+      "category": "privacy-audit",
+      "desc": "Anti-fingerprint browser — LEGIT use: audit what YOUR OWN site leaks. Evasion/impersonation use is refused (policy).",
+      "kind": "link",
+      "tags": [],
+      "status": "review",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-57-914360237",
+      "name": "AI Collection",
+      "url": "https://github.com/ai-collection/ai-collection",
+      "category": "ai-directory",
+      "desc": "Curated repo of AI tools, link-lists and MCP extensions — sourcing for the skill DB.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-58-1707047471",
+      "name": "Faker.js",
+      "url": "https://github.com/faker-js/faker",
+      "category": "dev-tools",
+      "desc": "Synthetic TEST data generator (labelled test data only — the honest alternative to fake-person services).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-59-939280313",
+      "name": "RaidRush link vault",
+      "url": "https://raidrush.ws",
+      "category": "review",
+      "desc": "REVIEW only: unverified underground list — do not execute or trust listed scripts.",
+      "kind": "link",
+      "tags": [],
+      "status": "review",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-60-253724828",
+      "name": "ComfyUI",
+      "url": "https://github.com/comfyanonymous/ComfyUI",
+      "category": "image-generation",
+      "desc": "Node-based Stable-Diffusion-GUI mit HTTP-API (/prompt, /history) — Backend für AURA Area 71.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-61-1879713060",
+      "name": "Stable Diffusion WebUI (A1111)",
+      "url": "https://github.com/AUTOMATIC1111/stable-diffusion-webui",
+      "category": "image-generation",
+      "desc": "SD-WebUI mit REST-API (--api, /sdapi/v1) — Backend für AURA Area 71.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": false,
+      "created_at": null,
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv4yc4xw-03njj",
+      "name": "ZZ Test-Link",
+      "url": "https://example.com/zz",
+      "category": "zz-mein-tooling",
+      "desc": "smoke-editiert",
+      "kind": "link",
+      "tags": [],
+      "status": "deleted",
+      "custom": true,
+      "created_at": "2026-10-12T07:50:00.452Z",
+      "updated_at": "2026-10-12T07:50:00.455Z",
+      "deleted_at": "2026-10-12T07:50:30.239Z"
+    },
+    {
+      "id": "yp-mv4yc4y1-v2tyt",
+      "name": "ZZ Wissen",
+      "url": "",
+      "category": "zz-mein-tooling",
+      "desc": "",
+      "kind": "knowledge",
+      "tags": [],
+      "status": "deleted",
+      "custom": true,
+      "created_at": "2026-10-12T07:50:00.457Z",
+      "updated_at": null,
+      "body": "Wertvolles Know-how für das Brain: So plant man Swarm-Routinen.",
+      "deleted_at": "2026-10-12T07:50:30.241Z"
+    },
+    {
+      "id": "yp-mv502d4z-rsufu",
+      "name": "MoneyPrinterTurbo",
+      "url": "https://github.com/harry0703/moneyprinterTurbo",
+      "category": "video-automation",
+      "desc": "Auto-Video-Pipeline (Skript→Voice→Clips→Upload). NUR eigene Kanäle + human gate (WF-14).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.747Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d52-k7at1",
+      "name": "YouTube Automation Agent",
+      "url": "https://github.com/darkzOGx/youtube-automation-agent",
+      "category": "video-automation",
+      "desc": "YouTube-Automation für EIGENE Kanäle; Upload nur mit Freigabe (WF-14).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.750Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d54-uu0r2",
+      "name": "OpenRouter",
+      "url": "https://openrouter.ai",
+      "category": "api-lists",
+      "desc": "Modell-Aggregator; Provider für Model Bay + OmniRoute (Keys maskiert, deploy/.env).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.752Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d55-6goj0",
+      "name": "veoAI-free Liste",
+      "url": "https://veoaifree.com",
+      "category": "ai-directories",
+      "desc": "Verzeichnis kostenloser AI-Tools (Kuratierung, Listing ≠ Freigabe zur Ausführung).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.753Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d57-feloz",
+      "name": "vheer",
+      "url": "https://vheer.com",
+      "category": "ai-directories",
+      "desc": "AI-Tool-Verzeichnis (Kuratierung).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.755Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d58-2mssm",
+      "name": "AI Free Forever",
+      "url": "https://aifreeforever.com",
+      "category": "ai-directories",
+      "desc": "Free-AI-Verzeichnis mit Tutorials.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.756Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5a-xnnft",
+      "name": "FreeBuf",
+      "url": "https://www.freebuf.com",
+      "category": "security-news",
+      "desc": "Security-News & Research-Artikel (user-Notiz: freebuff.com → korrekt freebuf.com).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.758Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5b-8h9hd",
+      "name": "Excalidraw",
+      "url": "https://github.com/excalidraw/excalidraw",
+      "category": "diagrams",
+      "desc": "Open-Source-Whiteboard; self-host-Preset in Service Fabric (Area 74).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.759Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5d-zta4m",
+      "name": "Unsloth",
+      "url": "https://github.com/unslothai/unsloth",
+      "category": "local-llm",
+      "desc": "Lokales LLM-Finetuning (2× schneller); cross-wired mit Skill Area 47 + WF-16.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.761Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5e-ojrzx",
+      "name": "API Mega List",
+      "url": "https://github.com/cporter202/api-mega-list",
+      "category": "api-lists",
+      "desc": "Riesige öffentliche API-Liste für neue Integrationen.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.762Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5g-y8oey",
+      "name": "AI APIs you can ship today",
+      "url": "https://github.com/cporter352/ai-apis-you-can-ship-today",
+      "category": "api-lists",
+      "desc": "Kuratierte shipping-ready AI-APIs.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.764Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5i-q8go4",
+      "name": "OpenMausBot",
+      "url": "https://github.com/milind-soni/openmausebot",
+      "category": "agent-harness",
+      "desc": "Open-Source Bot-Harness (Grok-Bot-Alternative). Nur EIGENE Konten, offizielle APIs, KEIN synthetisches Engagement.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.766Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5k-34hca",
+      "name": "awesome-selfhosted",
+      "url": "https://github.com/awesome-selfhosted/awesome-selfhosted",
+      "category": "selfhost",
+      "desc": "Die Selfhost-Referenzliste; cross-wired mit Service Fabric (Area 74, WF-15).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.768Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5l-gc8vf",
+      "name": "AnythingLLM",
+      "url": "https://github.com/mintplex-labs/anything-llm",
+      "category": "selfhost",
+      "desc": "Lokale RAG/LLM-Workspaces; Preset in Service Fabric + WF-16.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.769Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5n-9r5hx",
+      "name": "aio-sandbox",
+      "url": "https://github.com/aio-sandbox/aio-sandbox",
+      "category": "selfhost",
+      "desc": "All-in-one-Sandbox-Container; Preset in Service Fabric + Compute Router.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.771Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5o-77f6e",
+      "name": "OpenHuman",
+      "url": "https://github.com/tinyhumansai/openhuman",
+      "category": "agent-harness",
+      "desc": "Local-first Personal AI mit Memory-Graph & Agent-Fleets (Konzept-Crosslink zu Areas 18/69).",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.772Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5q-4wby0",
+      "name": "mue-x/mue-y",
+      "url": "https://github.com/mue-x/mue-y",
+      "category": "selfhost",
+      "desc": "Unbekanntes Repo aus Admin-Liste — REVIEW: erst prüfen, dann freischalten.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.774Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv502d5r-ta0l1",
+      "name": "dbx",
+      "url": "https://github.com/t8y2/dbx",
+      "category": "selfhost",
+      "desc": "Unbekanntes Repo aus Admin-Liste — REVIEW: erst prüfen, dann freischalten.",
+      "kind": "link",
+      "tags": [],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:38:23.775Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv50c87f-1ywto",
+      "name": "100.000 AI Prompts (contentifyai)",
+      "url": "https://github.com/contentifyai/100000-ai-prompts",
+      "category": "prompt-libraries",
+      "desc": "Mega-Sammlung: 100.000+ Prompts für ChatGPT, Bard, MidJourney & Stable Diffusion — für fast jede Eventualität ein Startpunkt.",
+      "kind": "link",
+      "tags": [
+        "prompts",
+        "mega",
+        "bild"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:46:03.915Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv50c87h-jgqnn",
+      "name": "Awesome Prompts (ai-boost)",
+      "url": "https://github.com/ai-boost/awesome-prompts",
+      "category": "prompt-libraries",
+      "desc": "Große kuratierte Prompt-Bibliothek: GPT-Prompts, Prompt-Engineering, Angriffs-/Verteidigungsstrategien, akademische Forschung.",
+      "kind": "link",
+      "tags": [
+        "prompts",
+        "engineering",
+        "forschung"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:46:03.917Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv50c87j-xpws3",
+      "name": "LLM Prompt Library (abilzerian)",
+      "url": "https://github.com/abilzerian/LLM-Prompt-Library",
+      "category": "prompt-libraries",
+      "desc": "164 Jinja2-Templates + 60 Prompts für alle großen Modell-Familien (OpenAI, Claude, Gemini, Llama, Mistral, xAI, DeepSeek); Finance/Legal/Medizin/Code. Enthält Red-Teaming-Beispiele — nur defensiv verwenden, kein Bypass.",
+      "kind": "link",
+      "tags": [
+        "prompts",
+        "templates",
+        "multi-modell"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:46:03.919Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv50c87l-ioczs",
+      "name": "Awesome AI System Prompts (dontriskit)",
+      "url": "https://github.com/dontriskit/awesome-ai-system-prompts",
+      "category": "prompt-libraries",
+      "desc": "System-Prompts von ChatGPT, Claude Code, Cursor, Manus, Devin & Co. — Blaupausen für eigene Harness-/Agent-Dateien.",
+      "kind": "link",
+      "tags": [
+        "prompts",
+        "system",
+        "harness"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:46:03.921Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv50c87n-e2jl8",
+      "name": "Awesome AI Prompts (rahulkolekardev)",
+      "url": "https://github.com/rahulkolekardev/awesome-ai-prompts",
+      "category": "prompt-libraries",
+      "desc": "100 kuratierte SFW-Test-Prompts, um LLMs zu vergleichen und zu bewerten (ChatGPT, Gemini, Claude, Open-Source).",
+      "kind": "link",
+      "tags": [
+        "prompts",
+        "eval",
+        "test"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:46:03.923Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv50c87o-yosk0",
+      "name": "Awesome Prompt Engineering (promptslab)",
+      "url": "https://github.com/promptslab/Awesome-Prompt-Engineering",
+      "category": "prompt-libraries",
+      "desc": "Ressourcen-Hub: Techniken, aktuelle Modell-Übersicht, Agent-Frameworks und Prompt-Engineering-Praxis.",
+      "kind": "link",
+      "tags": [
+        "prompts",
+        "engineering",
+        "hub"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T08:46:03.924Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu0g-nhn2u",
+      "name": "Nmap",
+      "url": "https://nmap.org",
+      "category": "security-audit",
+      "desc": "Der Standard: Netzwerk- & Port-Scanner — offene Ports, Dienste, Versionen erkennen. Basis für jeden Sicherheits-Check.",
+      "kind": "link",
+      "tags": [
+        "scanner",
+        "ports",
+        "netzwerk"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.760Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu0k-q2kvm",
+      "name": "Wazuh",
+      "url": "https://wazuh.com",
+      "category": "security-audit",
+      "desc": "Open-Source SIEM & Intrusion Detection: Log-Analyse, Anomalien, File-Integrity, Compliance — die Wache fürs ganze Servernetz.",
+      "kind": "link",
+      "tags": [
+        "siem",
+        "ids",
+        "monitoring"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.764Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu0m-sdf70",
+      "name": "CrowdSec",
+      "url": "https://www.crowdsec.net",
+      "category": "security-audit",
+      "desc": "Moderne fail2ban-Alternative: erkennt Angriffe per Verhalten, blockt IP-Pakete, teilt Bedrohungsdaten kollektiv.",
+      "kind": "link",
+      "tags": [
+        "ips",
+        "ddos",
+        "block"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.766Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu1b-sbjmn",
+      "name": "fail2ban",
+      "url": "https://www.fail2ban.org",
+      "category": "security-audit",
+      "desc": "Klassiker auf Root-Servern: liest Logs, sperrt IPs nach zu vielen Fehlversuchen (SSH-Brute-Force-Schutz).",
+      "kind": "link",
+      "tags": [
+        "brute-force",
+        "ssh",
+        "block"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.791Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu1d-1lsiv",
+      "name": "Suricata",
+      "url": "https://suricata.io",
+      "category": "security-audit",
+      "desc": "Netzwerk-IDS/IPS: tiefe Paketanalyse, Signatur- & Anomalie-Erkennung gegen Spionage und Angriffe von außen.",
+      "kind": "link",
+      "tags": [
+        "ids",
+        "ips",
+        "packets"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.793Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu1g-nsjii",
+      "name": "Zeek",
+      "url": "https://zeek.org",
+      "category": "security-audit",
+      "desc": "Netzwerk-Analyse-Framework: macht aus Traffic durchsuchbare Protokolle — perfekt für Trace-first-Forensik.",
+      "kind": "link",
+      "tags": [
+        "forensik",
+        "trace",
+        "netzwerk"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.796Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu1i-1v15i",
+      "name": "Trivy",
+      "url": "https://trivy.dev",
+      "category": "security-audit",
+      "desc": "Schwachstellen-Scanner für Container, Repos & Configs — findet CVEs bevor Angreifer sie finden.",
+      "kind": "link",
+      "tags": [
+        "cve",
+        "container",
+        "scan"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.798Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu1k-gvw8j",
+      "name": "Lynis",
+      "url": "https://cisofy.com/lynis/",
+      "category": "security-audit",
+      "desc": "Security-Auditing direkt auf dem Server: Härtungs-Checks, Warnungen, Empfehlungen — der Auditor für Linux.",
+      "kind": "link",
+      "tags": [
+        "audit",
+        "haertung",
+        "linux"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.800Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu1n-3d8l3",
+      "name": "testssl.sh",
+      "url": "https://testssl.sh",
+      "category": "security-audit",
+      "desc": "TLS/SSL-Prüfung gegen URLs: Protokolle, Zertifikate, Schwächen — schützt die 76+ Pages vor Ausspähung.",
+      "kind": "link",
+      "tags": [
+        "tls",
+        "ssl",
+        "urls"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.803Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu1p-3byiu",
+      "name": "OWASP ZAP",
+      "url": "https://www.zaproxy.org",
+      "category": "security-audit",
+      "desc": "Web-App-Security-Scanner: findet XSS, Injection & Co. in eigenen Seiten — defensives Testen der eigenen Projekte.",
+      "kind": "link",
+      "tags": [
+        "web",
+        "scanner",
+        "owasp"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.805Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu1r-d3oi5",
+      "name": "Agent2Agent Protocol (A2A)",
+      "url": "https://github.com/a2aproject/A2A",
+      "category": "agent-protocols",
+      "desc": "Offenes Protokoll der Linux Foundation (von Google gestartet): Agenten entdecken, rufen und delegieren einander — das \"agents recruiten/callen\" als Standard. AURA hat eine A2A-Surface unter /api/a2a.",
+      "kind": "link",
+      "tags": [
+        "a2a",
+        "protokoll",
+        "agenten"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.807Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu1u-z8igk",
+      "name": "Model Context Protocol (MCP)",
+      "url": "https://modelcontextprotocol.io",
+      "category": "agent-protocols",
+      "desc": "Anthropic-Standard unter der Linux Foundation: verbindet Agenten mit Tools/Daten. In AURA live als Area 72 (MCP-Manager).",
+      "kind": "link",
+      "tags": [
+        "mcp",
+        "protokoll",
+        "tools"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.810Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv51fu1w-ptsb3",
+      "name": "A2A-Spezifikation (Agent Cards)",
+      "url": "https://a2a-protocol.org",
+      "category": "agent-protocols",
+      "desc": "Spec: Agent Cards, message/send, Task-Streaming — Blaupause für Agent-Netzwerke. AURA-Karte: /api/a2a/agent-card.",
+      "kind": "link",
+      "tags": [
+        "a2a",
+        "spec",
+        "agent-card"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:16:51.812Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281t4-illne",
+      "name": "API Mega List — Featured (Top-Auswahl) (handverlesen APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/00-featured-apis",
+      "category": "mega-featured",
+      "desc": "cporter202/API-mega-list, Ordner 00-featured-apis: handverlesen APIs. AURA-Use-Case: Erste Anlaufstelle: bewährte APIs für schnelle Wins — Startpunkt für WF-17.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.232Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281t9-qtrku",
+      "name": "API Mega List — Automation (5.653 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/automation-apis-5653",
+      "category": "mega-automation",
+      "desc": "cporter202/API-mega-list, Ordner automation-apis-5653: 5.653 APIs. AURA-Use-Case: Kern für WF-17 + Service Fabric (74) + Routinen (75) + n8n-Bridge (15): Zapier-artige Ketten, Webhooks, Bot-Baukästen.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.237Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281tb-52rfr",
+      "name": "API Mega List — KI & Modelle (1.555 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/ai-apis-1555",
+      "category": "mega-ai",
+      "desc": "cporter202/API-mega-list, Ordner ai-apis-1555: 1.555 APIs. AURA-Use-Case: Cross-wired mit Model Bay (79), OmniRoute (58) + WF-16: Text/Bild/Sprache/Embeddings, Free-Tier-Anbieter zuerst.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.239Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281td-msu6a",
+      "name": "API Mega List — Agenten (623 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/agents-apis-623",
+      "category": "mega-agents",
+      "desc": "cporter202/API-mega-list, Ordner agents-apis-623: 623 APIs. AURA-Use-Case: Für A2A-Surface (/api/a2a), Hierarchie & Intercom: Agent-Orchestrierung, Agent-Hosting, Agent-Tools.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.241Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281tf-ds6gg",
+      "name": "API Mega List — MCP-Server (289 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/mcp-servers-apis-289",
+      "category": "mega-mcp",
+      "desc": "cporter202/API-mega-list, Ordner mcp-servers-apis-289: 289 APIs. AURA-Use-Case: Direkt in den MCP-Manager (Area 72) einhängbar — Tools/Datenquellen für alle Gehirne.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.243Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281th-uwj21",
+      "name": "API Mega List — Developer Tools (4.065 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/developer-tools-apis-4065",
+      "category": "mega-devtools",
+      "desc": "cporter202/API-mega-list, Ordner developer-tools-apis-4065: 4.065 APIs. AURA-Use-Case: App-Entwicklung: CI/CD, Code-Qualität, Hosting, Datenbanken — Fundament für die 76 Pages der Root-Server.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.245Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281tj-yreww",
+      "name": "API Mega List — Integrationen (841 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/integrations-apis-841",
+      "category": "mega-integrations",
+      "desc": "cporter202/API-mega-list, Ordner integrations-apis-841: 841 APIs. AURA-Use-Case: Verbindet AURA mit Drittsystemen (CRM, Tickets, Kalender) — immer über Vault (38) für Schlüssel.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.247Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281tl-rq8h4",
+      "name": "API Mega List — Business (514 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/business-apis-514",
+      "category": "mega-business",
+      "desc": "cporter202/API-mega-list, Ordner business-apis-514: 514 APIs. AURA-Use-Case: Cross-wired mit Finance Engine (31): Rechnungen, Buchhaltung, Verträge, Firmen-Daten.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.249Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281to-xan92",
+      "name": "API Mega List — E-Commerce (2.245 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/ecommerce-apis-2245",
+      "category": "mega-ecommerce",
+      "desc": "cporter202/API-mega-list, Ordner ecommerce-apis-2245: 2.245 APIs. AURA-Use-Case: Shops, Produkte, Zahlungen — mit Finance Engine (31) + human gate bei allen Zahlflüssen.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.252Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281tq-0usz9",
+      "name": "API Mega List — Marketing (290 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/marketing-apis-290",
+      "category": "mega-marketing",
+      "desc": "cporter202/API-mega-list, Ordner marketing-apis-290: 290 APIs. AURA-Use-Case: Cross-wired mit Content Forge (73) + Content Incubator (10): Kampagnen-Entwürfe, immer mit Freigabe.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.254Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281tt-ngvnu",
+      "name": "API Mega List — SEO-Tools (903 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/seo-tools-apis-903",
+      "category": "mega-seo",
+      "desc": "cporter202/API-mega-list, Ordner seo-tools-apis-903: 903 APIs. AURA-Use-Case: Direkt in SEO-Area (63) + WF-1 (Content-Pipeline): Rankings, Keywords, Site-Audits.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.257Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281tu-p9stw",
+      "name": "API Mega List — Social Media (2.786 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/social-media-apis-2786",
+      "category": "mega-social",
+      "desc": "cporter202/API-mega-list, Ordner social-media-apis-2786: 2.786 APIs. AURA-Use-Case: POLICY: nur offizielle APIs, nur eigene Konten, human approval, kein synthetisches Engagement (403-erzwungen).",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.258Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281tw-sx57f",
+      "name": "API Mega List — Video (705 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/videos-apis-705",
+      "category": "mega-videos",
+      "desc": "cporter202/API-mega-list, Ordner videos-apis-705: 705 APIs. AURA-Use-Case: Cross-wired mit WF-1 + WF-14 (Video-Automation): Rendering, Untertitel, Hosting — nur eigene Kanäle.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.260Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281tx-4k161",
+      "name": "API Mega List — News (537 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/news-apis-537",
+      "category": "mega-news",
+      "desc": "cporter202/API-mega-list, Ordner news-apis-537: 537 APIs. AURA-Use-Case: Für News Analyzer (21) + Research (62): Schlagzeilen, Themen-Monitoring, Fact-Check-Rohstoff.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.261Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281tz-ypldd",
+      "name": "API Mega List — Jobs & Karriere (1.149 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/jobs-apis-1149",
+      "category": "mega-jobs",
+      "desc": "cporter202/API-mega-list, Ordner jobs-apis-1149: 1.149 APIs. AURA-Use-Case: Stellenbörsen & Karriere-Daten — POLICY: nur eigene Anzeigen/Profile, keine Massen-Outreach.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.263Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281u0-bmeja",
+      "name": "API Mega List — Lead-Generierung (4.431 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/lead-generation-apis-4431",
+      "category": "mega-leadgen",
+      "desc": "cporter202/API-mega-list, Ordner lead-generation-apis-4431: 4.431 APIs. AURA-Use-Case: POLICY-STRENG: nur B2B mit Rechtsgrundlage, kein Ernten privater Daten, keine OSINT-Profile, immer Admin-Freigabe.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.264Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281u1-8qgkk",
+      "name": "API Mega List — Immobilien (1.089 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/real-estate-apis-1089",
+      "category": "mega-realestate",
+      "desc": "cporter202/API-mega-list, Ordner real-estate-apis-1089: 1.089 APIs. AURA-Use-Case: Börsen, Preise, Geodaten — Use-Case: Markt-Monitoring als Routine (75) mit Vault-Keys.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.266Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281u3-90crc",
+      "name": "API Mega List — Reisen (493 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/travel-apis-493",
+      "category": "mega-travel",
+      "desc": "cporter202/API-mega-list, Ordner travel-apis-493: 493 APIs. AURA-Use-Case: Flüge, Hotels, Wetter — Use-Case: Planungs-Assistent im Ultra-Brain-Kontext.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.267Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281u5-zcjgm",
+      "name": "API Mega List — Sport (21 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/sports-apis-21",
+      "category": "mega-sports",
+      "desc": "cporter202/API-mega-list, Ordner sports-apis-21: 21 APIs. AURA-Use-Case: Live-Scores & Statistiken — Content-Rohstoff für WF-1 mit Fact Checker.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.269Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281u7-aay1l",
+      "name": "API Mega List — Games (6 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/games-apis-6",
+      "category": "mega-games",
+      "desc": "cporter202/API-mega-list, Ordner games-apis-6: 6 APIs. AURA-Use-Case: Game-Daten & -Dienste — Bausteine für die Arcade-Page (/arcade) Experimente.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.271Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281ua-eg7ul",
+      "name": "API Mega List — Bildung (46 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/education-apis-46",
+      "category": "mega-education",
+      "desc": "cporter202/API-mega-list, Ordner education-apis-46: 46 APIs. AURA-Use-Case: Kurse, Wörterbücher, Lern-Daten — passt zu Kids-Story (08) & Wissensbasis (19).",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.274Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281uc-zfy19",
+      "name": "API Mega List — Für Creator (16 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/for-creators-apis-16",
+      "category": "mega-creators",
+      "desc": "cporter202/API-mega-list, Ordner for-creators-apis-16: 16 APIs. AURA-Use-Case: Creator-Tooling (Thumbnails, Monetarisierung) — nur eigene Inhalte/Kanäle.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.276Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281ud-kvyqk",
+      "name": "API Mega List — Open Source (84 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/open-source-apis-84",
+      "category": "mega-opensource",
+      "desc": "cporter202/API-mega-list, Ordner open-source-apis-84: 84 APIs. AURA-Use-Case: Freie, selbst hostbare APIs — Kandidaten für Service Fabric (74) auf deinen Root-Servern.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.277Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281uf-9nzzw",
+      "name": "API Mega List — Weitere (1.944 APIs)",
+      "url": "https://github.com/cporter202/API-mega-list/tree/main/other-apis-1944",
+      "category": "mega-other",
+      "desc": "cporter202/API-mega-list, Ordner other-apis-1944: 1.944 APIs. AURA-Use-Case: Samelbecken: Wetter, Finanzen, Wissenschaft, Fun — durchsuchen lohnt sich für Nischen-Use-Cases.",
+      "kind": "link",
+      "tags": [
+        "mega-api",
+        "free-api",
+        "cporter202"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.279Z",
+      "updated_at": null
+    },
+    {
+      "id": "yp-mv5281ug-ejymu",
+      "name": "Use-Case-Matrix: Mega-APIs → AURA (WF-17-Standardweg)",
+      "url": "",
+      "category": "use-cases",
+      "desc": "Verbindliche Zuordnung der 24 Mega-Kategorien zu AURA-Bereichen, Workflows und Sicherheitsregeln.",
+      "kind": "knowledge",
+      "tags": [
+        "mega-api",
+        "use-case",
+        "matrix"
+      ],
+      "status": "ok",
+      "custom": true,
+      "created_at": "2026-10-12T09:38:48.280Z",
+      "updated_at": null,
+      "body": "USE-CASE-MATRIX: cporter202/API-Mega-Liste → AURA (verbindlich für alle Gehirne)\n\nGRUNDREGEL (REGEL 1): Keine API wird ohne Autorisierung des Administrators angebunden. Jeder API-Key kommt ausschließlich in den Vault (Area 38) — niemals in Code oder URLs. Alles läuft über ehrliche Labels: LIVE / SIM / NOT-CONNECTED.\n\nSO WIRD EINE API EINGEBAUT (Standardweg WF-17):\n1. Auswahl: passende API aus einer der 24 Mega-Kategorien wählen (Free-Tier zuerst).\n2. Sicherheit: Schlüssel in Vault (38); Domain/Endpunkt als Service in Service Fabric (74) registrieren; Sentinel (86) beobachtet den Traffic.\n3. Umsetzung: Integrations-Architekt + Developer bauen den Connector; Fact Checker prüft die Antworten.\n4. Freigabe: human gate — der Administrator nickt ab, erst dann geht der Connector live.\n\nZUORDNUNG NACH BEREICH:\n- Automation/Apps: automation + devtools + integrations → Service Fabric (74), Routinen (75), n8n-Bridge (15), WF-15.\n- KI & Modelle: ai + agents + mcp → Model Bay (79), OmniRoute (58), MCP-Manager (72), A2A-Surface, WF-16.\n- Content & Marketing: marketing + seo + videos + news + creators → Content Forge (73), SEO (63), WF-1/WF-14, News Analyzer (21).\n- Business & Geld: business + ecommerce + jobs → Finance Engine (31), human gate bei Zahlflüssen.\n- Branchen: realestate + travel + sports + games + education + other → Routinen (75) + Wissensbasis (19).\n- Kontaktflächen: social + leadgen → NUR offizielle APIs, NUR eigene Konten/Daten mit Rechtsgrundlage, human approval, kein synthetisches Engagement, kein OSINT auf Personen.\n- Infrastruktur: open-source + mcp → selbst hosten auf den Root-Servern (Service Fabric), Sentinel-Wache auf jedem Server.\n\nVERBOTEN (permanent, auch innerhalb dieser Kategorien): Token-Ernte, Stealth-/Multi-Account-Systeme, CAPTCHA-Bypass, Umgehungs- und Jailbreak-Dienste, Scraping personenbezogener Daten, alles ohne Admin-Freigabe."
+    }
+  ],
+  "brain_feed": [],
+  "migrated_from_legacy": true
+}

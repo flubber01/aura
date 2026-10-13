@@ -1,0 +1,5 @@
+{
+  "_hinweis": "Eigene Assets des Traffic Mesh. Leer gelassen: die echten Pages/Kanäle werden vom Admin eingetragen (POST /api/growth/mesh/asset). Keine erfundenen URLs.",
+  "own_domains": [],
+  "assets": []
+}

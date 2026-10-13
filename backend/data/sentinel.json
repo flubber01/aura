@@ -1,0 +1,102 @@
+{
+  "events": [
+    {
+      "ts": "2026-10-12T09:17:31.974Z",
+      "ip": "203.0.113.7",
+      "type": "quarantaene",
+      "detail": "sweep-test"
+    },
+    {
+      "ts": "2026-10-12T09:39:49.986Z",
+      "ip": "203.0.113.7",
+      "type": "quarantaene",
+      "detail": "sweep-test"
+    },
+    {
+      "ts": "2026-10-12T11:14:35.117Z",
+      "ip": "203.0.113.7",
+      "type": "quarantaene",
+      "detail": "sweep-test"
+    },
+    {
+      "ts": "2026-10-12T11:14:55.119Z",
+      "ip": "203.0.113.7",
+      "type": "quarantaene",
+      "detail": "sweep-test"
+    },
+    {
+      "ts": "2026-10-12T11:16:16.396Z",
+      "ip": "203.0.113.7",
+      "type": "quarantaene",
+      "detail": "sweep-test"
+    }
+  ],
+  "blocklist": [],
+  "scans": [
+    {
+      "ts": "2026-10-12T09:17:31.973Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T09:17:31.978Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T09:17:32.023Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T09:17:46.208Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T09:23:26.179Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T09:39:49.985Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T09:39:49.990Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T11:14:35.116Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T11:14:35.122Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T11:14:55.118Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T11:14:55.123Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T11:16:16.395Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    },
+    {
+      "ts": "2026-10-12T11:16:16.400Z",
+      "verdict": "ALARM",
+      "anomalies": 4
+    }
+  ]
+}

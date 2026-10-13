@@ -10,8 +10,8 @@ const logger = require('./self_healing_logger');
 
 const DATA = path.join(__dirname, '..', 'data');
 // demo mode shrinks hours->seconds so the schedule is observable in preview
-const DEMO = process.env.AURA_SCHED_DEMO === '1';
-const H = DEMO ? 1 / 3600 : 1; // hours factor
+const DEMO = false; // kein Demo-Modus: Zeitfaktor ist immer echte Zeit
+const H = 1; // hours factor
 const SCHED = {
   super_brain_autosave_h: 12, // latest db of the super brain
   others_autosave_h: 4,       // feedback, vita, checkpoints
@@ -75,9 +75,12 @@ function kill(reason) {
   stopScheduler();
   store.audit({ area: 'OPS', event: 'KILL_SWITCH_ENGAGED', reason: killed.reason });
   logger.error('KILL SWITCH: ' + killed.reason);
+  // Kritisches Ereignis: Mensch soll erreicht werden. Eigene Eskalations-Kills nicht doppelt melden.
+  if (!/^Eskalation/.test(killed.reason)) { try { require('./escalation').raise({ kind: 'kill_switch', reason: killed.reason }); } catch { /* ignorieren */ } }
   return status();
 }
 function revive(reason) {
+  try { require('./escalation').thaw(reason || 'manual'); } catch { /* ignorieren */ }
   killed = { on: false, reason: 'revived: ' + (reason || 'manual'), at: new Date().toISOString() };
   startScheduler();
   store.audit({ area: 'OPS', event: 'kill_switch_revived', reason: killed.reason });

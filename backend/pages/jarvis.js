@@ -8,7 +8,7 @@ module.exports = function jarvisPageHtml() {
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{background:#020409;color:#cfe6ff;font:14px/1.55 'Segoe UI',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
 #grid{position:fixed;inset:0;z-index:0;opacity:.35}
-main{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:22px 16px}
+main{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:32px 16px 24px}
 header{text-align:center}h1{font-size:26px;letter-spacing:6px;color:#ffcf7d;text-shadow:0 0 24px rgba(255,207,125,.4)}
 .sub{color:#7d94ad;font-size:12px;margin-top:2px}
 .pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#0d3b2a;color:#5fff9f}
@@ -28,9 +28,10 @@ header{text-align:center}h1{font-size:26px;letter-spacing:6px;color:#ffcf7d;text
 .bar{display:flex;gap:8px}
 .bar input{flex:1;background:#081226;border:1px solid #24466f;color:#cfe6ff;border-radius:10px;padding:11px;font:inherit}
 .bar button{background:linear-gradient(90deg,#b8860b,#ffcf7d);color:#1a1200;border:0;border-radius:10px;padding:11px 18px;font-weight:800;cursor:pointer}
+.bar button.mic{background:#0c1830;color:#7fd0ff;border:1px solid #2c5a94}.bar button.mic.on{background:#5a1020;color:#ffb0b0;border-color:#b03040;animation:pulse 1s infinite}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 .chips button{background:#0c1830;border:1px solid #24466f;color:#9cc4ff;border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer}
-nav{margin-bottom:10px;font-size:13px}nav a{color:#ffcf7d;margin-right:12px;text-decoration:none}
+nav{margin:0 0 18px;padding:9px 14px;border:1px solid #1d3a66;border-radius:12px;background:rgba(8,14,30,.85);text-align:center;font-size:13px}nav a{color:#ffcf7d;margin:0 12px;text-decoration:none;letter-spacing:1px}nav a:hover{text-decoration:underline}
 #voice{font-size:12px;color:#7d94ad;margin-top:8px}
 </style></head><body><canvas id="grid"></canvas><main>
 <nav><a href="/hub">Hub</a><a href="/ignition">Ignition</a><a href="/logs">Logs</a><a href="/containers">Container</a></nav>
@@ -45,14 +46,16 @@ nav{margin-bottom:10px;font-size:13px}nav a{color:#ffcf7d;margin-right:12px;text
 <button onclick="ask('research self hosting dashboard')">Research</button>
 </div>
 <div id="chat"></div>
-<div class="bar"><input id="in" placeholder="Sir, was darf ich berichten? — frag mich nach status, learning, containers…" onkeydown="if(event.key==='Enter')send()"><button onclick="send()">SPRECHEN</button></div>
+<div class="bar"><input id="in" placeholder="Sir, was darf ich berichten? — frag mich nach status, learning, containers…" onkeydown="if(event.key==='Enter')send()"><button id="mic" class="mic" onclick="toggleMic()">🎙 Sprechen</button><button onclick="send()">SENDEN</button></div>
+<p id="llm" style="font-size:11px;color:#5f7186;margin-top:6px">LLM: prüfe …</p>
+<p id="micnote" style="font-size:11px;color:#5f7186;margin-top:6px">Mikrofon: Browser-Spracherkennung (Chrome/Edge). Die Aufnahme wird vom Browser an dessen Spracherkennungsdienst übergeben. Erst nach Klick auf „Sprechen“ und mit Erlaubnis.</p>
 <script>
 const ch=document.getElementById('chat');
 // (voice via browser SpeechSynthesis — no external service, works offline)
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 function speak(t){if(!document.getElementById('voice').checked||!window.speechSynthesis)return;
- const u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=1.05;u.pitch=.9;
- const v=speechSynthesis.getVoices().find(v=>/en[-_]GB/i.test(v.lang));if(v)u.voice=v;
+ const u=new SpeechSynthesisUtterance(t);u.lang='de-DE';u.rate=1.05;u.pitch=.9;
+ const v=speechSynthesis.getVoices().find(v=>/de[-_]DE/i.test(v.lang));if(v)u.voice=v;
  speechSynthesis.cancel();speechSynthesis.speak(u);}
 function add(role,text,data){
  const d=document.createElement('div');d.className='msg '+(role==='u'?'u':'j');
@@ -81,8 +84,26 @@ async function runResearch(topic){
  ch.scrollTop=ch.scrollHeight;
 }
 function send(){const i=document.getElementById('in');const t=i.value.trim();if(!t)return;i.value='';ask(t);}
+// Spracheingabe: Browser-Spracherkennung (Web Speech API), Deutsch, Ergebnis landet im Eingabefeld und wird gesendet
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,listening=false;
+function toggleMic(){
+ if(!SR){add('j','Spracheingabe ist in diesem Browser nicht verfügbar. Bitte Chrome oder Edge nutzen, oder Text eintippen.');return;}
+ if(listening){rec&&rec.stop();return;}
+ rec=new SR();rec.lang='de-DE';rec.interimResults=true;rec.continuous=false;
+ const inp=document.getElementById('in'),btn=document.getElementById('mic');
+ rec.onstart=()=>{listening=true;btn.textContent='■ Stopp';btn.classList.add('on');};
+ rec.onresult=e=>{let t='',fin=false;for(const r of e.results){t+=r[0].transcript;if(r.isFinal)fin=true;}inp.value=t;
+   if(fin){const q=t.trim();inp.value='';if(q)ask(q);}};
+ rec.onerror=e=>{add('j','Mikrofon-Fehler: '+e.error+'. Mikrofon-Zugriff im Browser erlauben und nochmal versuchen.');};
+ rec.onend=()=>{listening=false;btn.textContent='🎙 Sprechen';btn.classList.remove('on');};
+ try{rec.start();}catch(err){add('j','Mikrofon konnte nicht gestartet werden: '+err.message);}
+}
 add('j','Guten Tag. Alle Systeme im grünen Bereich. Wie kann ich dienen? Sprechen Sie frei oder nutzen Sie die Schnellfragen.');
 window.addEventListener('load',()=>speechSynthesis&&speechSynthesis.getVoices());
+fetch('/api/jarvis/llm').then(x=>x.json()).then(s=>{const el=document.getElementById('llm');
+ if(!s.configured){el.textContent='LLM: aus. Deterministische Engine (live Daten). Ollama aktivieren: Umgebungsvariable OLLAMA_URL setzen.';return;}
+ el.textContent=s.reachable?('LLM: Ollama erreichbar · Modell '+s.model+(s.model_present?'':' (nicht gepullt)')):('LLM: Ollama konfiguriert, aber nicht erreichbar ('+(s.error||'?')+') · Fallback: Engine');
+}).catch(()=>{document.getElementById('llm').textContent='LLM-Status nicht abrufbar';});
 const gc=document.getElementById('grid'),gx=gc.getContext('2d');
 function rs(){gc.width=innerWidth;gc.height=innerHeight}rs();addEventListener('resize',rs);
 let T=0;(function loop(){gx.clearRect(0,0,gc.width,gc.height);gx.strokeStyle='rgba(57,215,255,.07)';

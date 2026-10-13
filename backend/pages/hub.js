@@ -7,7 +7,7 @@ module.exports = function hubPageHtml() {
 <style>
 :root{--ink:#e8f4ff}
 *{box-sizing:border-box}body{margin:0;background:#02040a;color:var(--ink);font-family:system-ui,Segoe UI,Roboto,sans-serif;overflow-x:hidden}
-nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;gap:8px;justify-content:center;padding:10px;background:linear-gradient(180deg,rgba(2,4,10,.95),transparent)}
+nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;gap:8px;justify-content:center;padding:10px;background:#02040a;border-bottom:1px solid #12233f}
 nav a,nav button{cursor:pointer;background:#0b1526;border:1px solid #1e3a8a;color:#8ab4ff;border-radius:20px;padding:7px 16px;font-size:12px;letter-spacing:1px;font-weight:700;text-decoration:none}
 nav button.on{background:#12355e;color:#fff;box-shadow:0 0 14px rgba(57,215,255,.5)}
 section{display:none;min-height:100vh;padding-top:64px;position:relative}
@@ -74,6 +74,7 @@ h2.scr{ text-align:center;letter-spacing:4px;font-size:15px;margin:8px 0 4px }
 
 <section id="s-brain" class="on">
  <h2 class="scr" style="color:#7fd0ff">BLUE 3D BRAIN · 5-DIMENSIONAL AGENTIC CORE <span class="state live">LIVE</span></h2>
+ <div class="ticker" id="btick" style="padding:4px 14px 10px"></div>
  <div class="stage">
   <canvas id="neurons"></canvas>
   ${brain3dSnippet('hubbraincv', { w: 540, h: 540 })}
@@ -83,7 +84,6 @@ h2.scr{ text-align:center;letter-spacing:4px;font-size:15px;margin:8px 0 4px }
   <div class="dimchip" id="dc4">💾 REMEMBER<small id="d4"></small></div>
   <div class="dimchip" id="dc5">🛡 GOVERN<small id="d5"></small></div>
  </div>
- <div class="ticker" id="btick"></div>
 </section>
 
 <section id="s-matrix">

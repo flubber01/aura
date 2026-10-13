@@ -1,0 +1,22 @@
+{
+  "approved": {
+    "hello-tool": true,
+    "echo-integration": true,
+    "crash-dummy": true
+  },
+  "enabled": {
+    "hello-tool": true,
+    "echo-integration": true,
+    "crash-dummy": true
+  },
+  "config": {
+    "hello-tool": {
+      "loud": false
+    },
+    "__kv__": {
+      "hello-tool": {
+        "greets": 56
+      }
+    }
+  }
+}

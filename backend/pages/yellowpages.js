@@ -23,7 +23,7 @@ input,select{background:#120d04;color:#f4ecd8;border:1px solid #4d3a12;border-ra
 <nav><a href="/hub">Hub</a><a href="/pipelines">Pipelines</a><a href="/deploy">Deploy</a><a href="/cluster">Cluster</a></nav>
 <header><h1>📒 AURA YELLOW PAGES</h1><p class="sub">free-for.dev · thereisanaiforthat · n8n · Kaggle · Vercel & every useful list that matches a workflow category</p></header>
 <div class="wrap">
-<div class="controls"><input id="q" placeholder="Search links…" style="width:320px"><select id="cat"><option value="all">all categories</option></select></div>
+<div class="controls"><input id="q" placeholder="Search links…" style="width:320px"><select id="cat"><option value="all">all categories</option></select><label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#f5c96b"><input type="checkbox" id="comm" checked style="width:auto"> kommerzielle DAWs anzeigen</label></div>
 <div class="count" id="count"></div><div class="grid" id="grid"></div>
 </div>
 <script>
@@ -32,11 +32,11 @@ async function load(){L=(await (await fetch('/api/yellowpages')).json()).links;
  const cats=[...new Set(L.map(x=>x.category))].sort();
  const sel=document.getElementById('cat');cats.forEach(c=>sel.add(new Option(c,c)));render();}
 function render(){const q=document.getElementById('q').value.toLowerCase(),c=document.getElementById('cat').value;
- const f=L.filter(x=>(c==='all'||x.category===c)&&(x.name+x.desc).toLowerCase().includes(q));
+ const showComm=document.getElementById('comm').checked;\n const f=L.filter(x=>(c==='all'||x.category===c)&&(showComm||x.category!=='music-daw-commercial')&&(x.name+x.desc).toLowerCase().includes(q));
  document.getElementById('count').textContent=f.length+' of '+L.length+' curated links';
  document.getElementById('grid').innerHTML=f.map(x=>{const st=x.status||'ok';
   const blocked=st==='blocked';
   return '<a class="card" '+(blocked?'style="opacity:.55;border-color:#7f1d1d"':'')+' target="_blank" rel="noreferrer" href="'+x.url+'"><span class="cat" style="'+(blocked?'background:#3a1414;color:#f87171':st==='review'?'background:#2a1a08;color:#f5c96b':'')+'">'+(blocked?'⛔ BLOCKED':st==='review'?' REVIEW':x.category)+'</span><h3>'+x.name+'</h3><p>'+x.desc+'</p></a>';}).join('');}
-document.getElementById('q').oninput=render;document.getElementById('cat').onchange=render;load();
+document.getElementById('q').oninput=render;document.getElementById('cat').onchange=render;document.getElementById('comm').onchange=render;load();
 </script></body></html>`;
 };

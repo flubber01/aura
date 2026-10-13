@@ -2,69 +2,781 @@
   "schema_version": 2,
   "note": "AURA Yellow Pages — curated useful link lists & tools matched to workflow categories. Listing is not endorsement to execute; catalog rules apply (verify licenses, official APIs only, never auto-run).",
   "links": [
-    { "name": "free-for.dev", "url": "https://free-for.dev", "category": "dev-freebies", "desc": "Massive list of free tiers: hosting, CI, APIs, DBs, monitoring." },
-    { "name": "There's An AI For That", "url": "https://theresanaiforthat.com", "category": "ai-directory", "desc": "Searchable directory of AI tools for every task." },
-    { "name": "Public APIs", "url": "https://github.com/public-apis/public-apis", "category": "apis", "desc": "Collective list of free public APIs." },
-    { "name": "Hugging Face Models", "url": "https://huggingface.co/models", "category": "models", "desc": "Model hub — search, evaluate, download weights." },
-    { "name": "HF Spaces", "url": "https://huggingface.co/spaces", "category": "models", "desc": "Hosted demos & app hosting for models." },
-    { "name": "Ollama Library", "url": "https://ollama.com/library", "category": "models", "desc": "One-command local model runs." },
-    { "name": "Unsloth docs", "url": "https://docs.unsloth.ai", "category": "models", "desc": "Fast local fine-tuning guides." },
-    { "name": "GroqCloud", "url": "https://console.groq.com", "category": "models", "desc": "Fast inference API (key in secret store)." },
-    { "name": "MCP official", "url": "https://modelcontextprotocol.io", "category": "mcp", "desc": "Model Context Protocol spec & docs." },
-    { "name": "Smithery", "url": "https://smithery.ai", "category": "mcp", "desc": "MCP server directory." },
-    { "name": "MCP.so", "url": "https://mcp.so", "category": "mcp", "desc": "Community MCP server index." },
-    { "name": "Awesome Claude Skills", "url": "https://github.com/ComposioHQ/awesome-claude-skills", "category": "skills", "desc": "Curated agent skills list." },
-    { "name": "Awesome ChatGPT Prompts", "url": "https://github.com/f/awesome-chatgpt-prompts", "category": "prompts", "desc": "Prompt library by role/task." },
-    { "name": "NotebookLM", "url": "https://notebooklm.google.com", "category": "notebooks", "desc": "Source-grounded research notebooks (manual workflow)." },
-    { "name": "Jupyter", "url": "https://jupyter.org", "category": "notebooks", "desc": "Open notebook computing." },
-    { "name": "Observable", "url": "https://observablehq.com", "category": "notebooks", "desc": "Collaborative data notebooks." },
-    { "name": "Kaggle", "url": "https://kaggle.com", "category": "data", "desc": "Datasets & notebooks; relay only with opt-in compute policy (area 15)." },
-    { "name": "Papers with Code", "url": "https://paperswithcode.com", "category": "data", "desc": "Research + code, grounded sourcing." },
-    { "name": "n8n", "url": "https://n8n.io", "category": "automation", "desc": "Self-hostable workflow automation; HMAC-signed dispatch (area 15)." },
-    { "name": "n8n templates", "url": "https://n8n.io/workflows", "category": "automation", "desc": "Community workflow templates — review before use." },
-    { "name": "Activepieces", "url": "https://activepieces.com", "category": "automation", "desc": "Open-source Zapier alternative, self-hostable." },
-    { "name": "Windmill", "url": "https://windmill.dev", "category": "automation", "desc": "Open-source developer automation & internal tools." },
-    { "name": "Vercel", "url": "https://vercel.com", "category": "hosting", "desc": "Frontend/edge deploy; `vercel deploy` one-liner." },
-    { "name": "Netlify", "url": "https://netlify.com", "category": "hosting", "desc": "Static & serverless hosting with free tier." },
-    { "name": "Cloudflare Pages", "url": "https://pages.cloudflare.com", "category": "hosting", "desc": "Edge static hosting, generous free tier." },
-    { "name": "Fly.io", "url": "https://fly.io", "category": "hosting", "desc": "Container apps close to users." },
-    { "name": "Railway", "url": "https://railway.app", "category": "hosting", "desc": "Instant infra for APIs/DBs." },
-    { "name": "Render", "url": "https://render.com", "category": "hosting", "desc": "Managed services with free tiers." },
-    { "name": "Supabase", "url": "https://supabase.com", "category": "data", "desc": "Hosted Postgres + auth (backend for area 24 schema)." },
-    { "name": "Neon", "url": "https://neon.tech", "category": "data", "desc": "Serverless Postgres, branchable." },
-    { "name": "Upstash", "url": "https://upstash.com", "category": "data", "desc": "Serverless Redis/Kafka for edge cache (area 22)." },
-    { "name": "k3s", "url": "https://k3s.io", "category": "cluster", "desc": "Lightweight Kubernetes — the 1-click root-server binder." },
-    { "name": "Ansible", "url": "https://docs.ansible.com", "category": "cluster", "desc": "Agentless orchestration for fleet installs." },
-    { "name": "Coolify", "url": "https://coolify.io", "category": "cluster", "desc": "Self-hostable Heroku/Netlify alternative for your fleet." },
-    { "name": "CapRover", "url": "https://caprover.com", "category": "cluster", "desc": "Simple PaaS on your own servers." },
-    { "name": "Uptime Kuma", "url": "https://github.com/louislam/uptime-kuma", "category": "monitoring", "desc": "Self-hosted health checks for the collective." },
-    { "name": "Grafana", "url": "https://grafana.com", "category": "monitoring", "desc": "Dashboards over bundled fleet metrics." },
-    { "name": "StackBlitz", "url": "https://stackblitz.com", "category": "dev-tools", "desc": "Instant browser IDEs (WebContainers)." },
-    { "name": "CodeSandbox", "url": "https://codesandbox.io", "category": "dev-tools", "desc": "Cloud dev environments & prototypes." },
-    { "name": "Gitpod", "url": "https://gitpod.io", "category": "dev-tools", "desc": "Ephemeral dev environments from repos." },
-    { "name": "ngrok", "url": "https://ngrok.com", "category": "dev-tools", "desc": "Tunnel local previews (authorized usage)." },
-    { "name": "shadcn/ui", "url": "https://ui.shadcn.com", "category": "design", "desc": "Copy-in component system for dashboards." },
-    { "name": "Tailwind", "url": "https://tailwindcss.com", "category": "design", "desc": "Utility CSS for HUD builds." },
-    { "name": "v0", "url": "https://v0.dev", "category": "design", "desc": "Generative UI scaffolds (review output)." },
-    { "name": "Uiverse", "url": "https://uiverse.io", "category": "design", "desc": "Open-source CSS/UI elements." },
-    { "name": "Godly", "url": "https://godly.website", "category": "design", "desc": "Web design inspiration index." },
-    { "name": "Excalidraw", "url": "https://excalidraw.com", "category": "design", "desc": "Whiteboarding for cluster/architecture sketches." },
-    { "name": "Roadmap.sh", "url": "https://roadmap.sh", "category": "learning", "desc": "Role & stack learning roadmaps." },
-    { "name": "crontab.guru", "url": "https://crontab.guru", "category": "dev-freebies", "desc": "Schedule translator for daemons (area 17)." },
-    { "name": "Regex101", "url": "https://regex101.com", "category": "dev-freebies", "desc": "Regex testing & explanation." },
-    { "name": "Shields.io", "url": "https://shields.io", "category": "dev-freebies", "desc": "Badges for repo & HUD status." },
-    { "name": "Bluesky API", "url": "https://docs.bsky.app", "category": "social", "desc": "Official AT Protocol API docs." },
-    { "name": "Mastodon API", "url": "https://docs.joinmastodon.org/api/", "category": "social", "desc": "Official Mastodon REST API." },
-    { "name": "Telegram Bot API", "url": "https://core.telegram.org/bots/api", "category": "social", "desc": "Official bot interface." },
-    { "name": "YouTube Data API", "url": "https://developers.google.com/youtube", "category": "social", "desc": "Official uploads/metadata API." },
-    { "name": "WordPress REST", "url": "https://developer.wordpress.org/rest-api/", "category": "social", "desc": "Draft publishing via own site (area 14)." },
-    { "name": "Camoufox (privacy audit)", "url": "https://camoufox.com", "category": "privacy-audit", "desc": "Anti-fingerprint browser — LEGIT use: audit what YOUR OWN site leaks. Evasion/impersonation use is refused (policy).", "status": "review" },
-    { "name": "AI Collection", "url": "https://github.com/ai-collection/ai-collection", "category": "ai-directory", "desc": "Curated repo of AI tools, link-lists and MCP extensions — sourcing for the skill DB." },
-    { "name": "Faker.js", "url": "https://github.com/faker-js/faker", "category": "dev-tools", "desc": "Synthetic TEST data generator (labelled test data only — the honest alternative to fake-person services)." },
-    { "name": "FakePersonGenerator", "url": "https://fakepersongenerator.com", "category": "blocked", "desc": "BLOCKED by policy: fabricated identities for impersonation. Use Faker.js for test data instead.", "status": "blocked" },
-    { "name": "unMineable", "url": "https://unmineable.com", "category": "blocked", "desc": "BLOCKED: third-party compute mining without explicit permission (area 33 restricted).", "status": "blocked" },
-    { "name": "unblokked bypass hub", "url": "https://web.app", "category": "blocked", "desc": "BLOCKED: multi-accounting/bypass tooling — platform-evasion prohibited.", "status": "blocked" },
-    { "name": "RaidRush link vault", "url": "https://raidrush.ws", "category": "review", "desc": "REVIEW only: unverified underground list — do not execute or trust listed scripts.", "status": "review" },
-    { "name": "Notrack.ai", "url": "https://notrack.ai", "category": "blocked", "desc": "BLOCKED as bypass tunnel: 'uncensored evasion bridge' use refused. (Private browsing itself is fine.)", "status": "blocked" }
-  ]
+    {
+      "name": "free-for.dev",
+      "url": "https://free-for.dev",
+      "category": "dev-freebies",
+      "desc": "Massive list of free tiers: hosting, CI, APIs, DBs, monitoring."
+    },
+    {
+      "name": "There's An AI For That",
+      "url": "https://theresanaiforthat.com",
+      "category": "ai-directory",
+      "desc": "Searchable directory of AI tools for every task."
+    },
+    {
+      "name": "Public APIs",
+      "url": "https://github.com/public-apis/public-apis",
+      "category": "apis",
+      "desc": "Collective list of free public APIs."
+    },
+    {
+      "name": "Hugging Face Models",
+      "url": "https://huggingface.co/models",
+      "category": "models",
+      "desc": "Model hub — search, evaluate, download weights."
+    },
+    {
+      "name": "HF Spaces",
+      "url": "https://huggingface.co/spaces",
+      "category": "models",
+      "desc": "Hosted demos & app hosting for models."
+    },
+    {
+      "name": "Ollama Library",
+      "url": "https://ollama.com/library",
+      "category": "models",
+      "desc": "One-command local model runs."
+    },
+    {
+      "name": "Unsloth docs",
+      "url": "https://docs.unsloth.ai",
+      "category": "models",
+      "desc": "Fast local fine-tuning guides."
+    },
+    {
+      "name": "GroqCloud",
+      "url": "https://console.groq.com",
+      "category": "models",
+      "desc": "Fast inference API (key in secret store)."
+    },
+    {
+      "name": "MCP official",
+      "url": "https://modelcontextprotocol.io",
+      "category": "mcp",
+      "desc": "Model Context Protocol spec & docs."
+    },
+    {
+      "name": "Smithery",
+      "url": "https://smithery.ai",
+      "category": "mcp",
+      "desc": "MCP server directory."
+    },
+    {
+      "name": "MCP.so",
+      "url": "https://mcp.so",
+      "category": "mcp",
+      "desc": "Community MCP server index."
+    },
+    {
+      "name": "Awesome Claude Skills",
+      "url": "https://github.com/ComposioHQ/awesome-claude-skills",
+      "category": "skills",
+      "desc": "Curated agent skills list."
+    },
+    {
+      "name": "Awesome ChatGPT Prompts",
+      "url": "https://github.com/f/awesome-chatgpt-prompts",
+      "category": "prompts",
+      "desc": "Prompt library by role/task."
+    },
+    {
+      "name": "NotebookLM",
+      "url": "https://notebooklm.google.com",
+      "category": "notebooks",
+      "desc": "Source-grounded research notebooks (manual workflow)."
+    },
+    {
+      "name": "Jupyter",
+      "url": "https://jupyter.org",
+      "category": "notebooks",
+      "desc": "Open notebook computing."
+    },
+    {
+      "name": "Observable",
+      "url": "https://observablehq.com",
+      "category": "notebooks",
+      "desc": "Collaborative data notebooks."
+    },
+    {
+      "name": "Kaggle",
+      "url": "https://kaggle.com",
+      "category": "data",
+      "desc": "Datasets & notebooks; relay only with opt-in compute policy (area 15)."
+    },
+    {
+      "name": "Papers with Code",
+      "url": "https://paperswithcode.com",
+      "category": "data",
+      "desc": "Research + code, grounded sourcing."
+    },
+    {
+      "name": "n8n",
+      "url": "https://n8n.io",
+      "category": "automation",
+      "desc": "Self-hostable workflow automation; HMAC-signed dispatch (area 15)."
+    },
+    {
+      "name": "n8n templates",
+      "url": "https://n8n.io/workflows",
+      "category": "automation",
+      "desc": "Community workflow templates — review before use."
+    },
+    {
+      "name": "Activepieces",
+      "url": "https://activepieces.com",
+      "category": "automation",
+      "desc": "Open-source Zapier alternative, self-hostable."
+    },
+    {
+      "name": "Windmill",
+      "url": "https://windmill.dev",
+      "category": "automation",
+      "desc": "Open-source developer automation & internal tools."
+    },
+    {
+      "name": "Vercel",
+      "url": "https://vercel.com",
+      "category": "hosting",
+      "desc": "Frontend/edge deploy; `vercel deploy` one-liner."
+    },
+    {
+      "name": "Netlify",
+      "url": "https://netlify.com",
+      "category": "hosting",
+      "desc": "Static & serverless hosting with free tier."
+    },
+    {
+      "name": "Cloudflare Pages",
+      "url": "https://pages.cloudflare.com",
+      "category": "hosting",
+      "desc": "Edge static hosting, generous free tier."
+    },
+    {
+      "name": "Fly.io",
+      "url": "https://fly.io",
+      "category": "hosting",
+      "desc": "Container apps close to users."
+    },
+    {
+      "name": "Railway",
+      "url": "https://railway.app",
+      "category": "hosting",
+      "desc": "Instant infra for APIs/DBs."
+    },
+    {
+      "name": "Render",
+      "url": "https://render.com",
+      "category": "hosting",
+      "desc": "Managed services with free tiers."
+    },
+    {
+      "name": "Supabase",
+      "url": "https://supabase.com",
+      "category": "data",
+      "desc": "Hosted Postgres + auth (backend for area 24 schema)."
+    },
+    {
+      "name": "Neon",
+      "url": "https://neon.tech",
+      "category": "data",
+      "desc": "Serverless Postgres, branchable."
+    },
+    {
+      "name": "Upstash",
+      "url": "https://upstash.com",
+      "category": "data",
+      "desc": "Serverless Redis/Kafka for edge cache (area 22)."
+    },
+    {
+      "name": "k3s",
+      "url": "https://k3s.io",
+      "category": "cluster",
+      "desc": "Lightweight Kubernetes — the 1-click root-server binder."
+    },
+    {
+      "name": "Ansible",
+      "url": "https://docs.ansible.com",
+      "category": "cluster",
+      "desc": "Agentless orchestration for fleet installs."
+    },
+    {
+      "name": "Coolify",
+      "url": "https://coolify.io",
+      "category": "cluster",
+      "desc": "Self-hostable Heroku/Netlify alternative for your fleet."
+    },
+    {
+      "name": "CapRover",
+      "url": "https://caprover.com",
+      "category": "cluster",
+      "desc": "Simple PaaS on your own servers."
+    },
+    {
+      "name": "Uptime Kuma",
+      "url": "https://github.com/louislam/uptime-kuma",
+      "category": "monitoring",
+      "desc": "Self-hosted health checks for the collective."
+    },
+    {
+      "name": "Grafana",
+      "url": "https://grafana.com",
+      "category": "monitoring",
+      "desc": "Dashboards over bundled fleet metrics."
+    },
+    {
+      "name": "StackBlitz",
+      "url": "https://stackblitz.com",
+      "category": "dev-tools",
+      "desc": "Instant browser IDEs (WebContainers)."
+    },
+    {
+      "name": "CodeSandbox",
+      "url": "https://codesandbox.io",
+      "category": "dev-tools",
+      "desc": "Cloud dev environments & prototypes."
+    },
+    {
+      "name": "Gitpod",
+      "url": "https://gitpod.io",
+      "category": "dev-tools",
+      "desc": "Ephemeral dev environments from repos."
+    },
+    {
+      "name": "ngrok",
+      "url": "https://ngrok.com",
+      "category": "dev-tools",
+      "desc": "Tunnel local previews (authorized usage)."
+    },
+    {
+      "name": "shadcn/ui",
+      "url": "https://ui.shadcn.com",
+      "category": "design",
+      "desc": "Copy-in component system for dashboards."
+    },
+    {
+      "name": "Tailwind",
+      "url": "https://tailwindcss.com",
+      "category": "design",
+      "desc": "Utility CSS for HUD builds."
+    },
+    {
+      "name": "v0",
+      "url": "https://v0.dev",
+      "category": "design",
+      "desc": "Generative UI scaffolds (review output)."
+    },
+    {
+      "name": "Uiverse",
+      "url": "https://uiverse.io",
+      "category": "design",
+      "desc": "Open-source CSS/UI elements."
+    },
+    {
+      "name": "Godly",
+      "url": "https://godly.website",
+      "category": "design",
+      "desc": "Web design inspiration index."
+    },
+    {
+      "name": "Excalidraw",
+      "url": "https://excalidraw.com",
+      "category": "design",
+      "desc": "Whiteboarding for cluster/architecture sketches."
+    },
+    {
+      "name": "Roadmap.sh",
+      "url": "https://roadmap.sh",
+      "category": "learning",
+      "desc": "Role & stack learning roadmaps."
+    },
+    {
+      "name": "crontab.guru",
+      "url": "https://crontab.guru",
+      "category": "dev-freebies",
+      "desc": "Schedule translator for daemons (area 17)."
+    },
+    {
+      "name": "Regex101",
+      "url": "https://regex101.com",
+      "category": "dev-freebies",
+      "desc": "Regex testing & explanation."
+    },
+    {
+      "name": "Shields.io",
+      "url": "https://shields.io",
+      "category": "dev-freebies",
+      "desc": "Badges for repo & HUD status."
+    },
+    {
+      "name": "Bluesky API",
+      "url": "https://docs.bsky.app",
+      "category": "social",
+      "desc": "Official AT Protocol API docs."
+    },
+    {
+      "name": "Mastodon API",
+      "url": "https://docs.joinmastodon.org/api/",
+      "category": "social",
+      "desc": "Official Mastodon REST API."
+    },
+    {
+      "name": "Telegram Bot API",
+      "url": "https://core.telegram.org/bots/api",
+      "category": "social",
+      "desc": "Official bot interface."
+    },
+    {
+      "name": "YouTube Data API",
+      "url": "https://developers.google.com/youtube",
+      "category": "social",
+      "desc": "Official uploads/metadata API."
+    },
+    {
+      "name": "WordPress REST",
+      "url": "https://developer.wordpress.org/rest-api/",
+      "category": "social",
+      "desc": "Draft publishing via own site (area 14)."
+    },
+    {
+      "name": "Camoufox (privacy audit)",
+      "url": "https://camoufox.com",
+      "category": "privacy-audit",
+      "desc": "Anti-fingerprint browser — LEGIT use: audit what YOUR OWN site leaks. Evasion/impersonation use is refused (policy).",
+      "status": "review"
+    },
+    {
+      "name": "AI Collection",
+      "url": "https://github.com/ai-collection/ai-collection",
+      "category": "ai-directory",
+      "desc": "Curated repo of AI tools, link-lists and MCP extensions — sourcing for the skill DB."
+    },
+    {
+      "name": "Faker.js",
+      "url": "https://github.com/faker-js/faker",
+      "category": "dev-tools",
+      "desc": "Synthetic TEST data generator (labelled test data only — the honest alternative to fake-person services)."
+    },
+    {
+      "name": "FakePersonGenerator",
+      "url": "https://fakepersongenerator.com",
+      "category": "blocked",
+      "desc": "BLOCKED by policy: fabricated identities for impersonation. Use Faker.js for test data instead.",
+      "status": "blocked"
+    },
+    {
+      "name": "unMineable",
+      "url": "https://unmineable.com",
+      "category": "blocked",
+      "desc": "BLOCKED: third-party compute mining without explicit permission (area 33 restricted).",
+      "status": "blocked"
+    },
+    {
+      "name": "unblokked bypass hub",
+      "url": "https://web.app",
+      "category": "blocked",
+      "desc": "BLOCKED: multi-accounting/bypass tooling — platform-evasion prohibited.",
+      "status": "blocked"
+    },
+    {
+      "name": "RaidRush link vault",
+      "url": "https://raidrush.ws",
+      "category": "review",
+      "desc": "REVIEW only: unverified underground list — do not execute or trust listed scripts.",
+      "status": "review"
+    },
+    {
+      "name": "Notrack.ai",
+      "url": "https://notrack.ai",
+      "category": "blocked",
+      "desc": "BLOCKED as bypass tunnel: 'uncensored evasion bridge' use refused. (Private browsing itself is fine.)",
+      "status": "blocked"
+    },
+    {
+      "name": "Splice",
+      "url": "https://splice.com",
+      "category": "music-samples",
+      "desc": "Sample, MIDI and preset library with DAW integration and royalty-free licences."
+    },
+    {
+      "name": "Loopcloud",
+      "url": "https://www.loopcloud.io",
+      "category": "music-samples",
+      "desc": "Browser and library for samples, loops and presets with a low-cost entry tier."
+    },
+    {
+      "name": "Cymatics",
+      "url": "https://cymatics.com",
+      "category": "music-samples",
+      "desc": "Genre-focused sample packs (EDM, trap, hip-hop) with a large free vault."
+    },
+    {
+      "name": "LANDR Samples",
+      "url": "https://landr.com",
+      "category": "music-samples",
+      "desc": "Royalty-free samples and loops within the LANDR ecosystem (mastering, distribution)."
+    },
+    {
+      "name": "Sample Focus",
+      "url": "https://samplefocus.com",
+      "category": "music-samples",
+      "desc": "Community sample library, free, royalty-free."
+    },
+    {
+      "name": "Loopmasters",
+      "url": "https://www.loopmasters.com",
+      "category": "music-samples",
+      "desc": "Long-running sample store with packs from many sound designers and labels."
+    },
+    {
+      "name": "Ghost Syndicate",
+      "url": "https://ghostsyndicate.audio",
+      "category": "music-samples",
+      "desc": "In-house sample packs for bass music, dubstep, drum and bass, UK bass."
+    },
+    {
+      "name": "Producer Spot",
+      "url": "https://producerspot.com",
+      "category": "music-samples",
+      "desc": "Sample packs, synth presets, templates and tutorials for electronic production."
+    },
+    {
+      "name": "PresetShare",
+      "url": "https://presetshare.com",
+      "category": "music-plugins",
+      "desc": "Community platform for synth presets (Serum, Vital, Massive, Pigments and others)."
+    },
+    {
+      "name": "Plugin Boutique",
+      "url": "https://www.pluginboutique.com",
+      "category": "music-plugins",
+      "desc": "Marketplace for plugins and bundles from many developers with frequent sales."
+    },
+    {
+      "name": "Plugin Alliance",
+      "url": "https://www.plugin-alliance.com",
+      "category": "music-plugins",
+      "desc": "Premium plugin ecosystem from many developers, with All-Access subscription."
+    },
+    {
+      "name": "ADSR Sounds",
+      "url": "https://www.adsrsounds.com",
+      "category": "music-plugins",
+      "desc": "Shop for plugins, sample packs and presets, plus production courses."
+    },
+    {
+      "name": "Tracklib",
+      "url": "https://www.tracklib.com",
+      "category": "music-samples",
+      "desc": "Licensed sample library for clearing and using samples from existing tracks (check licence per use)."
+    },
+    {
+      "name": "KVR Audio",
+      "url": "https://www.kvraudio.com",
+      "category": "music-plugins",
+      "desc": "Plugin database and news for VST, AU and other audio plugins, with reviews and deals."
+    },
+    {
+      "name": "Freesound",
+      "url": "https://freesound.org",
+      "category": "music-samples",
+      "desc": "Community library of free sounds under Creative Commons licences (check each sound's licence)."
+    },
+    {
+      "name": "Ardour",
+      "url": "https://ardour.org",
+      "category": "music-daw",
+      "desc": "Open-source professional DAW (GPL-2.0), Linux, macOS, Windows. Recording, MIDI, mixing."
+    },
+    {
+      "name": "DistroKid",
+      "url": "https://distrokid.com",
+      "category": "music-distribution",
+      "desc": "Distribution to 150+ stores and streaming services, yearly plan, artist keeps rights and royalties."
+    },
+    {
+      "name": "TuneCore",
+      "url": "https://www.tunecore.com",
+      "category": "music-distribution",
+      "desc": "Distribution to 150+ stores, per-release or yearly plans, publishing options."
+    },
+    {
+      "name": "CD Baby",
+      "url": "https://cdbaby.com",
+      "category": "music-distribution",
+      "desc": "Distribution to 150+ stores, pay-per-release, takes a share of royalties."
+    },
+    {
+      "name": "Amuse",
+      "url": "https://www.amuse.io",
+      "category": "music-distribution",
+      "desc": "Distribution with plans from a free tier to paid tiers, mobile workflow, promotion tools."
+    },
+    {
+      "name": "Ditto Music",
+      "url": "https://dittomusic.com",
+      "category": "music-distribution",
+      "desc": "Distribution with yearly plans, store list and artist tools."
+    },
+    {
+      "name": "AWAL",
+      "url": "https://www.awal.com",
+      "category": "music-distribution",
+      "desc": "Distribution and label services for independent artists, commission-based."
+    },
+    {
+      "name": "Symphonic Distribution",
+      "url": "https://symphonicdistribution.com",
+      "category": "music-distribution",
+      "desc": "Distribution and label services, strong on electronic and Latin catalogues."
+    },
+    {
+      "name": "RouteNote",
+      "url": "https://routenote.com",
+      "category": "music-distribution",
+      "desc": "Distribution with free and paid plans, commission on some royalties."
+    },
+    {
+      "name": "UnitedMasters",
+      "url": "https://www.unitedmasters.com",
+      "category": "music-distribution",
+      "desc": "Distribution with brand and sync deal features, subscription plus commission."
+    },
+    {
+      "name": "ONErpm",
+      "url": "https://onerpm.com",
+      "category": "music-distribution",
+      "desc": "Distribution and label services for independent artists and labels."
+    },
+    {
+      "name": "EmuBands",
+      "url": "https://emubands.com",
+      "category": "music-distribution",
+      "desc": "Distribution for artists and labels, per-release pricing."
+    },
+    {
+      "name": "DaVinci Resolve",
+      "url": "https://www.blackmagicdesign.com/products/davinciresolve",
+      "category": "video-editing",
+      "desc": "Professional editor with colour grading, audio and VFX. Free version has limits, paid Studio version."
+    },
+    {
+      "name": "Shotcut",
+      "url": "https://www.shotcut.org",
+      "category": "video-editing",
+      "desc": "Open-source video editor (GPLv3), no watermark, 4K, works without transcoding."
+    },
+    {
+      "name": "Kdenlive",
+      "url": "https://kdenlive.org",
+      "category": "video-editing",
+      "desc": "Open-source multi-track video editor (GPL), proxy editing, Linux, Windows, macOS."
+    },
+    {
+      "name": "OpenShot",
+      "url": "https://www.openshot.org",
+      "category": "video-editing",
+      "desc": "Open-source video editor, simple workflow for beginners, Linux, Windows, macOS."
+    },
+    {
+      "name": "Blender",
+      "url": "https://www.blender.org",
+      "category": "video-editing",
+      "desc": "Open-source 3D suite with video sequencer and compositor (GPL)."
+    },
+    {
+      "name": "LosslessCut",
+      "url": "https://github.com/mifi/lossless-cut",
+      "category": "video-editing",
+      "desc": "Open-source tool for fast cutting without re-encoding (GitHub)."
+    },
+    {
+      "name": "FFmpeg",
+      "url": "https://ffmpeg.org",
+      "category": "video-editing",
+      "desc": "Command-line media toolkit for automated cuts, conversion and encoding (LGPL/GPL)."
+    },
+    {
+      "name": "ComfyUI",
+      "url": "https://github.com/comfyanonymous/ComfyUI",
+      "category": "ai-media",
+      "desc": "Node-based web UI for local image, video and audio generation. Check each model's licence."
+    },
+    {
+      "name": "FL Studio",
+      "url": "https://www.image-line.com/flstudio/",
+      "category": "music-daw-commercial",
+      "desc": "Kommerzielle DAW (Windows, macOS) mit Step-Sequencer und Piano Roll, beliebt für Beats. Editionen Fruity (nur MIDI, keine Audioaufnahme) und Producer (mit Aufnahme). Einmalkauf mit kostenlosen Updates."
+    },
+    {
+      "name": "Cubase Elements",
+      "url": "https://www.steinberg.net/cubase/",
+      "category": "music-daw-commercial",
+      "desc": "Steinberg-Einstiegsversion von Cubase, kommerziell. Gleiche Audio-Engine, aber weniger Spuren und Funktionen als Artist und Pro (z. B. kein VariAudio, keine Modulatoren)."
+    },
+    {
+      "name": "Vital",
+      "url": "https://vital.audio",
+      "category": "music-synths",
+      "desc": "Wavetable-Synth mit visueller Modulation, kostenlose Version (Freeware, kein Open Source), Zusatzinhalte kostenpflichtig."
+    },
+    {
+      "name": "Surge XT",
+      "url": "https://surge-synthesizer.github.io",
+      "category": "music-synths",
+      "desc": "Open-Source-Hybridsynth (GPL-3.0) mit FM, Wavetable und Subtraktiv. VST3, AU, CLAP, LV2 unter Windows, macOS und Linux."
+    },
+    {
+      "name": "Dexed",
+      "url": "https://asb2m10.github.io/dexed",
+      "category": "music-synths",
+      "desc": "Open-Source-FM-Synth nach dem Yamaha DX7, lädt originale DX7-Patches."
+    },
+    {
+      "name": "Helm",
+      "url": "https://tytel.org/helm",
+      "category": "music-synths",
+      "desc": "Open-Source-Polysynth (GPL), einfach zu lernen. Entwicklung ist laut Quellen eingefroren, also stabil, aber nicht mehr aktiv erweitert."
+    },
+    {
+      "name": "Spitfire LABS",
+      "url": "https://spitfireaudio.com/labs",
+      "category": "music-instruments",
+      "desc": "Kostenlose Sample-Instrumente (über 80) mit orchestralen und experimentellen Klängen."
+    },
+    {
+      "name": "Hydrogen",
+      "url": "https://www.hydrogen-music.org",
+      "category": "music-instruments",
+      "desc": "Open-Source-Drumcomputer und Beatmaker (GPL-2.0 oder neuer), Linux, macOS, Windows."
+    },
+    {
+      "name": "LMMS",
+      "url": "https://lmms.io",
+      "category": "music-instruments",
+      "desc": "Open-Source-Musikstudio mit Synths, Samplern und Tracker-Oberfläche (GPL-2.0 oder neuer)."
+    },
+    {
+      "name": "Valhalla Supermassive",
+      "url": "https://valhalladsp.com",
+      "category": "music-effects",
+      "desc": "Kostenloser Hall- und Delay-Effekt mit vielen Modi, proprietär (kostenlos, nicht Open Source)."
+    },
+    {
+      "name": "TDR Nova",
+      "url": "https://www.tokyodawn.net",
+      "category": "music-effects",
+      "desc": "Kostenloser dynamischer Parallel-EQ mit vier Bändern, proprietär. Upgrade auf erweiterte Version möglich."
+    },
+    {
+      "name": "OTT",
+      "url": "https://xferrecords.com",
+      "category": "music-effects",
+      "desc": "Kostenloser Multiband-Kompressor von Xfer Records, proprietär."
+    },
+    {
+      "name": "Calf Studio Gear",
+      "url": "https://calf-studio-gear.org",
+      "category": "music-effects",
+      "desc": "Open-Source-Effektpaket (LGPL) mit Kompressor, EQ, Hall und Verzerrung."
+    },
+    {
+      "name": "x42-Autotune",
+      "url": "https://x42-plugins.com/x42/x42-autotune",
+      "category": "music-vocal",
+      "desc": "Open-Source-Autotune (GPL) für Gesangs-Tonkorrektur, kostenlos. Windows, macOS und Linux."
+    },
+    {
+      "name": "Antares Auto-Tune",
+      "url": "https://www.antarestech.com",
+      "category": "music-vocal",
+      "desc": "Kommerzieller Standard für Echtzeit-Tonkorrektur und den Hard-Tune-Effekt. Preise bewusst nicht eingetragen."
+    },
+    {
+      "name": "Celemony Melodyne",
+      "url": "https://www.celemony.com",
+      "category": "music-vocal",
+      "desc": "Kommerzieller Note-für-Note-Editor für Tonhöhe, Timing und Formanten. Preise bewusst nicht eingetragen."
+    },
+    {
+      "name": "Sforzando",
+      "url": "https://www.plogue.com",
+      "category": "music-instruments",
+      "desc": "Kostenloser SFZ-Sampler von Plogue (Freeware, nicht Open Source) für Sample-Instrumente und Drum-Kits, als Standalone und Plugin."
+    },
+    {
+      "name": "SFZ-Instrumente (Mappings)",
+      "url": "https://github.com/sfzinstruments/mappings",
+      "category": "music-instruments",
+      "desc": "Community-Sammlung von SFZ-Mappings für freie Sample-Bibliotheken. Die Lizenz gilt je Bibliothek, bitte prüfen."
+    },
+    {
+      "name": "DrumGizmo DRSKit",
+      "url": "https://github.com/sfzinstruments/DrumGizmo.DRSKit",
+      "category": "music-instruments",
+      "desc": "Freies Drum-Kit als SFZ-Mapping, lizenziert unter CC-BY-4.0 (Namensnennung nötig)."
+    },
+    {
+      "name": "REAPER",
+      "url": "https://www.reaper.fm",
+      "category": "music-daw-commercial",
+      "desc": "Vollwertige DAW mit Video-Spur: Videos lassen sich direkt im Projekt schneiden und vertonen. Kommerziell, mit Testversion. Preise bewusst nicht eingetragen."
+    },
+    {
+      "name": "Airwindows",
+      "url": "https://www.airwindows.com",
+      "category": "music-effects",
+      "desc": "Große Sammlung kostenloser Effekte (Distortion, Saturation, Hall, EQ) unter MIT-Lizenz."
+    },
+    {
+      "name": "Dragonfly Reverb",
+      "url": "https://michaelwillis.github.io/dragonfly-reverb/",
+      "category": "music-effects",
+      "desc": "Open-Source-Hall-Plugin (GPL) mit Room-, Hall- und Plate-Modus."
+    },
+    {
+      "name": "prompts.chat",
+      "url": "https://prompts.chat",
+      "category": "prompts",
+      "desc": "Community-Sammlung von Prompts (früher Awesome ChatGPT Prompts), frei und Open Source, auch selbst hostbar."
+    },
+    {
+      "name": "Prompt Optimizer",
+      "url": "https://github.com/linshenkx/prompt-optimizer",
+      "category": "prompts",
+      "desc": "Open-Source-Werkzeug, das Prompts verbessert und Ergebnisse vergleicht."
+    },
+    {
+      "name": "Awesome Claude Code",
+      "url": "https://github.com/hesreallyhim/awesome-claude-code",
+      "category": "prompts",
+      "desc": "Handverlesene Liste mit Skills, Agenten, Statuslines und Tools rund um Claude Code."
+    },
+    {
+      "name": "Mr. Ranedeer AI Tutor",
+      "url": "https://github.com/JushBJJ/Mr.-Ranedeer-AI-Tutor",
+      "category": "prompts",
+      "desc": "Anpassbarer Tutor-Prompt für personalisiertes Lernen, ursprünglich für GPT-4 geschrieben."
+    },
+    {
+      "name": "LiteLLM",
+      "url": "https://github.com/BerriAI/litellm",
+      "category": "ai-gateway",
+      "desc": "Open-Source-Gateway für über 100 LLM-APIs im OpenAI-Format, mit Load Balancing, Fallbacks und Kosten-Tracking. Referenz für späteren Ausbau des Failovers."
+    },
+    {
+      "name": "9router",
+      "url": "https://github.com/decolua/9router",
+      "category": "ai-gateway",
+      "desc": "Lokaler Router für Coding-Tools mit automatischem Fallback zwischen Anbietern. Kostenlose Angebote hängen vom Anbieter ab, Lizenz vor Nutzung prüfen."
+    },
+    {
+      "name": "Arena AI",
+      "url": "https://arena.ai",
+      "category": "ai-platforms",
+      "desc": "Arena: KI-Leaderboard, Battle-Modus, Direktchat und Agent Mode für komplexe Aufgaben."
+    }
+  ],
+  "updated_at": "2026-10-13T16:25:23.454Z",
+  "via": "upload"
 }
