@@ -89,6 +89,9 @@ TELEGRAM_BOT_TOKEN=… TELEGRAM_ALLOWED_CHATS=<deine Chat-ID> AURA_URL=http://<s
   node backend/src/lib/telegram_poller.js
 ```
 
+### 4.7b Android über Termux
+Anleitung: [`docs/TERMUX.md`](TERMUX.md). Installation mit `bash deploy/termux/install.sh` (Node 22+, Port 8080). Autostart über Termux:Boot mit `deploy/termux/boot.sh`. Auf echtem Handy noch nicht getestet.
+
 ### 4.8 Cluster (4 Root-Server)
 `/cluster`: IPs und Rollen eingeben, Kit herunterladen, `ansible-playbook -i hosts.ini playbook.yml`. Nicht in dieser Sandbox geprüft.
 
