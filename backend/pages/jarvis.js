@@ -31,7 +31,7 @@ header{text-align:center}h1{font-size:26px;letter-spacing:6px;color:#ffcf7d;text
 .bar button.mic{background:#0c1830;color:#7fd0ff;border:1px solid #2c5a94}.bar button.mic.on{background:#5a1020;color:#ffb0b0;border-color:#b03040;animation:pulse 1s infinite}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 .chips button{background:#0c1830;border:1px solid #24466f;color:#9cc4ff;border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer}
-nav{margin-bottom:10px;font-size:13px}nav a{color:#ffcf7d;margin-right:12px;text-decoration:none}
+nav{margin:0 0 18px;padding:9px 14px;border:1px solid #1d3a66;border-radius:12px;background:rgba(8,14,30,.85);text-align:center;font-size:13px}nav a{color:#ffcf7d;margin:0 12px;text-decoration:none;letter-spacing:1px}nav a:hover{text-decoration:underline}
 #voice{font-size:12px;color:#7d94ad;margin-top:8px}
 </style></head><body><canvas id="grid"></canvas><main>
 <nav><a href="/hub">Hub</a><a href="/ignition">Ignition</a><a href="/logs">Logs</a><a href="/containers">Container</a></nav>
