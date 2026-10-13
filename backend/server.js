@@ -951,6 +951,10 @@ const server = http.createServer(async (req, res) => {
       if (m) return out(control.decide(m[1], body.decision, body.by));
       return send(res, 404, 'application/json', JSON.stringify({ ok: false, error: 'unknown control route' }));
     }
+    if (p === '/api/yellowpages/help' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      return send(res, 200, 'application/json', JSON.stringify({ q: sp.get('q') || '', results: require('./src/lib/yp_help').find(sp.get('q') || '', sp.get('limit') || 5) }, null, 2));
+    }
     if (p === '/api/skill-catalog' && req.method === 'GET') {
       const sp = new URL(req.url, 'http://x').searchParams;
       return send(res, 200, 'application/json', JSON.stringify(skillCatalog.search({ q: sp.get('q') || '', source: sp.get('source') || '', status: sp.get('status') || '', category: sp.get('category') || '', limit: sp.get('limit') || 100 }), null, 2));

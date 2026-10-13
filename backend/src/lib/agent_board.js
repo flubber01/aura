@@ -140,7 +140,9 @@ function act(taskId, action, by, body = {}) {
     if (!deptIds().has(dept)) return err(422, 'dept: unbekannte Abteilung');
     if (reason.length < 5) return err(400, 'reason: mindestens 5 Zeichen');
     const sug = candidatesFor(db, [dept], task.owner)[0] || null;
-    task.help_request = { dept, reason, suggested: sug ? sug.id : null, at: new Date().toISOString() };
+    // Gelbe-Seiten-Vorschläge (nur lesend, Mensch entscheidet): Suche aus Grund und Abteilung.
+    const yp = require('./yp_help').find(reason + ' ' + dept, 5);
+    task.help_request = { dept, reason, suggested: sug ? sug.id : null, yellow_pages: yp, at: new Date().toISOString() };
     task.status = tr.to;
     audit(task, 'help_requested', task.owner, `${dept}: ${reason}`);
   } else if (action === 'handoff') {
