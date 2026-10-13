@@ -14,6 +14,9 @@ const MAX_CHECKPOINTS = 20;      // bounded retention
 const curve = [];                // learning curve observations
 const weights = { A: 1, B: 1, C: 1 }; // consensus variant weights (heuristic)
 let loopCount = 0, healsApplied = 0;
+// Master-Schalter: Standard = Autonomie braucht Freigabe. Nur mit AURA_AUTONOMY_AUTO=1 heilt der Loop selbst.
+const REQUIRE_APPROVAL = process.env.AURA_AUTONOMY_AUTO !== '1';
+const proposals = [];
 const fs = require('fs');
 const path = require('path');
 
@@ -51,6 +54,13 @@ function runOnce(manual) {
   loopCount++;
   const findings = checks();
   for (const f of findings) {
+    if (REQUIRE_APPROVAL) {
+      // Standard: nichts ohne Freigabe. Nur Vorschlag, wird im Audit vermerkt.
+      proposals.push({ at: new Date().toISOString(), finding: f.id, proposed: f.heal, status: 'pending_approval' });
+      if (proposals.length > 50) proposals.shift();
+      store.audit({ area: '49', event: 'heal_proposed', finding: f.id });
+      continue;
+    }
     healsApplied++;
     logger.warn(`loop heal: ${f.id} -> ${f.heal}`);
     store.audit({ area: '49', event: 'self_heal', finding: f.id });
@@ -81,8 +91,9 @@ function stop() { if (timer) clearInterval(timer); timer = null; return { stoppe
 module.exports = {
   meta: { area: '49', id: 'autonomy_loop', name: 'Autonomous loop / learning curve', state: 'live' },
   start, stop, runOnce,
+  proposals: () => proposals.slice(-50),
   learning: () => ({ curve: curve.slice(-60), weights, note: 'heuristic, local-only learning signal — labelled as demo' }),
-  status: () => ({ loop_count: loopCount, heals_applied: healsApplied, checkpoint_every: CHECKPOINT_EVERY, max_checkpoints: MAX_CHECKPOINTS, running: !!timer, strategy: 'self-heal findings -> audit -> periodic swarm checkpoint -> learn from success rate' }),
+  status: () => ({ loop_count: loopCount, heals_applied: healsApplied, checkpoint_every: CHECKPOINT_EVERY, max_checkpoints: MAX_CHECKPOINTS, running: !!timer, require_approval: REQUIRE_APPROVAL, pending_proposals: proposals.length, strategy: 'self-heal findings -> audit -> periodic swarm checkpoint -> learn from success rate' }),
   actions: {
     start: () => start(),
     stop: () => stop(),
