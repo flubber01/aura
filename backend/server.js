@@ -965,8 +965,10 @@ const server = http.createServer(async (req, res) => {
     if (p === '/jarvis') return send(res, 200, 'text/html; charset=utf-8', pageJarvis());
     if (p === '/api/jarvis' && req.method === 'POST') {
       let body; try { body = JSON.parse(await readBody(req, 2e4)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
-      return send(res, 200, 'application/json', JSON.stringify(jarvis.ask(body.msg || body.q || body.text || body.message || ''), null, 2));
+      const out = await jarvis.askAsync(body.msg || body.q || body.text || body.message || '');
+      return send(res, 200, 'application/json', JSON.stringify(out, null, 2));
     }
+    if (p === '/api/jarvis/llm') return send(res, 200, 'application/json', JSON.stringify(await require('./src/lib/ollama_llm').status(), null, 2));
     if (p === '/api/jarvis/memory') return send(res, 200, 'application/json', JSON.stringify(jarvis.memory(), null, 2));
 
     // ---- Area 69: recursive learning core (max 1 failure per fingerprint) ----

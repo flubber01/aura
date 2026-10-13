@@ -114,10 +114,32 @@ function ask(msg) {
   const out = think(msg);
   remember('user', msg);
   remember('jarvis', out.reply);
-  return Object.assign(out, { memory: memory.slice(-10) });
+  return Object.assign(out, { memory: memory.slice(-10), llm: { used: false, reason: 'sync-Pfad' } });
+}
+
+// Async variant: the deterministic engine computes the facts; if OLLAMA_URL is set,
+// Ollama phrases them (free, own host). On any failure the engine's own answer stays.
+async function askAsync(msg) {
+  const out = think(msg);
+  let llm = { used: false, reason: 'keine Frage' };
+  const q = String(msg || '').trim();
+  if (q) {
+    const facts = out.reply + (out.data ? '\n' + JSON.stringify(out.data).slice(0, 2000) : '');
+    const p = await require('./ollama_llm').phrase({ question: q, facts });
+    if (p.used) {
+      out.reply = p.text;
+      out.mode = 'LOCAL-LLM · ollama:' + p.model;
+      llm = { used: true, model: p.model };
+    } else {
+      llm = { used: false, reason: p.reason };
+    }
+  }
+  remember('user', msg);
+  remember('jarvis', out.reply);
+  return Object.assign(out, { memory: memory.slice(-10), llm });
 }
 
 module.exports = {
   meta: { area: 'JARVIS', id: 'jarvis', name: 'J.A.R.V.I.S. assistant (live system brain)', state: 'live' },
-  ask, memory: () => memory.slice(-24),
+  ask, askAsync, memory: () => memory.slice(-24),
 };
