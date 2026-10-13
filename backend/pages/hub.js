@@ -7,7 +7,7 @@ module.exports = function hubPageHtml() {
 <style>
 :root{--ink:#e8f4ff}
 *{box-sizing:border-box}body{margin:0;background:#02040a;color:var(--ink);font-family:system-ui,Segoe UI,Roboto,sans-serif;overflow-x:hidden}
-nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;gap:8px;justify-content:center;padding:10px;background:linear-gradient(180deg,rgba(2,4,10,.95),transparent)}
+nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;gap:8px;justify-content:center;padding:10px;background:#02040a;border-bottom:1px solid #12233f}
 nav a,nav button{cursor:pointer;background:#0b1526;border:1px solid #1e3a8a;color:#8ab4ff;border-radius:20px;padding:7px 16px;font-size:12px;letter-spacing:1px;font-weight:700;text-decoration:none}
 nav button.on{background:#12355e;color:#fff;box-shadow:0 0 14px rgba(57,215,255,.5)}
 section{display:none;min-height:100vh;padding-top:64px;position:relative}
