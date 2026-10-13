@@ -55,8 +55,10 @@ const st = (id) => L.get(id).status;
     "module.exports={execute(){return new Promise(r=>setTimeout(()=>r({late:true}),800));}};");
   mk('fx-legacy', base('fx-legacy', { capabilities: [{ name: 'ping', description: 'ping', permissions: [], input: {} }] }),
     "module.exports={actions:{ping:(i)=>({pong:true})}};");
-  mk('fx-int', base('fx-int', { type: 'integration', mode: 'simulation', capabilities: [{ name: 'ping', description: 'sim', permissions: [], input: {} }] }),
-    "module.exports={execute(){return {simulated:true};},healthCheck(){return {status:'simulation'};}};");
+  mk('fx-int', base('fx-int', { type: 'integration', mode: 'live', capabilities: [{ name: 'ping', description: 'ping', permissions: [], input: {} }] }),
+    "module.exports={execute(){return {pong:true};},healthCheck(){return {status:'fehler',detail:'kein Netz'};}};");
+  mk('fx-sim', base('fx-sim', { type: 'integration', mode: 'simulation', capabilities: [{ name: 'ping', description: 'ping', permissions: [], input: {} }] }),
+    OK_SRC);
 
   L.discover();
 
@@ -187,12 +189,16 @@ const st = (id) => L.get(id).status;
     assert.deepStrictEqual(out.result, { pong: true });
   });
 
-  await t('Integration im Simulationsmodus gilt nie als verbunden', async () => {
+  await t('Simulationsmodus wird abgelehnt (nur mode live)', () => {
+    assert.strictEqual(st('fx-sim'), 'ungueltig');
+    assert.ok(L.get('fx-sim').errors.some((e) => e.includes('live')));
+  });
+
+  await t('Integration mit fehlgeschlagenem Health-Check gilt nicht als verbunden', async () => {
     L.approve('fx-int', { by: 'Daniel' });
     await L.enable('fx-int', { by: 'Daniel' });
-    assert.strictEqual(L.get('fx-int').connection, 'simulation');
     await L.health('fx-int');
-    assert.strictEqual(L.get('fx-int').connection, 'simulation');
+    assert.strictEqual(L.get('fx-int').connection, 'eingerichtet_nicht_erreichbar');
   });
 
   await t('Geänderte Datei verliert die Freigabe', async () => {

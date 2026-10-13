@@ -409,7 +409,7 @@ async function reload() {
 // ---------- Ansichten ----------
 function connectionOf(rec) {
   if (!rec.manifest || rec.manifest.type !== 'integration') return null;
-  if (rec.manifest.mode !== 'live') return 'simulation';
+  if (rec.manifest.mode !== 'live') return 'nicht_verbunden';
   if (rec.missing_config.length) return 'nicht_verbunden';
   if (rec.last_health && rec.last_health.status === 'ok' && rec.status === 'bereit') return 'verbunden_getestet';
   if (rec.last_health && rec.last_health.status !== 'ok') return 'eingerichtet_nicht_erreichbar';

@@ -34,7 +34,7 @@ backend/modules/
 | `dependencies` | nein | Liste aus `{ "id": "modul-id", "version": "^1.0.0" }` oder `{ "service": "registry" }` |
 | `healthCheck` | nein | `true`, wenn das Modul `healthCheck()` implementiert |
 | `timeoutMs` | nein | 100–60000, Standard 10000. Gilt für jede Aktion und für Start und Health. |
-| `mode` | nur Integrationen | `simulation` (Standard) oder `live`. `live` braucht `healthCheck`. |
+| `mode` | Integrationen | Pflicht und nur `live`. Simulation gibt es nicht. Integrationen brauchen `healthCheck: true`. |
 
 Versionsbereiche: `*`, `1.2.3` (genau), `>=1.2.0`, `^1.0.0` (gleiche Hauptversion, mindestens).
 Dienste für `dependencies.service`: `registry`, `audit`, `mcp`, `llm`.
@@ -78,7 +78,7 @@ module.exports = {
   // Pflicht für neue Module. Eine Aktion aus den capabilities.
   execute(action, input, ctx) { return { text: 'Hallo' }; },
 
-  // Optional. Standard: { status: 'unbekannt' }. Liefert { status: 'ok'|'fehler'|'simulation', detail }.
+  // Optional. Standard: { status: 'unbekannt' }. Liefert { status: 'ok'|'fehler', detail }.
   healthCheck() { return { status: 'ok' }; },
 
   // Optional. Wird beim Deaktivieren, Neuladen und bei geänderter Datei aufgerufen.
@@ -176,8 +176,7 @@ Eine Integration gilt nur dann als verbunden, wenn sie live läuft **und** der V
 
 | `connection` | Bedeutung |
 |---|---|
-| `simulation` | `mode` ist `simulation` (Standard). Keine echte Verbindung, egal was passiert. |
-| `nicht_verbunden` | `mode` ist `live`, aber ein Geheimnis oder Pflichtfeld fehlt |
+| `nicht_verbunden` | Ein Geheimnis oder Pflichtfeld fehlt |
 | `eingerichtet_nicht_erreichbar` | Health-Check ist fehlgeschlagen |
 | `eingerichtet_ungeprueft` | Konfiguriert, aber noch kein erfolgreicher Health-Check |
 | `verbunden_getestet` | `mode` ist `live`, Health-Check erfolgreich, Status `bereit` |
@@ -212,7 +211,7 @@ curl -X POST localhost:8080/api/modules/ext/mein-modul/enable  -H "x-aura-token:
 curl -X POST localhost:8080/api/modules/ext/mein-modul/action/greet -H "x-aura-token: $AURA_ADMIN_TOKEN" -H 'content-type: application/json' -d '{"input":{"name":"Welt"}}'
 ```
 
-Mitgelieferte Beispiele: `example-hello` (Modul mit Konfiguration und Rechten) und `example-echo-integration` (Integration im Simulationsmodus mit Geheimnis).
+Mitgelieferte Beispiele: `example-hello` (Modul mit Konfiguration und Rechten). Eine Integration-Vorlage mit echtem Health-Check folgt erst, wenn ein echter Dienst angebunden wird.
 
 ## 11. Konfiguration des Loaders
 
@@ -226,6 +225,6 @@ Mitgelieferte Beispiele: `example-hello` (Modul mit Konfiguration und Rechten) u
 
 ## 12. Tests
 
-`node test/module_loader.test.js` (21 Fälle): Erkennung, ungültige Manifeste, doppelte IDs, Abhängigkeiten,
-Versionskonflikte, Freigabe nur durch Mensch, Eingabeprüfung, Timeout, Quarantäne, Legacy-Adapter, Simulation,
+`node test/module_loader.test.js` (22 Fälle): Erkennung, ungültige Manifeste, doppelte IDs, Abhängigkeiten,
+Versionskonflikte, Freigabe nur durch Mensch, Eingabeprüfung, Timeout, Quarantäne, Legacy-Adapter, Ablehnung von Simulationsmodus,
 Geheimnisse, Hash-Änderung, Pfadschutz, Rückwärtskompatibilität der Registry.

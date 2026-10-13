@@ -436,7 +436,7 @@ Weitere Detaildokumente: `ARCHITECTURE.md`, `SETUP.md`, `DEPLOYMENT.md`, `CONFIG
 
 - Vollständige Spezifikation: `docs/MODULE_SPEC.md` (Manifest, Lebenszyklus, Vertrag, Rechte, Konfiguration, API, Grenzen).
 - Loader: `backend/src/lib/module_loader.js`, Manifest-Prüfung: `backend/src/lib/module_manifest.js`.
-- Module liegen unter `backend/modules/<ordner>/`. Beispiele: `example-hello`, `example-echo-integration`.
+- Module liegen unter `backend/modules/<ordner>/`. Beispiel: `example-hello`.
 - Registry: Erweiterungen werden ergänzt (`registry.status()` mit `mode: module`). Die 40 bestehenden Bereiche bleiben unverändert.
 - Routen: `GET /api/modules/ext`, `POST /api/modules/ext/...` (Admin-Token). Oberfläche: Block „Erweiterungsmodule“ in `/console`.
 - Tests: `test/module_loader.test.js` 21/21. `validate.js` 137/0.

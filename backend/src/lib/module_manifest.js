@@ -98,9 +98,9 @@ function validateManifest(raw, moduleDir) {
   const hc = m.healthCheck;
   if (hc !== undefined && typeof hc !== 'boolean') errors.push('healthCheck: true/false');
   if (m.timeoutMs !== undefined && (!Number.isInteger(m.timeoutMs) || m.timeoutMs < 100 || m.timeoutMs > MAX_TIMEOUT_MS)) errors.push('timeoutMs: 100–' + MAX_TIMEOUT_MS);
-  if (m.mode !== undefined && !['simulation', 'live'].includes(m.mode)) errors.push('mode: simulation | live');
-  if (m.type === 'integration' && m.mode === undefined) warnings.push('Integration ohne mode: wird als simulation geführt');
-  if (m.type === 'integration' && m.mode === 'live' && !m.healthCheck) errors.push('Integration mit mode live braucht healthCheck');
+  if (m.mode !== undefined && m.mode !== 'live') errors.push('mode: nur "live" erlaubt, Simulationsmodus gibt es nicht');
+  if (m.type === 'integration' && m.mode !== 'live') errors.push('Integration braucht mode: "live"');
+  if (m.type === 'integration' && !m.healthCheck) errors.push('Integration braucht healthCheck: true');
 
   if (moduleDir !== undefined) {
     const e = safeEntry(moduleDir, m.entry);
@@ -113,7 +113,7 @@ function validateManifest(raw, moduleDir) {
       id: m.id, name: m.name, version: m.version, description: m.description, author: m.author,
       entry: m.entry, type: m.type, permissions: m.permissions, configSchema: cs.schema,
       capabilities: m.capabilities, dependencies: deps, healthCheck: !!m.healthCheck,
-      timeoutMs: m.timeoutMs || 10000, mode: m.type === 'integration' ? (m.mode || 'simulation') : (m.mode || null),
+      timeoutMs: m.timeoutMs || 10000, mode: m.type === 'integration' ? 'live' : (m.mode || null),
     },
   };
 }
