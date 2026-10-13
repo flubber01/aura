@@ -1,0 +1,20 @@
+{
+  "default": "allow",
+  "per_module": {
+    "71": "allow"
+  },
+  "log": [
+    {
+      "at": "2026-10-12T07:16:24.501Z",
+      "event": "policy_set",
+      "module": "71",
+      "mode": "allow"
+    },
+    {
+      "at": "2026-10-12T07:16:08.630Z",
+      "event": "policy_set",
+      "module": "71",
+      "mode": "restrict"
+    }
+  ]
+}

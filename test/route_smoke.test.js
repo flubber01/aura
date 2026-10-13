@@ -40,6 +40,9 @@ async function main() {
   // Server läuft auf einer Kopie des Backends, damit der Test keine Repo-Dateien verändert
   const copy = path.join(tmp, 'backend');
   fs.cpSync(BACKEND, copy, { recursive: true, filter: (src) => !src.includes(`${path.sep}node_modules`) });
+  // Der Server liest Dateien relativ zu ../extracted, deshalb wird der Ordner mitkopiert
+  const extracted = path.join(ROOT, 'extracted');
+  if (fs.existsSync(extracted)) fs.cpSync(extracted, path.join(tmp, 'extracted'), { recursive: true });
   env.AURA_MODULES_DIR = path.join(copy, 'modules');
   const child = spawn(process.execPath, ['server.js'], { cwd: copy, env, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = '';

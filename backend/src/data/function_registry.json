@@ -1,0 +1,422 @@
+{
+  "functions": [
+    {
+      "id": "fn-health",
+      "name": "Health-Check",
+      "scope": "core",
+      "state": "active",
+      "created_at": "2026-10-12T07:16:08.672Z",
+      "custom": false
+    },
+    {
+      "id": "fn-report",
+      "name": "Tages-Report",
+      "scope": "core",
+      "state": "active",
+      "created_at": "2026-10-12T07:16:08.672Z",
+      "custom": false
+    },
+    {
+      "id": "fn-backup",
+      "name": "Backup-Vault Snapshot",
+      "scope": "core",
+      "state": "active",
+      "created_at": "2026-10-12T07:16:08.672Z",
+      "custom": false
+    },
+    {
+      "id": "fn-selfrepair",
+      "name": "Self-Repair Daemon",
+      "scope": "core",
+      "state": "active",
+      "created_at": "2026-10-12T07:16:08.672Z",
+      "custom": false
+    },
+    {
+      "id": "fn-killswitch",
+      "name": "Kill-Switch",
+      "scope": "core",
+      "protected": true,
+      "state": "active",
+      "created_at": "2026-10-12T07:16:08.672Z",
+      "custom": false
+    },
+    {
+      "id": "fn-restart",
+      "name": "Server-Restart",
+      "scope": "core",
+      "state": "active",
+      "created_at": "2026-10-12T07:16:08.672Z",
+      "custom": false
+    },
+    {
+      "id": "fn-forge",
+      "name": "Content Forge",
+      "scope": "area73",
+      "state": "active",
+      "created_at": "2026-10-12T07:16:08.672Z",
+      "custom": false
+    },
+    {
+      "id": "fn-studio",
+      "name": "Studio-Suite",
+      "scope": "area76",
+      "state": "active",
+      "created_at": "2026-10-12T07:16:08.672Z",
+      "custom": false
+    },
+    {
+      "id": "fn-mcp",
+      "name": "MCP-Manager",
+      "scope": "area72",
+      "state": "active",
+      "created_at": "2026-10-12T07:16:08.672Z",
+      "custom": false
+    },
+    {
+      "id": "fn-telegram",
+      "name": "Telegram-Agent",
+      "scope": "area78",
+      "state": "active",
+      "created_at": "2026-10-12T07:16:08.672Z",
+      "custom": false
+    }
+  ],
+  "log": [
+    {
+      "at": "2026-10-12T11:16:16.306Z",
+      "event": "fn_restored",
+      "id": "fn-298e3f"
+    },
+    {
+      "at": "2026-10-12T11:16:16.305Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-298e3f"
+    },
+    {
+      "at": "2026-10-12T11:16:16.302Z",
+      "event": "fn_ignored",
+      "id": "fn-298e3f"
+    },
+    {
+      "at": "2026-10-12T11:16:16.301Z",
+      "event": "fn_added",
+      "id": "fn-298e3f",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T11:14:55.026Z",
+      "event": "fn_restored",
+      "id": "fn-e93e09"
+    },
+    {
+      "at": "2026-10-12T11:14:55.025Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-e93e09"
+    },
+    {
+      "at": "2026-10-12T11:14:55.022Z",
+      "event": "fn_ignored",
+      "id": "fn-e93e09"
+    },
+    {
+      "at": "2026-10-12T11:14:55.021Z",
+      "event": "fn_added",
+      "id": "fn-e93e09",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T11:14:35.002Z",
+      "event": "fn_restored",
+      "id": "fn-4c9248"
+    },
+    {
+      "at": "2026-10-12T11:14:35.000Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-4c9248"
+    },
+    {
+      "at": "2026-10-12T11:14:34.996Z",
+      "event": "fn_ignored",
+      "id": "fn-4c9248"
+    },
+    {
+      "at": "2026-10-12T11:14:34.995Z",
+      "event": "fn_added",
+      "id": "fn-4c9248",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T09:39:49.889Z",
+      "event": "fn_restored",
+      "id": "fn-22ef72"
+    },
+    {
+      "at": "2026-10-12T09:39:49.888Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-22ef72"
+    },
+    {
+      "at": "2026-10-12T09:39:49.885Z",
+      "event": "fn_ignored",
+      "id": "fn-22ef72"
+    },
+    {
+      "at": "2026-10-12T09:39:49.884Z",
+      "event": "fn_added",
+      "id": "fn-22ef72",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T09:17:31.876Z",
+      "event": "fn_restored",
+      "id": "fn-f53848"
+    },
+    {
+      "at": "2026-10-12T09:17:31.875Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-f53848"
+    },
+    {
+      "at": "2026-10-12T09:17:31.872Z",
+      "event": "fn_ignored",
+      "id": "fn-f53848"
+    },
+    {
+      "at": "2026-10-12T09:17:31.871Z",
+      "event": "fn_added",
+      "id": "fn-f53848",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T08:51:56.067Z",
+      "event": "fn_restored",
+      "id": "fn-f343b9"
+    },
+    {
+      "at": "2026-10-12T08:51:56.066Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-f343b9"
+    },
+    {
+      "at": "2026-10-12T08:51:56.063Z",
+      "event": "fn_ignored",
+      "id": "fn-f343b9"
+    },
+    {
+      "at": "2026-10-12T08:51:56.062Z",
+      "event": "fn_added",
+      "id": "fn-f343b9",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T08:46:48.228Z",
+      "event": "fn_restored",
+      "id": "fn-8037b5"
+    },
+    {
+      "at": "2026-10-12T08:46:48.227Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-8037b5"
+    },
+    {
+      "at": "2026-10-12T08:46:48.223Z",
+      "event": "fn_ignored",
+      "id": "fn-8037b5"
+    },
+    {
+      "at": "2026-10-12T08:46:48.221Z",
+      "event": "fn_added",
+      "id": "fn-8037b5",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T08:39:55.069Z",
+      "event": "fn_restored",
+      "id": "fn-b1e221"
+    },
+    {
+      "at": "2026-10-12T08:39:55.067Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-b1e221"
+    },
+    {
+      "at": "2026-10-12T08:39:55.063Z",
+      "event": "fn_ignored",
+      "id": "fn-b1e221"
+    },
+    {
+      "at": "2026-10-12T08:39:55.061Z",
+      "event": "fn_added",
+      "id": "fn-b1e221",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T08:15:08.207Z",
+      "event": "fn_restored",
+      "id": "fn-279aa9"
+    },
+    {
+      "at": "2026-10-12T08:15:08.206Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-279aa9"
+    },
+    {
+      "at": "2026-10-12T08:15:08.202Z",
+      "event": "fn_ignored",
+      "id": "fn-279aa9"
+    },
+    {
+      "at": "2026-10-12T08:15:08.201Z",
+      "event": "fn_added",
+      "id": "fn-279aa9",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T08:06:47.006Z",
+      "event": "fn_restored",
+      "id": "fn-306b69"
+    },
+    {
+      "at": "2026-10-12T08:06:47.005Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-306b69"
+    },
+    {
+      "at": "2026-10-12T08:06:47.002Z",
+      "event": "fn_ignored",
+      "id": "fn-306b69"
+    },
+    {
+      "at": "2026-10-12T08:06:47.001Z",
+      "event": "fn_added",
+      "id": "fn-306b69",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T07:55:12.793Z",
+      "event": "fn_restored",
+      "id": "fn-263b34"
+    },
+    {
+      "at": "2026-10-12T07:55:12.792Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-263b34"
+    },
+    {
+      "at": "2026-10-12T07:55:12.789Z",
+      "event": "fn_ignored",
+      "id": "fn-263b34"
+    },
+    {
+      "at": "2026-10-12T07:55:12.788Z",
+      "event": "fn_added",
+      "id": "fn-263b34",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T07:53:17.568Z",
+      "event": "fn_restored",
+      "id": "fn-3d66a6"
+    },
+    {
+      "at": "2026-10-12T07:53:17.567Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-3d66a6"
+    },
+    {
+      "at": "2026-10-12T07:53:17.563Z",
+      "event": "fn_ignored",
+      "id": "fn-3d66a6"
+    },
+    {
+      "at": "2026-10-12T07:53:17.561Z",
+      "event": "fn_added",
+      "id": "fn-3d66a6",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T07:22:53.558Z",
+      "event": "fn_restored",
+      "id": "fn-30bebf"
+    },
+    {
+      "at": "2026-10-12T07:22:53.557Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-30bebf"
+    },
+    {
+      "at": "2026-10-12T07:22:53.554Z",
+      "event": "fn_ignored",
+      "id": "fn-30bebf"
+    },
+    {
+      "at": "2026-10-12T07:22:53.553Z",
+      "event": "fn_added",
+      "id": "fn-30bebf",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T07:19:39.922Z",
+      "event": "fn_restored",
+      "id": "fn-fa905a"
+    },
+    {
+      "at": "2026-10-12T07:19:39.921Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-fa905a"
+    },
+    {
+      "at": "2026-10-12T07:19:39.917Z",
+      "event": "fn_ignored",
+      "id": "fn-fa905a"
+    },
+    {
+      "at": "2026-10-12T07:19:39.916Z",
+      "event": "fn_added",
+      "id": "fn-fa905a",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T07:18:27.778Z",
+      "event": "fn_restored",
+      "id": "fn-2e0f1c"
+    },
+    {
+      "at": "2026-10-12T07:18:27.777Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-2e0f1c"
+    },
+    {
+      "at": "2026-10-12T07:18:27.773Z",
+      "event": "fn_ignored",
+      "id": "fn-2e0f1c"
+    },
+    {
+      "at": "2026-10-12T07:18:27.772Z",
+      "event": "fn_added",
+      "id": "fn-2e0f1c",
+      "name": "zz sweep function"
+    },
+    {
+      "at": "2026-10-12T07:17:00.750Z",
+      "event": "fn_restored",
+      "id": "fn-report"
+    },
+    {
+      "at": "2026-10-12T07:17:00.745Z",
+      "event": "fn_deleted_soft",
+      "id": "fn-report"
+    },
+    {
+      "at": "2026-10-12T07:16:24.431Z",
+      "event": "fn_restored",
+      "id": "fn-mcp"
+    },
+    {
+      "at": "2026-10-12T07:16:08.740Z",
+      "event": "fn_restored",
+      "id": "fn-studio"
+    }
+  ]
+}

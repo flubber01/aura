@@ -1,0 +1,10 @@
+{
+  "url": "http://127.0.0.1:11434",
+  "installed": [],
+  "assigned": {},
+  "policy": {
+    "auto_pull": false
+  },
+  "custom": [],
+  "keys": {}
+}
