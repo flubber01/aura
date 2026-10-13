@@ -191,6 +191,38 @@ async function main() {
   const after = await get('/api/modules/24/action/status');
   results.items.push({ kind: 'enforce', path: 'actions unblocked after revive', ok: after.status === 200, detail: 'status ' + after.status });
 
+  // ---- Phase 2 growth: WF-18 · Traffic Mesh · WF-19 · Unified Analytics ----
+  await checkPage('/growth');
+  await checkApi('/api/growth/repurpose', (j) => Array.isArray(j.items) && Array.isArray(j.formats) && j.formats.length === 8 ? true : 'formats/items fehlen');
+  await checkApi('/api/growth/mesh', (j) => (j.proposals && j.assets && Array.isArray(j.orphans)) ? true : 'mesh shape');
+  await checkApi('/api/growth/releases', (j) => Array.isArray(j.releases) && j.stages.length === 9 ? true : 'releases/stages');
+  await checkApi('/api/growth/analytics', (j) => (j.connectors && j.connectors.length === 5 && j.labels) ? true : 'connectors/labels');
+  await checkPost('/api/growth/repurpose', {
+    title: 'Phase 2 Validierung Inhalt',
+    body: 'Dies ist ein eigener Testtext für die Validierung. Er hat genug Zeichen für die Mindestlänge. Der zweite Satz beschreibt einen neuen Track. Der dritte Satz kündigt die Veröffentlichung an.',
+    rights_ok: true,
+  }, (j) => (j.ok && j.record.drafts.length === 8 && j.record.drafts.every((d) => d.requires_approval === true)) ? true : 'expected 8 drafts, all approval-gated');
+  const rpBad = await post('/api/growth/repurpose', { title: 'Kurz', body: 'zu kurz', rights_ok: false });
+  results.items.push({ kind: 'enforce', path: 'WF-18 rejects invalid input (400)', ok: rpBad.status === 400, detail: 'status ' + rpBad.status });
+  const rpBanned = await post('/api/growth/repurpose', { title: 'Kampagne Test', body: 'Wir wollen follower kaufen, damit der Kanal wächst und mehr Reichweite entsteht. Das ist der Plan für diesen Monat.', rights_ok: true });
+  results.items.push({ kind: 'enforce', path: 'WF-18 rejects bought-growth text (400)', ok: rpBanned.status === 400, detail: 'status ' + rpBanned.status });
+  const meshHttp = await post('/api/growth/mesh/asset', { id: 'val-page-1', type: 'page', url: 'http://example.invalid', owned: true });
+  results.items.push({ kind: 'enforce', path: 'mesh rejects non-https / non-owned asset (400)', ok: meshHttp.status === 400, detail: 'status ' + meshHttp.status });
+  const meshForeign = await post('/api/growth/mesh/asset', { id: 'val-yt-1', type: 'youtube_channel', url: 'https://www.youtube.com/@val', owned: false });
+  results.items.push({ kind: 'enforce', path: 'mesh rejects owned=false (400)', ok: meshForeign.status === 400, detail: 'status ' + meshForeign.status });
+  const rel = await post('/api/growth/releases', { track: { title: 'Validierung Track', genre: 'ambient', duration_s: 120 } });
+  let relId = null; try { relId = JSON.parse(rel.body).release.id; } catch {}
+  results.items.push({ kind: 'api', path: '/api/growth/releases (POST)', ok: rel.status === 201 && !!relId, detail: rel.status + ' · ' + (relId || 'no id') });
+  if (relId) {
+    const skip = await post('/api/growth/releases/' + relId + '/advance', { target: 'calendar_slot', release_date: '2099-01-01' });
+    results.items.push({ kind: 'enforce', path: 'WF-19 refuses to skip a gate (409)', ok: skip.status === 409, detail: 'status ' + skip.status });
+  }
+  const impBad = await post('/api/growth/analytics/import', { platform: 'myspace', rows: [{ content_ref: 'x', date: '2026-10-10', views: 1 }] });
+  results.items.push({ kind: 'enforce', path: 'analytics rejects unknown platform (400)', ok: impBad.status === 400, detail: 'status ' + impBad.status });
+  const dash = await get('/api/growth/analytics');
+  let honest = false; try { const j = JSON.parse(dash.body); honest = j.connectors.every((c) => ['LIVE', 'IMPORTED', 'CONFIGURED', 'NOT-CONNECTED'].includes(c.state)); } catch {}
+  results.items.push({ kind: 'enforce', path: 'analytics only uses honest labels', ok: honest, detail: honest ? 'labels ok' : 'unknown label' });
+
   // data files valid JSON
   for (const f of fs.readdirSync(path.join(__dirname, '..', 'backend', 'data'))) {
     if (!f.endsWith('.json')) continue;

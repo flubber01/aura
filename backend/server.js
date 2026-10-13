@@ -73,6 +73,11 @@ const pageContainers = require('./pages/containers');
 const jarvis = require('./src/lib/jarvis');
 const pageJarvis = require('./pages/jarvis');
 const learningCore = require('./src/lib/learning_core');
+const repurposeEngine = require('./src/lib/repurpose_engine'); // Phase 2 · WF-18
+const crosslinkMesh = require('./src/lib/crosslink_mesh');     // Phase 2 · Traffic Mesh
+const labelPipeline = require('./src/lib/label_pipeline');     // Phase 2 · WF-19
+const analyticsHub = require('./src/lib/analytics_hub');       // Phase 2 · Unified Analytics
+const pageGrowth = require('./pages/growth');
 const { execFile } = require('child_process');
 
 // emergency kill switch auto-engage on critical errors / syntax failures
@@ -856,6 +861,45 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/builder/simulate' && req.method === 'POST') {
       let body; try { body = JSON.parse(await readBody(req, 2e5)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
       return send(res, 200, 'application/json', JSON.stringify(wfBuilder.simulate(body.id), null, 2));
+    }
+
+    // ---- Phase 2: Growth (WF-18 Repurposing · Traffic Mesh · WF-19 Label · Unified Analytics) ----
+    // Schreibende Routen: kill-gated (423) und nie öffentlich veröffentlichend — nur Entwürfe/Vorschläge.
+    if (p === '/growth') return send(res, 200, 'text/html; charset=utf-8', pageGrowth(analyticsHub.PLATFORMS));
+    if (p === '/api/growth/repurpose' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(repurposeEngine.list(), null, 2));
+    if (p === '/api/growth/repurpose' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' }));
+      let body; try { body = JSON.parse(await readBody(req, 2e5)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, errors: ['invalid JSON'] })); }
+      const r = repurposeEngine.repurpose(body);
+      return send(res, r.ok ? 201 : 400, 'application/json', JSON.stringify(r, null, 2));
+    }
+    if (p === '/api/growth/mesh' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(crosslinkMesh.matrix(), null, 2));
+    if (p === '/api/growth/mesh/asset' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' }));
+      let body; try { body = JSON.parse(await readBody(req, 2e5)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, errors: ['invalid JSON'] })); }
+      const r = crosslinkMesh.addAsset(body);
+      return send(res, r.ok ? 201 : 400, 'application/json', JSON.stringify(r, null, 2));
+    }
+    if (p === '/api/growth/releases' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(labelPipeline.list(), null, 2));
+    if (p === '/api/growth/releases' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' }));
+      let body; try { body = JSON.parse(await readBody(req, 2e5)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, errors: ['invalid JSON'] })); }
+      const r = labelPipeline.create(body);
+      return send(res, r.ok ? 201 : 400, 'application/json', JSON.stringify(r, null, 2));
+    }
+    if (p.startsWith('/api/growth/releases/') && p.endsWith('/advance') && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' }));
+      let body; try { body = JSON.parse(await readBody(req, 2e5)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, errors: ['invalid JSON'] })); }
+      const id = decodeURIComponent(p.split('/')[4] || '');
+      const r = labelPipeline.advance(id, body.target, body);
+      return send(res, r.ok ? 200 : (r.code || 400), 'application/json', JSON.stringify(r, null, 2));
+    }
+    if (p === '/api/growth/analytics' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(analyticsHub.dashboard(), null, 2));
+    if (p === '/api/growth/analytics/import' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' }));
+      let body; try { body = JSON.parse(await readBody(req, 2e6)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, errors: ['invalid JSON'] })); }
+      const r = analyticsHub.importRows(body.platform, body.rows);
+      return send(res, r.ok ? 201 : 400, 'application/json', JSON.stringify(r, null, 2));
     }
 
     // ---- Area 62: Deep Research (real GitHub-API data) ----

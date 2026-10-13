@@ -21,6 +21,7 @@ Everything runs with `node backend/server.js` → http://localhost:8080 (binds 0
 | `/terminal` | sandboxed inbound terminal (non-root, audited, kill-gated) |
 | `/minibot` | mini-bot AI setup wizard (BotFather) |
 | `/downloads` | external downloadable catalogs (ALL-TYPES txt/json/md/csv) |
+| `/growth` | Phase 2: WF-18 Repurposing (1 → 8 Formate), Traffic Mesh, WF-19 Label-Pipeline, Unified Analytics (ehrliche Labels) — Details: [`docs/GROWTH.md`](docs/GROWTH.md) |
 
 ## Quick start
 ```bash
