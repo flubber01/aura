@@ -1155,7 +1155,10 @@ const server = http.createServer(async (req, res) => {
     // ---- Area 64: backup vault (verified snapshots + restore) ----
     if (p === '/api/backups' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(watcher.backups(), null, 2));
     if (p === '/api/backups/restore' && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (!adminToken || req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig (AURA_ADMIN_TOKEN gesetzt und Header x-aura-token)' }));
       let body; try { body = JSON.parse(await readBody(req, 2e4)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      if (!body || typeof body.file !== 'string' || !body.file) return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'file fehlt (Name des Backups)' }));
       return send(res, 200, 'application/json', JSON.stringify(watcher.restore(body.file)));
     }
 

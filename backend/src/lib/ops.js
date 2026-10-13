@@ -10,8 +10,8 @@ const logger = require('./self_healing_logger');
 
 const DATA = path.join(__dirname, '..', 'data');
 // demo mode shrinks hours->seconds so the schedule is observable in preview
-const DEMO = process.env.AURA_SCHED_DEMO === '1';
-const H = DEMO ? 1 / 3600 : 1; // hours factor
+const DEMO = false; // kein Demo-Modus: Zeitfaktor ist immer echte Zeit
+const H = 1; // hours factor
 const SCHED = {
   super_brain_autosave_h: 12, // latest db of the super brain
   others_autosave_h: 4,       // feedback, vita, checkpoints
