@@ -28,6 +28,7 @@ header{text-align:center}h1{font-size:26px;letter-spacing:6px;color:#ffcf7d;text
 .bar{display:flex;gap:8px}
 .bar input{flex:1;background:#081226;border:1px solid #24466f;color:#cfe6ff;border-radius:10px;padding:11px;font:inherit}
 .bar button{background:linear-gradient(90deg,#b8860b,#ffcf7d);color:#1a1200;border:0;border-radius:10px;padding:11px 18px;font-weight:800;cursor:pointer}
+.bar button.mic{background:#0c1830;color:#7fd0ff;border:1px solid #2c5a94}.bar button.mic.on{background:#5a1020;color:#ffb0b0;border-color:#b03040;animation:pulse 1s infinite}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 .chips button{background:#0c1830;border:1px solid #24466f;color:#9cc4ff;border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer}
 nav{margin-bottom:10px;font-size:13px}nav a{color:#ffcf7d;margin-right:12px;text-decoration:none}
@@ -45,7 +46,8 @@ nav{margin-bottom:10px;font-size:13px}nav a{color:#ffcf7d;margin-right:12px;text
 <button onclick="ask('research self hosting dashboard')">Research</button>
 </div>
 <div id="chat"></div>
-<div class="bar"><input id="in" placeholder="Sir, was darf ich berichten? — frag mich nach status, learning, containers…" onkeydown="if(event.key==='Enter')send()"><button onclick="send()">SPRECHEN</button></div>
+<div class="bar"><input id="in" placeholder="Sir, was darf ich berichten? — frag mich nach status, learning, containers…" onkeydown="if(event.key==='Enter')send()"><button id="mic" class="mic" onclick="toggleMic()">🎙 Sprechen</button><button onclick="send()">SENDEN</button></div>
+<p id="micnote" style="font-size:11px;color:#5f7186;margin-top:6px">Mikrofon: Browser-Spracherkennung (Chrome/Edge). Die Aufnahme wird vom Browser an dessen Spracherkennungsdienst übergeben. Erst nach Klick auf „Sprechen“ und mit Erlaubnis.</p>
 <script>
 const ch=document.getElementById('chat');
 // (voice via browser SpeechSynthesis — no external service, works offline)
@@ -81,6 +83,20 @@ async function runResearch(topic){
  ch.scrollTop=ch.scrollHeight;
 }
 function send(){const i=document.getElementById('in');const t=i.value.trim();if(!t)return;i.value='';ask(t);}
+// Spracheingabe: Browser-Spracherkennung (Web Speech API), Deutsch, Ergebnis landet im Eingabefeld und wird gesendet
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,listening=false;
+function toggleMic(){
+ if(!SR){add('j','Spracheingabe ist in diesem Browser nicht verfügbar. Bitte Chrome oder Edge nutzen, oder Text eintippen.');return;}
+ if(listening){rec&&rec.stop();return;}
+ rec=new SR();rec.lang='de-DE';rec.interimResults=true;rec.continuous=false;
+ const inp=document.getElementById('in'),btn=document.getElementById('mic');
+ rec.onstart=()=>{listening=true;btn.textContent='■ Stopp';btn.classList.add('on');};
+ rec.onresult=e=>{let t='',fin=false;for(const r of e.results){t+=r[0].transcript;if(r.isFinal)fin=true;}inp.value=t;
+   if(fin){const q=t.trim();inp.value='';if(q)ask(q);}};
+ rec.onerror=e=>{add('j','Mikrofon-Fehler: '+e.error+'. Mikrofon-Zugriff im Browser erlauben und nochmal versuchen.');};
+ rec.onend=()=>{listening=false;btn.textContent='🎙 Sprechen';btn.classList.remove('on');};
+ try{rec.start();}catch(err){add('j','Mikrofon konnte nicht gestartet werden: '+err.message);}
+}
 add('j','Guten Tag. Alle Systeme im grünen Bereich. Wie kann ich dienen? Sprechen Sie frei oder nutzen Sie die Schnellfragen.');
 window.addEventListener('load',()=>speechSynthesis&&speechSynthesis.getVoices());
 const gc=document.getElementById('grid'),gx=gc.getContext('2d');
