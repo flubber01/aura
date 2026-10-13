@@ -83,7 +83,9 @@ const pageBoard = require('./pages/board');
 const dataUpload = require('./src/lib/data_upload');          // geprüfter Upload für Link-Listen
 const pageUpload = require('./pages/upload');
 const skillCatalog = require('./src/lib/skill_catalog');   // Skill-Katalog (nur Lesen)
+const control = require('./src/lib/control_center');        // Steuerzentrale: Schalter + Freigaben
 const pageSkills = require('./pages/skills');
+const pageControl = require('./pages/control');
 const { execFile } = require('child_process');
 
 // emergency kill switch auto-engage on critical errors / syntax failures
@@ -903,6 +905,22 @@ const server = http.createServer(async (req, res) => {
     // ---- Daten-Upload (Link-Listen): Vorschau schreibt nichts, Übernahme nur mit Name + Token ----
     if (p === '/upload') return send(res, 200, 'text/html; charset=utf-8', pageUpload());
     if (p === '/skills') return send(res, 200, 'text/html; charset=utf-8', pageSkills());
+    if (p === '/control') return send(res, 200, 'text/html; charset=utf-8', pageControl());
+    // ---- Steuerzentrale: Schalter und Freigaben (Schreiben nur mit Admin-Token, nie bei Kill-Switch) ----
+    if (p === '/api/control' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify({ actions: control.actions(), pending: control.pending() }, null, 2));
+    if (p.startsWith('/api/control/') && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token fehlt oder falsch (Header x-aura-token)' }));
+      let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const out = (r) => send(res, r.code || (r.ok ? 200 : 400), 'application/json', JSON.stringify(r, null, 2));
+      let m = p.match(/^\/api\/control\/action\/([a-z_]+)\/(enable|disable)$/);
+      if (m) return out(control.setEnabled(m[1], m[2] === 'enable', body.by));
+      m = p.match(/^\/api\/control\/run\/([a-z_]+)$/);
+      if (m) return out(control.gate(m[1], { by: body.by, args: body.args || {}, killed: ops.isKilled() }));
+      m = p.match(/^\/api\/control\/approvals\/(AP-[0-9a-f]{6})$/);
+      if (m) return out(control.decide(m[1], body.decision, body.by));
+      return send(res, 404, 'application/json', JSON.stringify({ ok: false, error: 'unknown control route' }));
+    }
     if (p === '/api/skill-catalog' && req.method === 'GET') {
       const sp = new URL(req.url, 'http://x').searchParams;
       return send(res, 200, 'application/json', JSON.stringify(skillCatalog.search({ q: sp.get('q') || '', source: sp.get('source') || '', status: sp.get('status') || '', category: sp.get('category') || '', limit: sp.get('limit') || 100 }), null, 2));

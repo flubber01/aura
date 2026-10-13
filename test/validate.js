@@ -260,6 +260,14 @@ async function main() {
   results.items.push({ kind: 'api', path: '/api/jarvis (POST status)', ok: jvOk, detail: 'status ' + jv.status + (jvOk ? ' · reply+mode+llm ok' : ' · shape') });
 
 
+  // ---- Steuerzentrale + Skill-Katalog ----
+  await checkPage('/control');
+  await checkApi('/api/control', (j) => Array.isArray(j.actions) && j.actions.length >= 8 ? true : 'actions');
+  await checkPage('/skills');
+  await checkApi('/api/skill-catalog?limit=2', (j) => j.total > 0 ? true : 'catalog');
+  const runSync = await post('/api/control/run/sync', { by: 'Validator' });
+  results.items.push({ kind: 'enforce', path: 'control: riskante Aktion erzeugt Freigabe statt Lauf', ok: runSync.status === 202, detail: 'status ' + runSync.status });
+
   // ---- Daten-Upload: Vorschau prüft, Übernahme wird abgelehnt ohne gültige Daten/Name (schreibt nichts) ----
   await checkPage('/upload');
   await checkApi('/api/upload/kinds', (j) => Array.isArray(j) && j.length === 2 ? true : 'kinds');
