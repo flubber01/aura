@@ -8,20 +8,7 @@ Spalten: **Name** · **Typ** · **Datei** · **Test** (Verweis in test/) · **Ve
 
 ## Lücken
 
-- /api/builder/simulate: Route ohne Doku-Verweis
-- /api/builder/workflows: Route ohne Doku-Verweis
-- /api/downloads: Route ohne Doku-Verweis
-- /api/ignition: Route ohne Doku-Verweis
-- /api/integrations: Route ohne Doku-Verweis
-- /api/modules/live: Route ohne Doku-Verweis
-- /api/research: Route ohne Doku-Verweis
-- /api/research/export: Route ohne Doku-Verweis
-- /api/selfrepair/drill: Route ohne Doku-Verweis
-- /api/seo: Route ohne Doku-Verweis
-- /api/socialchain: Route ohne Doku-Verweis
-- /api/ultra/chat: Route ohne Doku-Verweis
-- /api/xrefs: Route ohne Doku-Verweis
-- /api/yellowpages/help: Route ohne Doku-Verweis
+- keine
 
 ## Index
 
