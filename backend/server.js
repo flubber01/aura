@@ -80,6 +80,8 @@ const analyticsHub = require('./src/lib/analytics_hub');       // Phase 2 · Uni
 const pageGrowth = require('./pages/growth');
 const agentBoard = require('./src/lib/agent_board');        // Agent Board (Kanban für Agenten)
 const pageBoard = require('./pages/board');
+const dataUpload = require('./src/lib/data_upload');          // geprüfter Upload für Link-Listen
+const pageUpload = require('./pages/upload');
 const { execFile } = require('child_process');
 
 // emergency kill switch auto-engage on critical errors / syntax failures
@@ -896,6 +898,23 @@ const server = http.createServer(async (req, res) => {
       const r = labelPipeline.advance(id, body.target, body);
       return send(res, r.ok ? 200 : (r.code || 400), 'application/json', JSON.stringify(r, null, 2));
     }
+    // ---- Daten-Upload (Link-Listen): Vorschau schreibt nichts, Übernahme nur mit Name + Token ----
+    if (p === '/upload') return send(res, 200, 'text/html; charset=utf-8', pageUpload());
+    if (p === '/api/upload/kinds' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(dataUpload.KINDS(), null, 2));
+    if (p === '/api/upload/preview' && req.method === 'POST') {
+      let body; try { body = JSON.parse(await readBody(req, 1.5e6) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const r = dataUpload.preview(body.kind, body.text);
+      return send(res, r.status, 'application/json', JSON.stringify(r, null, 2));
+    }
+    if (p === '/api/upload/commit' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED — upload locked' }));
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token fehlt oder falsch' }));
+      let body; try { body = JSON.parse(await readBody(req, 1.5e6) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const r = dataUpload.commit(body.kind, body.text, body.by);
+      return send(res, r.status, 'application/json', JSON.stringify(r, null, 2));
+    }
+
     // ---- Agent Board (Kanban für Agenten; Freigabe nur durch Menschen) ----
     if (p === '/board') return send(res, 200, 'text/html; charset=utf-8', pageBoard());
     if (p === '/api/board' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(agentBoard.board(), null, 2));
@@ -1078,8 +1097,13 @@ const server = http.createServer(async (req, res) => {
 
     // ---------- config upload (easy update system) ----------
     if (p === '/api/config/upload' && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED — upload locked' }));
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ error: 'Admin-Token fehlt oder falsch' }));
       const raw = await readBody(req); let body;
       try { body = JSON.parse(raw || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON — upload must be a JSON file' })); }
+      if (body.target === 'yellowpages') return send(res, 410, 'application/json', JSON.stringify({ error: 'Yellow Pages laufen jetzt über /api/upload/preview und /api/upload/commit (geprüft, mit Vorschau und Backup).' }));
+
       const T = { yellowpages: (c) => Array.isArray(c.links), departments: (c) => Array.isArray(c.departments), teams: (c) => Array.isArray(c.teams), skills: (c) => Array.isArray(c.skills) };
       if (!T[body.target] || !T[body.target](body.config || {})) return send(res, 400, 'application/json', JSON.stringify({ error: 'target must be one of ' + Object.keys(T).join('/') + ' with a valid shape' }));
       const file = path.join(__dirname, 'data', body.target + '.json');

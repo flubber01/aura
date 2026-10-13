@@ -22,6 +22,7 @@ Everything runs with `node backend/server.js` → http://localhost:8080 (binds 0
 | `/minibot` | mini-bot AI setup wizard (BotFather) |
 | `/downloads` | external downloadable catalogs (ALL-TYPES txt/json/md/csv) |
 | `/board` | Agent Board: Kanban für Agenten. Zuweisung nach Abteilung mit WIP-Limit, Hilfe anfordern und übergeben, Freigabe nur durch einen Menschen — Details: [`docs/BOARD-JARVIS.md`](docs/BOARD-JARVIS.md) |
+| `/upload` | Daten-Upload für Link-Listen (Yellow Pages, API-Katalog): Vorschau, Ablehnungsgründe, Übernahme nur mit Name und Token, Backup vorher — Details: [`docs/UPLOAD.md`](docs/UPLOAD.md) |
 | `/growth` | Phase 2: WF-18 Repurposing (1 → 8 Formate), Traffic Mesh, WF-19 Label-Pipeline, Unified Analytics (ehrliche Labels) — Details: [`docs/GROWTH.md`](docs/GROWTH.md) |
 
 ## Quick start

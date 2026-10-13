@@ -260,6 +260,18 @@ async function main() {
   results.items.push({ kind: 'api', path: '/api/jarvis (POST status)', ok: jvOk, detail: 'status ' + jv.status + (jvOk ? ' · reply+mode+llm ok' : ' · shape') });
 
 
+  // ---- Daten-Upload: Vorschau prüft, Übernahme wird abgelehnt ohne gültige Daten/Name (schreibt nichts) ----
+  await checkPage('/upload');
+  await checkApi('/api/upload/kinds', (j) => Array.isArray(j) && j.length === 2 ? true : 'kinds');
+  const upPrev = await post('/api/upload/preview', { kind: 'yellowpages', text: JSON.stringify({ links: [{ name: 'Captcha Bypass Z', url: 'https://z.example', category: 'x', desc: '' }] }) });
+  results.items.push({ kind: 'enforce', path: 'upload preview rejects forbidden content (no write)', ok: upPrev.status === 200 && JSON.parse(upPrev.body).can_commit === false, detail: 'status ' + upPrev.status });
+  const upBot = await post('/api/upload/commit', { kind: 'yellowpages', text: JSON.stringify({ links: [] }), by: 'Bot-Agent' });
+  results.items.push({ kind: 'enforce', path: 'upload commit refuses non-human name (403/400/422)', ok: [400, 403, 422].includes(upBot.status), detail: 'status ' + upBot.status });
+  const upBad = await post('/api/upload/commit', { kind: 'yellowpages', text: JSON.stringify({ links: [{ name: 'Captcha Bypass Z', url: 'https://z.example', category: 'x', desc: '' }] }), by: 'Validator' });
+  results.items.push({ kind: 'enforce', path: 'upload commit refuses rejected batch (422, no write)', ok: upBad.status === 422, detail: 'status ' + upBad.status });
+  const legacy = await post('/api/config/upload', { target: 'yellowpages', config: { links: [] } });
+  results.items.push({ kind: 'enforce', path: 'legacy yellowpages config upload retired (410)', ok: legacy.status === 410 || legacy.status === 401 || legacy.status === 423, detail: 'status ' + legacy.status });
+
   // data files valid JSON
   for (const f of fs.readdirSync(path.join(__dirname, '..', 'backend', 'data'))) {
     if (!f.endsWith('.json')) continue;
