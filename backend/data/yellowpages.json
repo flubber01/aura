@@ -601,8 +601,20 @@
       "url": "https://github.com/comfyanonymous/ComfyUI",
       "category": "ai-media",
       "desc": "Node-based web UI for local image, video and audio generation. Check each model's licence."
+    },
+    {
+      "name": "FL Studio",
+      "url": "https://www.image-line.com/flstudio/",
+      "category": "music-daw-commercial",
+      "desc": "Kommerzielle DAW (Windows, macOS) mit Step-Sequencer und Piano Roll, beliebt für Beats. Editionen Fruity (nur MIDI, keine Audioaufnahme) und Producer (mit Aufnahme). Einmalkauf mit kostenlosen Updates."
+    },
+    {
+      "name": "Cubase Elements",
+      "url": "https://www.steinberg.net/cubase/",
+      "category": "music-daw-commercial",
+      "desc": "Steinberg-Einstiegsversion von Cubase, kommerziell. Gleiche Audio-Engine, aber weniger Spuren und Funktionen als Artist und Pro (z. B. kein VariAudio, keine Modulatoren)."
     }
   ],
-  "updated_at": "2026-10-13T16:09:39.470Z",
+  "updated_at": "2026-10-13T16:10:55.363Z",
   "via": "upload"
 }
