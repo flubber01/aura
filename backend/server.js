@@ -82,6 +82,8 @@ const agentBoard = require('./src/lib/agent_board');        // Agent Board (Kanb
 const pageBoard = require('./pages/board');
 const dataUpload = require('./src/lib/data_upload');          // geprüfter Upload für Link-Listen
 const pageUpload = require('./pages/upload');
+const skillCatalog = require('./src/lib/skill_catalog');   // Skill-Katalog (nur Lesen)
+const pageSkills = require('./pages/skills');
 const { execFile } = require('child_process');
 
 // emergency kill switch auto-engage on critical errors / syntax failures
@@ -900,6 +902,11 @@ const server = http.createServer(async (req, res) => {
     }
     // ---- Daten-Upload (Link-Listen): Vorschau schreibt nichts, Übernahme nur mit Name + Token ----
     if (p === '/upload') return send(res, 200, 'text/html; charset=utf-8', pageUpload());
+    if (p === '/skills') return send(res, 200, 'text/html; charset=utf-8', pageSkills());
+    if (p === '/api/skill-catalog' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      return send(res, 200, 'application/json', JSON.stringify(skillCatalog.search({ q: sp.get('q') || '', source: sp.get('source') || '', status: sp.get('status') || '', category: sp.get('category') || '', limit: sp.get('limit') || 100 }), null, 2));
+    }
     if (p === '/api/upload/kinds' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(dataUpload.KINDS(), null, 2));
     if (p === '/api/upload/preview' && req.method === 'POST') {
       let body; try { body = JSON.parse(await readBody(req, 1.5e6) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
