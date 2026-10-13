@@ -697,8 +697,44 @@
       "url": "https://www.celemony.com",
       "category": "music-vocal",
       "desc": "Kommerzieller Note-für-Note-Editor für Tonhöhe, Timing und Formanten. Preise bewusst nicht eingetragen."
+    },
+    {
+      "name": "Sforzando",
+      "url": "https://www.plogue.com",
+      "category": "music-instruments",
+      "desc": "Kostenloser SFZ-Sampler von Plogue (Freeware, nicht Open Source) für Sample-Instrumente und Drum-Kits, als Standalone und Plugin."
+    },
+    {
+      "name": "SFZ-Instrumente (Mappings)",
+      "url": "https://github.com/sfzinstruments/mappings",
+      "category": "music-instruments",
+      "desc": "Community-Sammlung von SFZ-Mappings für freie Sample-Bibliotheken. Die Lizenz gilt je Bibliothek, bitte prüfen."
+    },
+    {
+      "name": "DrumGizmo DRSKit",
+      "url": "https://github.com/sfzinstruments/DrumGizmo.DRSKit",
+      "category": "music-instruments",
+      "desc": "Freies Drum-Kit als SFZ-Mapping, lizenziert unter CC-BY-4.0 (Namensnennung nötig)."
+    },
+    {
+      "name": "REAPER",
+      "url": "https://www.reaper.fm",
+      "category": "music-daw-commercial",
+      "desc": "Vollwertige DAW mit Video-Spur: Videos lassen sich direkt im Projekt schneiden und vertonen. Kommerziell, mit Testversion. Preise bewusst nicht eingetragen."
+    },
+    {
+      "name": "Airwindows",
+      "url": "https://www.airwindows.com",
+      "category": "music-effects",
+      "desc": "Große Sammlung kostenloser Effekte (Distortion, Saturation, Hall, EQ) unter MIT-Lizenz."
+    },
+    {
+      "name": "Dragonfly Reverb",
+      "url": "https://michaelwillis.github.io/dragonfly-reverb/",
+      "category": "music-effects",
+      "desc": "Open-Source-Hall-Plugin (GPL) mit Room-, Hall- und Plate-Modus."
     }
   ],
-  "updated_at": "2026-10-13T16:13:59.212Z",
+  "updated_at": "2026-10-13T16:16:43.897Z",
   "via": "upload"
 }
