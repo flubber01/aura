@@ -74,6 +74,7 @@ h2.scr{ text-align:center;letter-spacing:4px;font-size:15px;margin:8px 0 4px }
 
 <section id="s-brain" class="on">
  <h2 class="scr" style="color:#7fd0ff">BLUE 3D BRAIN · 5-DIMENSIONAL AGENTIC CORE <span class="state live">LIVE</span></h2>
+ <div class="ticker" id="btick" style="padding:4px 14px 10px"></div>
  <div class="stage">
   <canvas id="neurons"></canvas>
   ${brain3dSnippet('hubbraincv', { w: 540, h: 540 })}
@@ -83,7 +84,6 @@ h2.scr{ text-align:center;letter-spacing:4px;font-size:15px;margin:8px 0 4px }
   <div class="dimchip" id="dc4">💾 REMEMBER<small id="d4"></small></div>
   <div class="dimchip" id="dc5">🛡 GOVERN<small id="d5"></small></div>
  </div>
- <div class="ticker" id="btick"></div>
 </section>
 
 <section id="s-matrix">
