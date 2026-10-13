@@ -8,7 +8,7 @@ module.exports = function jarvisPageHtml() {
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{background:#020409;color:#cfe6ff;font:14px/1.55 'Segoe UI',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
 #grid{position:fixed;inset:0;z-index:0;opacity:.35}
-main{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:22px 16px}
+main{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:32px 16px 24px}
 header{text-align:center}h1{font-size:26px;letter-spacing:6px;color:#ffcf7d;text-shadow:0 0 24px rgba(255,207,125,.4)}
 .sub{color:#7d94ad;font-size:12px;margin-top:2px}
 .pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#0d3b2a;color:#5fff9f}
