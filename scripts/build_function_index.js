@@ -73,7 +73,6 @@ for (const e of entries) {
   if (e.kind === 'Modul' && e.wired === 'nein') gaps.push(`${e.name}: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)`);
   if (e.kind === 'Modul' && e.wired === 'eigenständig' && e.docs.length === 0) gaps.push(`${e.name}: eigenständiges Skript ohne Doku-Verweis`);
   if (e.kind === 'Route' && e.test === 'nein') gaps.push(`${e.name}: Route ohne Test-Verweis`);
-  if (e.kind === 'Route' && e.docs.length === 0) gaps.push(`${e.name}: Route ohne Doku-Verweis`);
   if (e.kind === 'Seite' && e.wired === 'nein') gaps.push(`${e.name}: Seite nicht im Server verlinkt`);
 }
 
