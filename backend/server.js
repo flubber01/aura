@@ -630,7 +630,37 @@ async function tick(){
  }catch(e){document.getElementById('p-core').textContent='RECONNECT…';}
 }
 tick();setInterval(tick,3000);
-</script></body></html>`;
+</script>
+<style>
+.mx-btn{position:fixed;bottom:12px;z-index:50;background:rgba(8,14,30,.9);color:#ffcf7d;border:1px solid #1d3a66;border-radius:999px;padding:4px 12px;font:12px system-ui,sans-serif;letter-spacing:1px;cursor:pointer}
+.mx-btn:hover{border-color:#ffcf7d}
+#mx-left{left:12px}#mx-right{right:12px}
+#mx-panel{display:none;position:fixed;left:12px;right:12px;bottom:46px;height:72vh;z-index:49;background:#020409;border:1px solid #1d3a66;border-radius:12px;overflow:hidden}
+#mx-panel.open{display:flex}
+#mx-list{width:190px;overflow:auto;border-right:1px solid #1d3a66;background:rgba(8,14,30,.85);padding:8px}
+#mx-list button{display:block;width:100%;text-align:left;background:none;border:0;color:#cfe6ff;padding:5px 6px;font:12px system-ui,sans-serif;cursor:pointer;border-radius:6px}
+#mx-list button:hover,#mx-list button.on{background:#14284a;color:#ffcf7d}
+#mx-frame{flex:1;border:0;background:#020409}
+#mx-close{position:absolute;top:6px;right:8px;background:none;border:0;color:#7fa6d6;font-size:16px;cursor:pointer;z-index:2}
+</style>
+<div id="mx-panel"><button id="mx-close" title="schließen (Esc)">✕</button><div id="mx-list"></div><iframe id="mx-frame" title="Zweitbildschirm"></iframe></div>
+<button class="mx-btn" id="mx-left" title="Zweitbildschirme">◀ screens</button>
+<button class="mx-btn" id="mx-right" title="3D-Gehirn">3D ▶</button>
+<script>
+(function(){
+  var SCREENS=[['Hub','/hub'],['3D Brain','/brain'],['Board','/board'],['Growth','/growth'],['JARVIS','/jarvis'],['Upload','/upload'],['Skills','/skills'],['Steuerzentrale','/control'],['Hierarchie','/hierarchy'],['Ops','/ops'],['Console','/console'],['Logs','/logs'],['Container','/containers'],['Zeitplan','/schedule'],['Research','/research'],['SEO','/seo'],['Pipelines','/pipelines'],['Yellow Pages','/yellowpages']];
+  var panel=document.getElementById('mx-panel'),list=document.getElementById('mx-list'),frame=document.getElementById('mx-frame');
+  function show(path,btn){frame.src=path;[].forEach.call(list.querySelectorAll('button'),function(b){b.classList.toggle('on',b===btn);});}
+  SCREENS.forEach(function(s){var b=document.createElement('button');b.textContent=s[0];b.onclick=function(){show(s[1],b);};list.appendChild(b);});
+  function open(path){panel.classList.add('open');show(path,null);}
+  function close(){panel.classList.remove('open');frame.src='about:blank';}
+  document.getElementById('mx-left').onclick=function(){panel.classList.contains('open')?close():open('/hub');};
+  document.getElementById('mx-right').onclick=function(){open('/brain');};
+  document.getElementById('mx-close').onclick=close;
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+})();
+</script>
+</body></html>`;
 }
 
 // ---------- skill db page ----------
