@@ -61,7 +61,10 @@ let S=null;
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function msg(t,bad){const m=document.getElementById('msg');m.textContent=t;m.style.color=bad?'#ffb0b0':'#ffcf7d'}
 async function api(path,body){
-  const r=await fetch(path,{method:body?'POST':'GET',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});
+  const send=()=>{const h={'content-type':'application/json'};const t=sessionStorage.getItem('aura_token');if(t)h['x-aura-token']=t;
+    return fetch(path,{method:body?'POST':'GET',headers:h,body:body?JSON.stringify(body):undefined});};
+  let r=await send();
+  if(r.status===401&&body){const t=prompt('Admin-Token für das Board (wird nur in dieser Sitzung gemerkt):');if(t){sessionStorage.setItem('aura_token',t.trim());r=await send();}}
   const j=await r.json().catch(()=>({}));
   if(!r.ok){msg((j.error||('Fehler '+r.status))+(r.status===423?' — Kill-Switch aktiv':''),true);return null;}
   msg('');return j;

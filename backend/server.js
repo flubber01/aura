@@ -901,6 +901,8 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/board' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(agentBoard.board(), null, 2));
     if (p.startsWith('/api/board/') && req.method === 'POST') {
       if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED — board locked' }));
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token fehlt oder falsch (Header x-aura-token)' }));
       let body = {};
       try { const raw = await readBody(req, 2e4); body = raw ? JSON.parse(raw) : {}; } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
       if (p === '/api/board/task') {
