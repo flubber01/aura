@@ -34,6 +34,7 @@ const store = require('./src/lib/store');
 const pages = {
   hub: require('./pages/hub'),
   pipelines: require('./pages/pipelines'),
+  studio: require('./pages/studio'),
   yellowpages: require('./pages/yellowpages'),
   deploy: require('./pages/deploy'),
   cluster: require('./pages/cluster'),
@@ -841,6 +842,22 @@ const server = http.createServer(async (req, res) => {
     if (p === '/skills') return send(res, 200, 'text/html; charset=utf-8', skillsPageHtml());
     if (p === '/hub') return send(res, 200, 'text/html; charset=utf-8', pages.hub());
     if (p === '/pipelines') return send(res, 200, 'text/html; charset=utf-8', pages.pipelines());
+    if (p === '/studio') return send(res, 200, 'text/html; charset=utf-8', pages.studio());
+    if (p === '/api/studio/groove' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      try { return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/music_studio').groove({ style: sp.get('style') || 'boom-bap', bars: sp.get('bars'), swing: sp.get('swing'), humanize: sp.get('humanize'), seed: sp.get('seed') }))); }
+      catch (e) { return send(res, 422, 'application/json', JSON.stringify({ ok: false, error: e.message })); }
+    }
+    if (p === '/api/studio/orchestrate' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      try { return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/music_studio').orchestrate({ form: sp.get('form') || undefined, bars: sp.get('bars') }))); }
+      catch (e) { return send(res, 422, 'application/json', JSON.stringify({ ok: false, error: e.message })); }
+    }
+    if (p === '/api/music/skills' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      const results = require('./src/lib/music_studio').skills(sp.get('q') || '', sp.get('limit') || 20);
+      return send(res, 200, 'application/json', JSON.stringify({ q: sp.get('q') || '', results }, null, 2));
+    }
     if (p === '/yellowpages') return send(res, 200, 'text/html; charset=utf-8', pages.yellowpages());
     if (p === '/deploy') return send(res, 200, 'text/html; charset=utf-8', pages.deploy());
     if (p === '/cluster') return send(res, 200, 'text/html; charset=utf-8', pages.cluster());
@@ -1337,6 +1354,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
+  require('./src/lib/escalation').setNotifier(require('./src/lib/notify').notifyEmergency); // Notfall: Telegram/SMS/Anruf, nur wenn konfiguriert
   require('./src/lib/autonomy_loop').start(); // self-healing loop + swarm strategy + learning curve
   ops.startScheduler(); // 12h super-brain autosave · 4h others · 24h full sync
   watcher.start(config.get('watcher.interval_ms', 1500)); // hot-reload data files w/ rollback on syntax error

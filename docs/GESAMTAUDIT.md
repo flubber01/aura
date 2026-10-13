@@ -117,6 +117,12 @@ Anleitung: [`docs/TERMUX.md`](TERMUX.md). Installation mit `bash deploy/termux/i
 | `AURA_LLM_CHAIN` | nein | Reihenfolge der Endpunkte, z. B. `ollama,openrouter` | `ollama,openrouter` |
 | `AURA_LLM_COOLDOWN_MS` | nein | Abklingzeit nach Fehler (verdoppelt sich, max. 10 min) | `60000` |
 | `AURA_ESCALATION_TIMEOUT_MS` | nein | Frist, bis der Mensch bei kritischen Ereignissen bestätigt (min. 60 s) | `900000` (15 min) |
+| `EMERGENCY_TELEGRAM_CHAT` | nein | Chat-ID für Notfall-Nachrichten über Telegram (braucht `TELEGRAM_BOT_TOKEN`) | leer |
+| `TWILIO_ACCOUNT_SID` | nein | Twilio-Konto für Notfall-SMS und Anruf | leer |
+| `TWILIO_AUTH_TOKEN` | nein | Twilio-Token (nur Umgebungsvariable, nie in Dateien) | leer |
+| `TWILIO_FROM` | nein | Absendernummer im E.164-Format, z. B. `+4921100000` | leer |
+| `EMERGENCY_PHONE` | nein | Deine Nummer für SMS (E.164, z. B. `+49…`) | leer |
+| `EMERGENCY_PHONE_CALL` | nein | Nummer für Anruf, falls abweichend | wie `EMERGENCY_PHONE` |
 | `TELEGRAM_BOT_TOKEN` | für Telegram | Bot-Token, nur im Secret-Manager | leer |
 | `TELEGRAM_ALLOWED_CHATS` | für Telegram | Kommagetrennte Chat-IDs, nur diese dürfen Befehle geben | leer = **keine** Sperre |
 | `AURA_URL` | für Telegram | Adresse des AURA-Servers aus Sicht des Pollers | `http://localhost:8080` |
@@ -254,6 +260,8 @@ Zwei Pfade als Argumente (lokale Klone). Erzeugt `backend/data/skill_catalog.jso
 | Skills | `GET /api/skills` (alte Registry, 13 Einträge), `GET /api/skill-catalog?q=&source=&status=&category=&limit=` |
 | JARVIS | `POST /api/jarvis`, `GET /api/jarvis/llm`, `GET /api/jarvis/memory` |
 | LLM-Failover | `GET /api/llm/chain` (Status je Endpunkt, ohne Schlüssel). Tests: `node --test test/api_failover.test.js` |
+| Studio | `GET /studio` (Seite), `GET /api/studio/groove?style=&bars=&swing=&humanize=&seed=`, `GET /api/studio/orchestrate?form=&bars=`, `GET /api/music/skills?q=`. Tests: `node --test test/music_studio.test.js` |
+| Notfall-Kanäle | Nur für Eskalationen (`backend/src/lib/notify.js`). Telegram, SMS, Anruf je nach Konfiguration. Ohne Konfiguration kein Versand. Tests: `node --test test/notify.test.js` |
 | Eskalation | `GET /api/escalations`, `POST /api/escalations/ESC-…/ack` (Token), `POST /api/escalations/raise` (Token, Art `kill_switch` oder `integrity_loss`). Frist ohne Bestätigung → eingefroren (Kill-Switch an, kein Lernen, keine Heilung). Nur der Mensch hebt auf (`revive` mit Token). Tests: `node --test test/escalation.test.js` |
 | Growth | `GET/POST /api/growth/repurpose`, `GET/POST /api/growth/mesh`, `POST /api/growth/mesh/asset`, `GET/POST /api/growth/releases`, `POST /api/growth/releases/<id>/advance`, `GET /api/growth/analytics`, `POST /api/growth/analytics/import` |
 | Hierarchie | `GET /api/hierarchy`, `GET /api/hierarchy/knowledge`, `GET /api/roles`, `GET /api/departments`, `GET /api/teams` |
