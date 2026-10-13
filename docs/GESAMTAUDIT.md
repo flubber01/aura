@@ -420,3 +420,14 @@ Weitere Detaildokumente: `ARCHITECTURE.md`, `SETUP.md`, `DEPLOYMENT.md`, `CONFIG
 - **Zusammenführen**: nach URL. Bekannte Einträge werden aktualisiert, neue angehängt. Vor Übernahme wird nach `backend/src/data/backups/` gesichert (wie bei den übrigen Quellen).
 - **Routen**: `GET /api/creators?platform&topic&enabled&bell`.
 - **Tests**: `test/creator_import.test.js` 11/11 (Temp-Datei, die echte Liste bleibt unangetastet). `data_upload.test.js` und `validate.js` auf drei Upload-Arten angepasst.
+
+### Multi-Kanal-Pipeline und Ultra-Scout (neu)
+
+- **Kanäle** (`backend/src/lib/channel_pipelines.js`): YouTube, WordPress, Medium, Newsletter, Börsen-News (nur Information, Pflicht-Hinweis „Keine Anlageberatung“), Musik-Distributoren (DistroKid, TuneCore, CD Baby, Ditto, manuell). Eigene Kanäle in `backend/data/channels.json` (ist Nutzerdaten, nicht ignoriert).
+- **Grundregel**: Entwurf zuerst, Mensch prüft und gibt frei. Publish-Modus je Kanal: privat zuerst (YouTube), Entwurf zuerst (WordPress), nur Entwurf (Medium), nur Mensch (Newsletter, Distributoren), Prüfung durch Mensch (Börsen-News).
+- **Routen**: `GET /api/channels`, `GET /api/channels/plan?channels=a,b&topic=`, `POST /api/channels/check` und `POST /api/channels/publish-check` (Admin-Token, Body `{channel, meta}` bzw. `{channel, approved_by}`).
+- **Ultra-Scout** (`backend/src/lib/ultra_scout.js`): Läuft täglich nach dem Start (erster Lauf nach 10 Minuten). Liest nur öffentliche GitHub-Metadaten (Suche nach sechs Topics). Filter: Lizenz (MIT, Apache-2.0, BSD, ISC, MPL-2.0), nicht archiviert, kein Fork, Mindeststerne (Standard 50, `AURA_ULTRA_MIN_STARS`), Aktualität, Sperrwörter. Vorschläge landen in `backend/data/ultra_proposals.json` (gitignoriert).
+- **Keine Ausführung**: Der Scout installiert und führt nichts aus. Freigabe heißt nur „zur weiteren Prüfung“. Echte Tests in einer Sandbox brauchen eine eigene Isolation und sind noch nicht gebaut.
+- **Abschalten**: `AURA_ULTRA_SCOUT=0`. Optionaler Token: `GITHUB_TOKEN`, sonst gelten die niedrigen unauthentifizierten Limits.
+- **Routen**: `GET /api/ultra/proposals`, `POST /api/ultra/scout/run` (Admin), `POST /api/ultra/proposals/UP-xxxxxx/decide` (Admin, Body `{decision: approve|reject, by}`).
+- **Tests**: `test/channel_ultra.test.js` 11/11, `youtube_pipeline` 11/11, `creator_import` 11/11, `validate.js` 135/0.

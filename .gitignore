@@ -20,3 +20,4 @@ backend/src/data/growth.json.tmp
 
 # Steuerzentrale (Schalter, Freigaben) — Laufzeit, never commit
 backend/src/data/control.json
+backend/data/ultra_proposals.json

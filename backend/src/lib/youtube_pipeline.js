@@ -86,4 +86,11 @@ function uploadBody(meta, { approvedBy = '' } = {}) {
   };
 }
 
-module.exports = { STAGES, RULES, checkMeta, plan, uploadBody, meta: { area: 'CRW', id: 'youtube_pipeline', name: 'YouTube-Pipeline (Gerüst, Freigabe-Tore, Trockenlauf)', state: 'live' } };
+// Gemeinsame Textprüfung für alle Kanäle (gekaufte Reichweite, Mod-Apps).
+function textIssues(text) {
+  const out = [];
+  for (const [re, rule] of BAD) if (re.test(String(text || ''))) out.push({ rule, msg: 'Verbotene Formulierung gefunden' });
+  return out;
+}
+
+module.exports = { STAGES, RULES, checkMeta, textIssues, plan, uploadBody, meta: { area: 'CRW', id: 'youtube_pipeline', name: 'YouTube-Pipeline (Gerüst, Freigabe-Tore, Trockenlauf)', state: 'live' } };

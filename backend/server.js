@@ -876,6 +876,42 @@ const server = http.createServer(async (req, res) => {
       const out = body.mode === 'upload' ? yt.uploadBody(body.meta || {}, { approvedBy: body.approved_by || '' }) : yt.checkMeta(body.meta || {});
       return send(res, 200, 'application/json', JSON.stringify(out, null, 2));
     }
+    if (p === '/api/channels' && req.method === 'GET') {
+      const cp = require('./src/lib/channel_pipelines');
+      return send(res, 200, 'application/json', JSON.stringify({ channels: cp.channels().map((c) => ({ id: c.id, label: c.label, kind: c.kind, publish: c.publish, api: c.api, source: c.source })), note: cp.meta.name }, null, 2));
+    }
+    if (p === '/api/channels/plan' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/channel_pipelines').plan({ channel_ids: (sp.get('channels') || '').split(',').filter(Boolean), topic: sp.get('topic') || '' }), null, 2));
+    }
+    if ((p === '/api/channels/check' || p === '/api/channels/publish-check') && req.method === 'POST') {
+      // Trockenlauf. Sendet nie etwas. Freigabe-Prüfung verlangt Admin-Token und einen Menschen.
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (!adminToken || req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig (AURA_ADMIN_TOKEN muss gesetzt sein)' }));
+      let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const cp = require('./src/lib/channel_pipelines');
+      const out = p === '/api/channels/check'
+        ? cp.checkDraft(body.channel, body.meta || {})
+        : cp.publishAllowed(body.channel, { approvedBy: body.approved_by || '' });
+      return send(res, 200, 'application/json', JSON.stringify(out, null, 2));
+    }
+    if (p === '/api/ultra/proposals' && req.method === 'GET') {
+      return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/ultra_scout').list(), null, 2));
+    }
+    if (p === '/api/ultra/scout/run' && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (!adminToken || req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig' }));
+      try { return send(res, 200, 'application/json', JSON.stringify(await require('./src/lib/ultra_scout').runScout(), null, 2)); }
+      catch (e) { return send(res, 500, 'application/json', JSON.stringify({ ok: false, error: e.message })); }
+    }
+    const dm = p.match(/^\/api\/ultra\/proposals\/(UP-[0-9a-f]{6})\/decide$/);
+    if (dm && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (!adminToken || req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token nötig' }));
+      let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      const r = require('./src/lib/ultra_scout').decide(dm[1], { decision: body.decision, by: body.by });
+      return send(res, r.status, 'application/json', JSON.stringify(r, null, 2));
+    }
     if (p === '/yellowpages') return send(res, 200, 'text/html; charset=utf-8', pages.yellowpages());
     if (p === '/deploy') return send(res, 200, 'text/html; charset=utf-8', pages.deploy());
     if (p === '/cluster') return send(res, 200, 'text/html; charset=utf-8', pages.cluster());
@@ -1371,7 +1407,7 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, HOST, () => {
+server.listen(PORT, HOST, () => { try { require('./src/lib/ultra_scout').startDaily(); } catch (e) { console.error('ultra_scout: ' + e.message); }
   require('./src/lib/escalation').setNotifier(require('./src/lib/notify').notifyEmergency); // Notfall: Telegram/SMS/Anruf, nur wenn konfiguriert
   require('./src/lib/autonomy_loop').start(); // self-healing loop + swarm strategy + learning curve
   ops.startScheduler(); // 12h super-brain autosave · 4h others · 24h full sync
