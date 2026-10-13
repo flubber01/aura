@@ -487,8 +487,122 @@
       "url": "https://ardour.org",
       "category": "music-daw",
       "desc": "Open-source professional DAW (GPL-2.0), Linux, macOS, Windows. Recording, MIDI, mixing."
+    },
+    {
+      "name": "DistroKid",
+      "url": "https://distrokid.com",
+      "category": "music-distribution",
+      "desc": "Distribution to 150+ stores and streaming services, yearly plan, artist keeps rights and royalties."
+    },
+    {
+      "name": "TuneCore",
+      "url": "https://www.tunecore.com",
+      "category": "music-distribution",
+      "desc": "Distribution to 150+ stores, per-release or yearly plans, publishing options."
+    },
+    {
+      "name": "CD Baby",
+      "url": "https://cdbaby.com",
+      "category": "music-distribution",
+      "desc": "Distribution to 150+ stores, pay-per-release, takes a share of royalties."
+    },
+    {
+      "name": "Amuse",
+      "url": "https://www.amuse.io",
+      "category": "music-distribution",
+      "desc": "Distribution with plans from a free tier to paid tiers, mobile workflow, promotion tools."
+    },
+    {
+      "name": "Ditto Music",
+      "url": "https://dittomusic.com",
+      "category": "music-distribution",
+      "desc": "Distribution with yearly plans, store list and artist tools."
+    },
+    {
+      "name": "AWAL",
+      "url": "https://www.awal.com",
+      "category": "music-distribution",
+      "desc": "Distribution and label services for independent artists, commission-based."
+    },
+    {
+      "name": "Symphonic Distribution",
+      "url": "https://symphonicdistribution.com",
+      "category": "music-distribution",
+      "desc": "Distribution and label services, strong on electronic and Latin catalogues."
+    },
+    {
+      "name": "RouteNote",
+      "url": "https://routenote.com",
+      "category": "music-distribution",
+      "desc": "Distribution with free and paid plans, commission on some royalties."
+    },
+    {
+      "name": "UnitedMasters",
+      "url": "https://www.unitedmasters.com",
+      "category": "music-distribution",
+      "desc": "Distribution with brand and sync deal features, subscription plus commission."
+    },
+    {
+      "name": "ONErpm",
+      "url": "https://onerpm.com",
+      "category": "music-distribution",
+      "desc": "Distribution and label services for independent artists and labels."
+    },
+    {
+      "name": "EmuBands",
+      "url": "https://emubands.com",
+      "category": "music-distribution",
+      "desc": "Distribution for artists and labels, per-release pricing."
+    },
+    {
+      "name": "DaVinci Resolve",
+      "url": "https://www.blackmagicdesign.com/products/davinciresolve",
+      "category": "video-editing",
+      "desc": "Professional editor with colour grading, audio and VFX. Free version has limits, paid Studio version."
+    },
+    {
+      "name": "Shotcut",
+      "url": "https://www.shotcut.org",
+      "category": "video-editing",
+      "desc": "Open-source video editor (GPLv3), no watermark, 4K, works without transcoding."
+    },
+    {
+      "name": "Kdenlive",
+      "url": "https://kdenlive.org",
+      "category": "video-editing",
+      "desc": "Open-source multi-track video editor (GPL), proxy editing, Linux, Windows, macOS."
+    },
+    {
+      "name": "OpenShot",
+      "url": "https://www.openshot.org",
+      "category": "video-editing",
+      "desc": "Open-source video editor, simple workflow for beginners, Linux, Windows, macOS."
+    },
+    {
+      "name": "Blender",
+      "url": "https://www.blender.org",
+      "category": "video-editing",
+      "desc": "Open-source 3D suite with video sequencer and compositor (GPL)."
+    },
+    {
+      "name": "LosslessCut",
+      "url": "https://github.com/mifi/lossless-cut",
+      "category": "video-editing",
+      "desc": "Open-source tool for fast cutting without re-encoding (GitHub)."
+    },
+    {
+      "name": "FFmpeg",
+      "url": "https://ffmpeg.org",
+      "category": "video-editing",
+      "desc": "Command-line media toolkit for automated cuts, conversion and encoding (LGPL/GPL)."
+    },
+    {
+      "name": "ComfyUI",
+      "url": "https://github.com/comfyanonymous/ComfyUI",
+      "category": "ai-media",
+      "desc": "Node-based web UI for local image, video and audio generation. Check each model's licence."
     }
   ],
-  "updated_at": "2026-10-13T16:08:34.826Z",
+  "updated_at": "2026-10-13T16:09:39.470Z",
   "via": "upload"
 }
