@@ -52,6 +52,11 @@ function learn() {
 
 function runOnce(manual) {
   loopCount++;
+  // Eskalation: ohne Bestätigung des Menschen nach Ablauf der Frist → einfrieren (Kill-Switch an, kein Lernen, keine Heilung).
+  const esc = require('./escalation');
+  const ops = require('./ops');
+  esc.tick(Date.now(), () => { if (!ops.isKilled()) ops.kill('Eskalation: Frist ohne Bestätigung, System eingefroren'); });
+  if (esc.isFrozen() || ops.isKilled()) return { loop: loopCount, manual: !!manual, paused: true, reason: esc.isFrozen() ? 'eingefroren (Eskalation)' : 'Kill-Switch aktiv' };
   const findings = checks();
   for (const f of findings) {
     if (REQUIRE_APPROVAL) {

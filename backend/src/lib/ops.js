@@ -75,9 +75,12 @@ function kill(reason) {
   stopScheduler();
   store.audit({ area: 'OPS', event: 'KILL_SWITCH_ENGAGED', reason: killed.reason });
   logger.error('KILL SWITCH: ' + killed.reason);
+  // Kritisches Ereignis: Mensch soll erreicht werden. Eigene Eskalations-Kills nicht doppelt melden.
+  if (!/^Eskalation/.test(killed.reason)) { try { require('./escalation').raise({ kind: 'kill_switch', reason: killed.reason }); } catch { /* ignorieren */ } }
   return status();
 }
 function revive(reason) {
+  try { require('./escalation').thaw(reason || 'manual'); } catch { /* ignorieren */ }
   killed = { on: false, reason: 'revived: ' + (reason || 'manual'), at: new Date().toISOString() };
   startScheduler();
   store.audit({ area: 'OPS', event: 'kill_switch_revived', reason: killed.reason });

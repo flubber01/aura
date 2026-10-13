@@ -116,6 +116,7 @@ Anleitung: [`docs/TERMUX.md`](TERMUX.md). Installation mit `bash deploy/termux/i
 | `OPENROUTER_MODEL` | nein | Modell für OpenRouter | `openrouter/auto` |
 | `AURA_LLM_CHAIN` | nein | Reihenfolge der Endpunkte, z. B. `ollama,openrouter` | `ollama,openrouter` |
 | `AURA_LLM_COOLDOWN_MS` | nein | Abklingzeit nach Fehler (verdoppelt sich, max. 10 min) | `60000` |
+| `AURA_ESCALATION_TIMEOUT_MS` | nein | Frist, bis der Mensch bei kritischen Ereignissen bestätigt (min. 60 s) | `900000` (15 min) |
 | `TELEGRAM_BOT_TOKEN` | für Telegram | Bot-Token, nur im Secret-Manager | leer |
 | `TELEGRAM_ALLOWED_CHATS` | für Telegram | Kommagetrennte Chat-IDs, nur diese dürfen Befehle geben | leer = **keine** Sperre |
 | `AURA_URL` | für Telegram | Adresse des AURA-Servers aus Sicht des Pollers | `http://localhost:8080` |
@@ -253,6 +254,7 @@ Zwei Pfade als Argumente (lokale Klone). Erzeugt `backend/data/skill_catalog.jso
 | Skills | `GET /api/skills` (alte Registry, 13 Einträge), `GET /api/skill-catalog?q=&source=&status=&category=&limit=` |
 | JARVIS | `POST /api/jarvis`, `GET /api/jarvis/llm`, `GET /api/jarvis/memory` |
 | LLM-Failover | `GET /api/llm/chain` (Status je Endpunkt, ohne Schlüssel). Tests: `node --test test/api_failover.test.js` |
+| Eskalation | `GET /api/escalations`, `POST /api/escalations/ESC-…/ack` (Token), `POST /api/escalations/raise` (Token, Art `kill_switch` oder `integrity_loss`). Frist ohne Bestätigung → eingefroren (Kill-Switch an, kein Lernen, keine Heilung). Nur der Mensch hebt auf (`revive` mit Token). Tests: `node --test test/escalation.test.js` |
 | Growth | `GET/POST /api/growth/repurpose`, `GET/POST /api/growth/mesh`, `POST /api/growth/mesh/asset`, `GET/POST /api/growth/releases`, `POST /api/growth/releases/<id>/advance`, `GET /api/growth/analytics`, `POST /api/growth/analytics/import` |
 | Hierarchie | `GET /api/hierarchy`, `GET /api/hierarchy/knowledge`, `GET /api/roles`, `GET /api/departments`, `GET /api/teams` |
 | Zeitplan | `GET /api/schedule`, `POST /api/schedule/add`, `POST /api/schedule/remove`, `GET /api/schedule/recommend`, `GET /api/schedule/csv` |

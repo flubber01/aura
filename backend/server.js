@@ -951,6 +951,22 @@ const server = http.createServer(async (req, res) => {
       if (m) return out(control.decide(m[1], body.decision, body.by));
       return send(res, 404, 'application/json', JSON.stringify({ ok: false, error: 'unknown control route' }));
     }
+    if (p === '/api/escalations' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/escalation').status(), null, 2));
+    if (p === '/api/escalations/raise' && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token fehlt oder falsch' }));
+      let body; try { body = JSON.parse(await readBody(req, 20000) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      try { return send(res, 200, 'application/json', JSON.stringify({ ok: true, escalation: require('./src/lib/escalation').raise({ kind: body.kind, reason: body.reason }) }, null, 2)); }
+      catch (e) { return send(res, 422, 'application/json', JSON.stringify({ ok: false, error: e.message })); }
+    }
+    const escAck = p.match(/^\/api\/escalations\/(ESC-[0-9a-f]{6})\/ack$/);
+    if (escAck && req.method === 'POST') {
+      const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+      if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token fehlt oder falsch' }));
+      let body; try { body = JSON.parse(await readBody(req, 4000) || '{}'); } catch { body = {}; }
+      const r = require('./src/lib/escalation').ack(escAck[1], body.by || 'nutzer');
+      return send(res, r.ok ? 200 : r.code, 'application/json', JSON.stringify(r, null, 2));
+    }
     if (p === '/api/yellowpages/help' && req.method === 'GET') {
       const sp = new URL(req.url, 'http://x').searchParams;
       return send(res, 200, 'application/json', JSON.stringify({ q: sp.get('q') || '', results: require('./src/lib/yp_help').find(sp.get('q') || '', sp.get('limit') || 5) }, null, 2));
