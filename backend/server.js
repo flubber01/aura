@@ -897,6 +897,11 @@ const server = http.createServer(async (req, res) => {
       try { return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/music_studio').orchestrate({ form: sp.get('form') || undefined, bars: sp.get('bars') }))); }
       catch (e) { return send(res, 422, 'application/json', JSON.stringify({ ok: false, error: e.message })); }
     }
+    if (p === '/api/studio/release' && req.method === 'GET') {
+      const sp = new URL(req.url, 'http://x').searchParams;
+      const channelIds = (sp.get('channels') || '').split(',').map((s) => s.trim()).filter(Boolean);
+      return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/studio_release').releasePlan({ channelIds }), null, 2));
+    }
     if (p === '/api/music/skills' && req.method === 'GET') {
       const sp = new URL(req.url, 'http://x').searchParams;
       const results = require('./src/lib/music_studio').skills(sp.get('q') || '', sp.get('limit') || 20);
