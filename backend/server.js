@@ -78,6 +78,8 @@ const crosslinkMesh = require('./src/lib/crosslink_mesh');     // Phase 2 · Tra
 const labelPipeline = require('./src/lib/label_pipeline');     // Phase 2 · WF-19
 const analyticsHub = require('./src/lib/analytics_hub');       // Phase 2 · Unified Analytics
 const pageGrowth = require('./pages/growth');
+const agentBoard = require('./src/lib/agent_board');        // Agent Board (Kanban für Agenten)
+const pageBoard = require('./pages/board');
 const { execFile } = require('child_process');
 
 // emergency kill switch auto-engage on critical errors / syntax failures
@@ -893,6 +895,24 @@ const server = http.createServer(async (req, res) => {
       const id = decodeURIComponent(p.split('/')[4] || '');
       const r = labelPipeline.advance(id, body.target, body);
       return send(res, r.ok ? 200 : (r.code || 400), 'application/json', JSON.stringify(r, null, 2));
+    }
+    // ---- Agent Board (Kanban für Agenten; Freigabe nur durch Menschen) ----
+    if (p === '/board') return send(res, 200, 'text/html; charset=utf-8', pageBoard());
+    if (p === '/api/board' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(agentBoard.board(), null, 2));
+    if (p.startsWith('/api/board/') && req.method === 'POST') {
+      if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED — board locked' }));
+      let body = {};
+      try { const raw = await readBody(req, 2e4); body = raw ? JSON.parse(raw) : {}; } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })); }
+      if (p === '/api/board/task') {
+        const r = agentBoard.createTask(body);
+        return send(res, r.status, 'application/json', JSON.stringify(r.ok ? { ok: true, task: r.task } : { ok: false, error: r.error }, null, 2));
+      }
+      const m = p.match(/^\/api\/board\/(T-[0-9a-f]{6})\/(assign|start|request_help|handoff|submit|approve|reject)$/);
+      if (m) {
+        const r = agentBoard.act(m[1], m[2], body.by, body);
+        return send(res, r.status, 'application/json', JSON.stringify(r.ok ? { ok: true, task: r.task } : { ok: false, error: r.error }, null, 2));
+      }
+      return send(res, 404, 'application/json', JSON.stringify({ error: 'unknown board route' }));
     }
     if (p === '/api/growth/analytics' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(analyticsHub.dashboard(), null, 2));
     if (p === '/api/growth/analytics/import' && req.method === 'POST') {
