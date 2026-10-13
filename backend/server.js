@@ -887,6 +887,11 @@ const server = http.createServer(async (req, res) => {
     if (p === '/hub') return send(res, 200, 'text/html; charset=utf-8', pages.hub());
     if (p === '/pipelines') return send(res, 200, 'text/html; charset=utf-8', pages.pipelines());
     if (p === '/studio') return send(res, 200, 'text/html; charset=utf-8', pages.studio());
+    if (p === '/forge') return send(res, 200, 'text/html; charset=utf-8', require('./pages/forge')());
+    if (p === '/imagegen') return send(res, 200, 'text/html; charset=utf-8', require('./pages/imagegen')());
+    if (p === '/intercom') return send(res, 200, 'text/html; charset=utf-8', require('./pages/intercom')());
+    if (p === '/models') return send(res, 200, 'text/html; charset=utf-8', require('./pages/models')());
+    if (p === '/tower') return send(res, 200, 'text/html; charset=utf-8', require('./pages/tower')());
     if (p === '/api/studio/groove' && req.method === 'GET') {
       const sp = new URL(req.url, 'http://x').searchParams;
       try { return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/music_studio').groove({ style: sp.get('style') || 'boom-bap', bars: sp.get('bars'), swing: sp.get('swing'), humanize: sp.get('humanize'), seed: sp.get('seed') }))); }

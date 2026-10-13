@@ -18,19 +18,15 @@ Spalten: **Name** · **Typ** · **Datei** · **Test** (Verweis in test/) · **Ve
 - delivery_monitor: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - editorial_incubator: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - finance_engine: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
-- forge: Seite nicht im Server verlinkt
 - function_registry: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - gateway_health: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - hardware_router: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - harness_kit: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - image_gen: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
-- imagegen: Seite nicht im Server verlinkt
-- intercom: Seite nicht im Server verlinkt
 - knowledge_sync: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - mcp_manager: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - media_pipeline: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - mesh_engine: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
-- models: Seite nicht im Server verlinkt
 - n8n_bridge: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - report_daemon: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - routine_control: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
@@ -38,7 +34,6 @@ Spalten: **Name** · **Typ** · **Datei** · **Test** (Verweis in test/) · **Ve
 - studio: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - telemetry_stream: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - test_lab: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
-- tower: Seite nicht im Server verlinkt
 - variance_lifecycle: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - vault: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
 - vision_bridge: Modul ohne Verbindung (nicht in server.js oder Skript eingebunden)
@@ -224,7 +219,7 @@ Spalten: **Name** · **Typ** · **Datei** · **Test** (Verweis in test/) · **Ve
 | Name | Typ | Datei | Test | Verbunden | Doku | Kurzbeschreibung |
 |---|---|---|---|---|---|---|
 | `finance_engine` | Modul | `backend/src/lib/finance_engine.js` | nein | nein | — | AURA Area 31 — OmniRoute Financial Engine (LIVE, sicher redesign). |
-| `forge` | Seite | `backend/pages/forge.js` | — | nein | — | AURA Areas 73+74 — Content Forge (minion automation) + Service Fabric UI. |
+| `forge` | Seite | `backend/pages/forge.js` | — | ja | — | AURA Areas 73+74 — Content Forge (minion automation) + Service Fabric UI. |
 | `function_registry` | Modul | `backend/src/lib/function_registry.js` | nein | nein | — | AURA Area 83 — Function Capability Registry: admins can ADD, IGNORE or |
 
 ## G
@@ -252,8 +247,8 @@ Spalten: **Name** · **Typ** · **Datei** · **Test** (Verweis in test/) · **Ve
 |---|---|---|---|---|---|---|
 | `ignition` | Seite | `backend/pages/ignition.js` | — | ja | DEPLOYMENT, GESAMTAUDIT, HOWTO_BUILD | IGNITION — master dashboard: ALL sites/projects/games/links/services under |
 | `image_gen` | Modul | `backend/src/lib/image_gen.js` | nein | nein | — | AURA Area 71 — Image Generation Gateway: ComfyUI + AUTOMATIC1111 WebUI. |
-| `imagegen` | Seite | `backend/pages/imagegen.js` | — | nein | — | AURA Area 71 — Image Generation Gateway UI (ComfyUI + WebUI). |
-| `intercom` | Seite | `backend/pages/intercom.js` | — | nein | — | Agent Intercom — Chat der Agenten untereinander (Area 84). |
+| `imagegen` | Seite | `backend/pages/imagegen.js` | — | ja | — | AURA Area 71 — Image Generation Gateway UI (ComfyUI + WebUI). |
+| `intercom` | Seite | `backend/pages/intercom.js` | — | ja | — | Agent Intercom — Chat der Agenten untereinander (Area 84). |
 
 ## J
 
@@ -292,7 +287,7 @@ Spalten: **Name** · **Typ** · **Datei** · **Test** (Verweis in test/) · **Ve
 | `mesh_engine` | Modul | `backend/src/lib/mesh_engine.js` | nein | nein | — | AURA Area 29 — Sandbox Mesh Engine (LIVE). |
 | `metadata_shredder` | Modul | `backend/src/lib/metadata_shredder.js` | nein | ja | — | 07 · Media metadata privacy pipeline — real JPEG EXIF scrubber (pure Node). |
 | `minibot` | Seite | `backend/pages/minibot.js` | — | ja | GESAMTAUDIT, SETUP, ../README | Mini-bot AI setup help: wizard that generates a ready mini-bot kit |
-| `models` | Seite | `backend/pages/models.js` | — | nein | GESAMTAUDIT | Model Bay — offenes Modell-System (Area 79): Suche, eigene Modelle, Test, Keys. |
+| `models` | Seite | `backend/pages/models.js` | — | ja | GESAMTAUDIT | Model Bay — offenes Modell-System (Area 79): Suche, eigene Modelle, Test, Keys. |
 | `module_container` | Modul | `backend/src/lib/module_container.js` | nein | ja | — | AURA Area 67 — Module Containers: every live-module action runs inside an |
 | `module_loader` | Modul | `backend/src/lib/module_loader.js` | ja | ja | GESAMTAUDIT, MODULE_SPEC | AURA — Modul-Loader für Erweiterungsmodule (backend/modules/<ordner>/aura.module.json). |
 | `module_manifest` | Modul | `backend/src/lib/module_manifest.js` | ja | ja | GESAMTAUDIT | AURA — Manifest-Prüfung für Erweiterungsmodule (aura.module.json). |
@@ -368,7 +363,7 @@ Spalten: **Name** · **Typ** · **Datei** · **Test** (Verweis in test/) · **Ve
 | `telemetry_stream` | Modul | `backend/src/lib/telemetry_stream.js` | nein | nein | — | AURA Area 30 — Streaming Telemetry / Remote Workers (LIVE). |
 | `terminal` | Seite | `backend/pages/terminal.js` | — | ja | ARCHITECTURE, DEPLOYMENT, GESAMTAUDIT, ../README | Sandboxed web terminal — runs as the sandbox user (NOT root, by design), |
 | `test_lab` | Modul | `backend/src/lib/test_lab.js` | nein | nein | — | AURA Area 77 — Test Lab: admin force-run harness with EXPECT-FAILURE view. |
-| `tower` | Seite | `backend/pages/tower.js` | — | nein | — | AURA — Command Tower UI: Brain-Mapping (80), Directives (81), |
+| `tower` | Seite | `backend/pages/tower.js` | — | ja | — | AURA — Command Tower UI: Brain-Mapping (80), Directives (81), |
 | `traffic` | Modul | `backend/src/lib/traffic.js` | ja | ja | DEPLOYMENT, MODULES | AURA Area 65 — honest traffic telemetry: REAL request counts per route, |
 | `txt_watcher` | Modul | `backend/src/lib/txt_watcher.js` | nein | ja | — | File-system pulse watcher: hot-reloads editable data files (edit via /terminal |
 | `types_catalog` | Modul | `backend/src/lib/types_catalog.js` | nein | ja | — | ALL-TYPES catalog + downloadable artifact renderers (previously inline in server.js). |
