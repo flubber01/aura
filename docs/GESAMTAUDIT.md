@@ -410,3 +410,13 @@ Weitere Detaildokumente: `ARCHITECTURE.md`, `SETUP.md`, `DEPLOYMENT.md`, `CONFIG
 - **Routen**: `GET /api/creators?platform&topic&enabled`, `GET /api/youtube/plan?topic&creators=a,b`, `POST /api/youtube/check` (Admin-Token nötig, `mode: "check"` oder `"upload"`). Der Upload-Modus baut nur den Körper für `videos.insert` und sendet nichts.
 - **Offen**: Echte Anbindung an die YouTube Data API (OAuth-Zugang), automatischer Creator-Abruf, KI-Kennzeichnungsfeld gegen aktuelle API-Doku prüfen. Eine Seite im Browser fehlt noch.
 - **Tests**: `test/youtube_pipeline.test.js` 11/11.
+
+### Nachtrag: Creator-Import (Upload)
+
+- **Upload-Art** `creators` im Daten-Upload (`/upload`). Vorschau schreibt nichts, Übernahme alles-oder-nichts mit Name und Admin-Token. Abgelehnte Zeilen bleiben sichtbar.
+- **Drei Formate**: JSON (`[...]` oder `{"creators": [...]}`), Zeilen `Name | Link | Themen | bell` (bell: ja/yes/true/1/glocke), YouTube-Takeout-CSV der Abos (Spalten `Channel Id, Channel Url, Channel Title`).
+- **Link-Erkennung**: Plattform aus dem Host (youtube, x, tiktok, instagram, soundcloud, bandcamp, spotify, telegram, open-data für musicbrainz/discogs/wikidata, sonst website). YouTube-Kanäle werden auf die kanonische Form gebracht. Mit Kanal-ID wird der öffentliche RSS-Feed (`feeds/videos.xml`) ergänzt.
+- **Glocke (`bell`)**: Ist nur ein Hinweisfeld. Die YouTube-API und der Takeout-Export liefern den Glocken-Status nicht. Er muss von Hand oder im Textformat gesetzt werden.
+- **Zusammenführen**: nach URL. Bekannte Einträge werden aktualisiert, neue angehängt. Vor Übernahme wird nach `backend/src/data/backups/` gesichert (wie bei den übrigen Quellen).
+- **Routen**: `GET /api/creators?platform&topic&enabled&bell`.
+- **Tests**: `test/creator_import.test.js` 11/11 (Temp-Datei, die echte Liste bleibt unangetastet). `data_upload.test.js` und `validate.js` auf drei Upload-Arten angepasst.

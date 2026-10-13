@@ -861,7 +861,7 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/creators' && req.method === 'GET') {
       const sp = new URL(req.url, 'http://x').searchParams;
       const cw = require('./src/lib/creator_watch');
-      return send(res, 200, 'application/json', JSON.stringify({ platform: sp.get('platform') || '', topic: sp.get('topic') || '', creators: cw.list({ platform: sp.get('platform') || '', topic: sp.get('topic') || '', enabled: sp.get('enabled') || '' }), check: cw.check() }, null, 2));
+      return send(res, 200, 'application/json', JSON.stringify({ platform: sp.get('platform') || '', topic: sp.get('topic') || '', creators: cw.list({ platform: sp.get('platform') || '', topic: sp.get('topic') || '', enabled: sp.get('enabled') || '', bell: sp.get('bell') || '' }), check: cw.check() }, null, 2));
     }
     if (p === '/api/youtube/plan' && req.method === 'GET') {
       const sp = new URL(req.url, 'http://x').searchParams;

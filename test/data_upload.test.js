@@ -12,7 +12,7 @@ const good = { name: 'Beispiel Tool', url: 'https://example.org/tool', category:
 
 test('Quellen sind registriert', () => {
   const ids = du.KINDS().map((k) => k.id);
-  assert.deepStrictEqual(ids.sort(), ['apis', 'yellowpages']);
+  assert.deepStrictEqual(ids.sort(), ['apis', 'creators', 'yellowpages']);
 });
 
 test('gültige Yellow-Pages-Liste: Vorschau ok, Übernahme erlaubt', () => {

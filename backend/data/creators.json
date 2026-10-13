@@ -1,7 +1,20 @@
 {
   "schema_version": 1,
   "note": "Creator-Beobachtungsliste. Nur öffentliche Inhalte, nur offizielle Schnittstellen oder RSS. Kein Login-Scraping, keine Umgehung, keine Engagement-Käufe. Nichts wird automatisch abgerufen, solange kein Abruf gebaut und freigegeben ist. Einträge sind nur Referenz.",
-  "platforms": ["youtube", "x", "tiktok", "instagram", "website", "newsletter", "telegram", "other"],
+  "platforms": [
+    "youtube",
+    "x",
+    "tiktok",
+    "instagram",
+    "soundcloud",
+    "bandcamp",
+    "spotify",
+    "website",
+    "newsletter",
+    "telegram",
+    "open-data",
+    "other"
+  ],
   "creators": [
     {
       "id": "julian-goldie",
@@ -9,7 +22,12 @@
       "platform": "x",
       "url": "https://x.com/JulianGoldieSEO",
       "website": "https://juliangoldie.com",
-      "topics": ["ai-tools", "hermes-agent", "seo", "content-strategie"],
+      "topics": [
+        "ai-tools",
+        "hermes-agent",
+        "seo",
+        "content-strategie"
+      ],
       "enabled": true,
       "watch": "manuell",
       "note": "Beobachtung für Trends. Keine Übernahme von Verkaufsversprechen oder Lead-Taktiken."

@@ -270,7 +270,7 @@ async function main() {
 
   // ---- Daten-Upload: Vorschau prüft, Übernahme wird abgelehnt ohne gültige Daten/Name (schreibt nichts) ----
   await checkPage('/upload');
-  await checkApi('/api/upload/kinds', (j) => Array.isArray(j) && j.length === 2 ? true : 'kinds');
+  await checkApi('/api/upload/kinds', (j) => Array.isArray(j) && j.length === 3 ? true : 'kinds');
   const upPrev = await post('/api/upload/preview', { kind: 'yellowpages', text: JSON.stringify({ links: [{ name: 'Captcha Bypass Z', url: 'https://z.example', category: 'x', desc: '' }] }) });
   results.items.push({ kind: 'enforce', path: 'upload preview rejects forbidden content (no write)', ok: upPrev.status === 200 && JSON.parse(upPrev.body).can_commit === false, detail: 'status ' + upPrev.status });
   const upBot = await post('/api/upload/commit', { kind: 'yellowpages', text: JSON.stringify({ links: [] }), by: 'Bot-Agent' });

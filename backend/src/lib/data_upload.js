@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const store = require('./store');
 const registry = require('./registry');
+const creatorWatch = require('./creator_watch');
 
 const MAX_BYTES = 1_000_000;
 const MAX_ITEMS = 500;
@@ -95,6 +96,12 @@ const KINDS = {
     parse: parseYellowpages,
     mode: 'merge', // neue URLs werden ergänzt, bekannte aktualisiert
   },
+  creators: {
+    label: 'Creator-Liste (JSON, Zeilen "Name | Link | Themen | bell" oder YouTube-Takeout-CSV)',
+    file: creatorWatch.FILE,
+    parse: (t) => creatorWatch.parseUpload(t, { checkItem }),
+    mode: 'merge', // nach URL: bekannte aktualisiert, neue ergänzt
+  },
   apis: {
     label: 'API-Katalog (ingest/apis.txt, Format: name | url | category)',
     file: path.join(ROOT, 'ingest', 'apis.txt'),
@@ -118,6 +125,11 @@ function preview(kind, text) {
   if (kind === 'yellowpages' && k.mode === 'merge') {
     const cur = JSON.parse(fs.readFileSync(k.file, 'utf8')).links || [];
     const known = new Set(cur.map((l) => l.url));
+    for (const it of r.accepted) (known.has(it.url) ? updated++ : added++);
+  }
+  if (kind === 'creators') {
+    const cur = creatorWatch.load().creators;
+    const known = new Set(cur.map((c) => c.url));
     for (const it of r.accepted) (known.has(it.url) ? updated++ : added++);
   }
   return {
@@ -164,6 +176,9 @@ function commit(kind, text, by) {
     const next = { ...cur, links, updated_at: new Date().toISOString(), via: 'upload' };
     fs.writeFileSync(k.file + '.tmp', JSON.stringify(next, null, 2));
     fs.renameSync(k.file + '.tmp', k.file);
+  } else if (kind === 'creators') {
+    const res = creatorWatch.mergeAccepted(parsed.accepted);
+    added = res.added; updated = res.updated;
   } else {
     const body = parsed.accepted.map((it) => [it.name, it.url, it.category].join(' | ')).join('\n');
     const header = '# AURA catalog ingestor input — public tool/API links\n# Format: name | url | category\n';
