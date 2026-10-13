@@ -1133,6 +1133,11 @@ const server = http.createServer(async (req, res) => {
     if (p === '/api/ops/sync' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(ops.runFullSync() || { ok: true }));
     if (p === '/api/kill' && req.method === 'POST') {
       const raw = await readBody(req); let body; try { body = JSON.parse(raw || '{}'); } catch { body = {}; }
+      // Auslösen ist immer erlaubt (sicherer Zustand). Lösen braucht den Admin-Token, wenn er gesetzt ist.
+      if (!body.arm) {
+        const adminToken = process.env.AURA_ADMIN_TOKEN || '';
+        if (adminToken && req.headers['x-aura-token'] !== adminToken) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Kill-Switch lösen braucht Admin-Token (x-aura-token)' }));
+      }
       return send(res, 200, 'application/json', JSON.stringify(body.arm ? ops.kill(body.reason) : ops.revive(body.reason)));
     }
     if (p === '/api/telegram/kit') return send(res, 200, 'application/json', JSON.stringify(ops.telegramKit(), null, 2));
