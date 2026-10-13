@@ -223,6 +223,43 @@ async function main() {
   let honest = false; try { const j = JSON.parse(dash.body); honest = j.connectors.every((c) => ['LIVE', 'IMPORTED', 'CONFIGURED', 'NOT-CONNECTED'].includes(c.state)); } catch {}
   results.items.push({ kind: 'enforce', path: 'analytics only uses honest labels', ok: honest, detail: honest ? 'labels ok' : 'unknown label' });
 
+  // ---- Agent Board (Kanban für Agenten): Seite, API, Gates, Freigabe nur durch Mensch ----
+  await checkPage('/board');
+  await checkApi('/api/board', (j) => (Array.isArray(j.columns) && j.columns.length === 6 && Array.isArray(j.roles) && j.roles.length > 0) ? true : 'board shape');
+  const bBad = await post('/api/board/task', { title: 'x', goal: 'kurz', needs: ['research'] });
+  results.items.push({ kind: 'enforce', path: 'board rejects invalid task (400)', ok: bBad.status === 400, detail: 'status ' + bBad.status });
+  const bNew = await post('/api/board/task', { title: 'Validierung Board', goal: 'Automatischer Testlauf des Boards', needs: ['research'] });
+  const bId = bNew.status === 201 ? JSON.parse(bNew.body).task.id : null;
+  results.items.push({ kind: 'enforce', path: 'board creates task (201)', ok: bNew.status === 201 && !!bId, detail: 'status ' + bNew.status });
+  if (bId) {
+    const bAssign = await post('/api/board/' + bId + '/assign', {});
+    const bAssignedTo = bAssign.status === 200 ? JSON.parse(bAssign.body).task.owner : null;
+    results.items.push({ kind: 'enforce', path: 'board assigns by capability (200, owner set)', ok: bAssign.status === 200 && !!bAssignedTo, detail: 'status ' + bAssign.status });
+    const bStart = await post('/api/board/' + bId + '/start', {});
+    results.items.push({ kind: 'enforce', path: 'board start (200)', ok: bStart.status === 200, detail: 'status ' + bStart.status });
+    const bEarly = await post('/api/board/' + bId + '/approve', { by: 'Validator' });
+    results.items.push({ kind: 'enforce', path: 'board no approve before review (409)', ok: bEarly.status === 409, detail: 'status ' + bEarly.status });
+    const bOther = await post('/api/board/' + bId + '/submit', { by: 'fremde-rolle', result: 'Ergebnis vom falschen Agenten, sollte abgelehnt werden.' });
+    results.items.push({ kind: 'enforce', path: 'board submit by non-owner denied (403)', ok: bOther.status === 403, detail: 'status ' + bOther.status });
+    const bSub = await post('/api/board/' + bId + '/submit', { by: bAssignedTo, result: 'Automatischer Testlauf: Ergebnis eingereicht.' });
+    results.items.push({ kind: 'enforce', path: 'board submit by owner (200)', ok: bSub.status === 200, detail: 'status ' + bSub.status });
+    const bAgentOk = await post('/api/board/' + bId + '/approve', { by: 'Bot-Agent' });
+    results.items.push({ kind: 'enforce', path: 'board agent cannot approve (403)', ok: bAgentOk.status === 403, detail: 'status ' + bAgentOk.status });
+    const bRoleOk = await post('/api/board/' + bId + '/approve', { by: bAssignedTo });
+    results.items.push({ kind: 'enforce', path: 'board role id cannot approve (403)', ok: bRoleOk.status === 403, detail: 'status ' + bRoleOk.status });
+    const bHuman = await post('/api/board/' + bId + '/approve', { by: 'Validator' });
+    results.items.push({ kind: 'enforce', path: 'board human approves (200)', ok: bHuman.status === 200, detail: 'status ' + bHuman.status });
+  }
+
+  // ---- J.A.R.V.I.S.: Seite, Antwort mit Modus, LLM-Status ehrlich (ohne Ollama -> Engine) ----
+  await checkPage('/jarvis');
+  await checkApi('/api/jarvis/llm', (j) => typeof j.configured === 'boolean' && typeof j.reachable === 'boolean' ? true : 'llm status shape');
+  const jv = await post('/api/jarvis', { msg: 'status' });
+  let jvOk = jv.status === 200;
+  try { const j = JSON.parse(jv.body); jvOk = jvOk && typeof j.reply === 'string' && typeof j.mode === 'string' && j.llm && typeof j.llm.used === 'boolean'; } catch { jvOk = false; }
+  results.items.push({ kind: 'api', path: '/api/jarvis (POST status)', ok: jvOk, detail: 'status ' + jv.status + (jvOk ? ' · reply+mode+llm ok' : ' · shape') });
+
+
   // data files valid JSON
   for (const f of fs.readdirSync(path.join(__dirname, '..', 'backend', 'data'))) {
     if (!f.endsWith('.json')) continue;
