@@ -108,7 +108,11 @@ TELEGRAM_BOT_TOKEN=… TELEGRAM_ALLOWED_CHATS=<deine Chat-ID> AURA_URL=http://<s
 | `OLLAMA_URL` | nein | Ollama-Endpunkt für JARVIS-Freitext. Ohne Wert: aus | leer |
 | `OLLAMA_MODEL` | nein | Modellname bei Ollama | `llama3.2` |
 | `OLLAMA_TIMEOUT_MS` | nein | Zeitlimit je Anfrage | siehe Code |
-| `OPENROUTER_API_KEY` | nein | Cloud-Anbindung (nur Routing-Eintrag, kein Aufruf gebaut) | leer |
+| `OPENROUTER_API_KEY` | nein | Cloud-Endpunkt für den API-Failover (`backend/src/lib/api_failover.js`). Ohne Schlüssel wird er übersprungen. | leer |
+| `OPENROUTER_BASE_URL` | nein | Basis-URL, nur https (http nur localhost) | `https://openrouter.ai/api/v1` |
+| `OPENROUTER_MODEL` | nein | Modell für OpenRouter | `openrouter/auto` |
+| `AURA_LLM_CHAIN` | nein | Reihenfolge der Endpunkte, z. B. `ollama,openrouter` | `ollama,openrouter` |
+| `AURA_LLM_COOLDOWN_MS` | nein | Abklingzeit nach Fehler (verdoppelt sich, max. 10 min) | `60000` |
 | `TELEGRAM_BOT_TOKEN` | für Telegram | Bot-Token, nur im Secret-Manager | leer |
 | `TELEGRAM_ALLOWED_CHATS` | für Telegram | Kommagetrennte Chat-IDs, nur diese dürfen Befehle geben | leer = **keine** Sperre |
 | `AURA_URL` | für Telegram | Adresse des AURA-Servers aus Sicht des Pollers | `http://localhost:8080` |
@@ -245,6 +249,7 @@ Zwei Pfade als Argumente (lokale Klone). Erzeugt `backend/data/skill_catalog.jso
 | Upload | `GET /api/upload/kinds`, `POST /api/upload/preview`, `POST /api/upload/commit` |
 | Skills | `GET /api/skills` (alte Registry, 13 Einträge), `GET /api/skill-catalog?q=&source=&status=&category=&limit=` |
 | JARVIS | `POST /api/jarvis`, `GET /api/jarvis/llm`, `GET /api/jarvis/memory` |
+| LLM-Failover | `GET /api/llm/chain` (Status je Endpunkt, ohne Schlüssel). Tests: `node --test test/api_failover.test.js` |
 | Growth | `GET/POST /api/growth/repurpose`, `GET/POST /api/growth/mesh`, `POST /api/growth/mesh/asset`, `GET/POST /api/growth/releases`, `POST /api/growth/releases/<id>/advance`, `GET /api/growth/analytics`, `POST /api/growth/analytics/import` |
 | Hierarchie | `GET /api/hierarchy`, `GET /api/hierarchy/knowledge`, `GET /api/roles`, `GET /api/departments`, `GET /api/teams` |
 | Zeitplan | `GET /api/schedule`, `POST /api/schedule/add`, `POST /api/schedule/remove`, `GET /api/schedule/recommend`, `GET /api/schedule/csv` |

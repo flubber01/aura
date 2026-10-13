@@ -1064,6 +1064,7 @@ const server = http.createServer(async (req, res) => {
       const out = await jarvis.askAsync(body.msg || body.q || body.text || body.message || '');
       return send(res, 200, 'application/json', JSON.stringify(out, null, 2));
     }
+    if (p === '/api/llm/chain') return send(res, 200, 'application/json', JSON.stringify(require('./src/lib/api_failover').status(), null, 2));
     if (p === '/api/jarvis/llm') return send(res, 200, 'application/json', JSON.stringify(await require('./src/lib/ollama_llm').status(), null, 2));
     if (p === '/api/jarvis/memory') return send(res, 200, 'application/json', JSON.stringify(jarvis.memory(), null, 2));
 

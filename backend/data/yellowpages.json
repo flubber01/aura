@@ -733,8 +733,44 @@
       "url": "https://michaelwillis.github.io/dragonfly-reverb/",
       "category": "music-effects",
       "desc": "Open-Source-Hall-Plugin (GPL) mit Room-, Hall- und Plate-Modus."
+    },
+    {
+      "name": "prompts.chat",
+      "url": "https://prompts.chat",
+      "category": "prompts",
+      "desc": "Community-Sammlung von Prompts (früher Awesome ChatGPT Prompts), frei und Open Source, auch selbst hostbar."
+    },
+    {
+      "name": "Prompt Optimizer",
+      "url": "https://github.com/linshenkx/prompt-optimizer",
+      "category": "prompts",
+      "desc": "Open-Source-Werkzeug, das Prompts verbessert und Ergebnisse vergleicht."
+    },
+    {
+      "name": "Awesome Claude Code",
+      "url": "https://github.com/hesreallyhim/awesome-claude-code",
+      "category": "prompts",
+      "desc": "Handverlesene Liste mit Skills, Agenten, Statuslines und Tools rund um Claude Code."
+    },
+    {
+      "name": "Mr. Ranedeer AI Tutor",
+      "url": "https://github.com/JushBJJ/Mr.-Ranedeer-AI-Tutor",
+      "category": "prompts",
+      "desc": "Anpassbarer Tutor-Prompt für personalisiertes Lernen, ursprünglich für GPT-4 geschrieben."
+    },
+    {
+      "name": "LiteLLM",
+      "url": "https://github.com/BerriAI/litellm",
+      "category": "ai-gateway",
+      "desc": "Open-Source-Gateway für über 100 LLM-APIs im OpenAI-Format, mit Load Balancing, Fallbacks und Kosten-Tracking. Referenz für späteren Ausbau des Failovers."
+    },
+    {
+      "name": "9router",
+      "url": "https://github.com/decolua/9router",
+      "category": "ai-gateway",
+      "desc": "Lokaler Router für Coding-Tools mit automatischem Fallback zwischen Anbietern. Kostenlose Angebote hängen vom Anbieter ab, Lizenz vor Nutzung prüfen."
     }
   ],
-  "updated_at": "2026-10-13T16:16:43.897Z",
+  "updated_at": "2026-10-13T16:19:10.144Z",
   "via": "upload"
 }
