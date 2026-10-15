@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "note": "Musik-Skills als Metadaten. Nichts wird installiert oder ausgeführt. Beschreibungen sind eigene Texte, keine fremden Skill-Inhalte.",
+  "skills": [
+    {"id":"producer","title":"Producer","description":"Leitet ein Projekt: Idee, Arrangement, Sounds, Entscheidungen über Richtung und Fertigstellung.","tasks":["Projektplan","Arrangement-Entwurf","Entscheidung Referenztrack"]},
+    {"id":"toningenieur","title":"Toningenieur (Tonmeister)","description":"Nimmt auf, richtet Mikrofone und Pegel ein, sorgt für sauberen Klang am Aufnahmeplatz.","tasks":["Mikrofonwahl","Pegel und Gain-Staging","Aufnahme-Checkliste"]},
+    {"id":"mix_engineer","title":"Mix-Engineer","description":"Balanciert Spuren, EQ, Kompression, Panorama und Raum zu einem stimmigen Mix.","tasks":["Gain-Staging","Frequenzbalance","Bus-Kompression"]},
+    {"id":"mastering_engineer","title":"Mastering-Engineer","description":"Letzter Schritt vor der Veröffentlichung: Lautheit (LUFS), Stereobild, Format.","tasks":["LUFS-Ziel","True-Peak-Kontrolle","Formatprüfung"]},
+    {"id":"backing_vocal_artist","title":"Backing-Vocal-Artist","description":"Entwirft und singt Hintergrundstimmen: Harmonien, Doppelungen, Call-and-Response.","tasks":["Stimmsatz","Harmonie-Plan","Doppelung und Panning"]},
+    {"id":"lead_vocal_coach","title":"Gesangscoach","description":"Arbeitet an Phrasierung, Atmung und Intonation. Gibt Hinweise, keine Stimmkopien.","tasks":["Phrasierung","Atemtechnik","Intonationsübung"]},
+    {"id":"vocal_producer","title":"Vocal-Producer","description":"Führt die Gesangsaufnahme: Takes, Comping, Timing, Tonkorrektur mit Melodyne oder Auto-Tune.","tasks":["Comping","Timing-Korrektur","Pitch-Korrektur (Maß halten)"]},
+    {"id":"arranger","title":"Arrangeur","description":"Ordnet Abschnitte, Instrumente und Dichte im Verlauf eines Stücks.","tasks":["Form-Plan","Instrumentierung","Spannungsbogen"]},
+    {"id":"orchestrator","title":"Orchestrator","description":"Verteilt Stimmen auf Instrumentengruppen für Ensemble oder Orchesterklang.","tasks":["Stimmverteilung","Dichte pro Abschnitt"]},
+    {"id":"groove_programmer","title":"Groove-Programmierer","description":"Baut Drum- und Groove-Muster: Swing, Ghost Notes, Humanize.","tasks":["Muster je Stil","Swing einstellen","Humanize"]},
+    {"id":"beatmaker","title":"Beatmaker","description":"Erstellt Beats und Loops, oft mit Samples und Drum-Kits.","tasks":["Loop-Bau","Drum-Kit-Auswahl"]},
+    {"id":"sound_designer","title":"Sound-Designer","description":"Baut Klänge mit Synths, Samplern und Effekten, passt Hüllkurven und Filter an.","tasks":["Synth-Patch","Sampler-Mapping","Modulation"]},
+    {"id":"session_drummer","title":"Session-Drummer","description":"Spielt oder programmiert Schlagzeug passend zum Stil und zur Form.","tasks":["Pattern je Abschnitt","Fill-Vorschläge"]},
+    {"id":"session_bassist","title":"Session-Bassist","description":"Baut Basslinien zu Akkorden und Groove.","tasks":["Bassline zu Akkorden","Grooving mit Kick"]},
+    {"id":"session_keys","title":"Session-Keyboarder","description":"Akkorde, Pads und Melodien auf Klavier oder Synth.","tasks":["Akkordfolge","Voicing"]},
+    {"id":"songwriter","title":"Songwriter","description":"Schreibt Texte und Melodien, arbeitet mit dem Producer an der Form.","tasks":["Hook-Entwurf","Strophe und Refrain"]},
+    {"id":"music_supervisor","title":"Music Supervisor","description":"Prüft Musik für Film, Werbung oder Spiele: Lizenz, Freigabe, Passung.","tasks":["Lizenzprüfung","Cue-Liste"]},
+    {"id":"mixing_assistant","title":"Mix-Assistent","description":"Vorbereitung für den Mix: Spuren benennen, Gruppen bilden, Referenz setzen.","tasks":["Spurenordnung","Referenzmix"]},
+    {"id":"dj","title":"DJ","description":"Mixt Tracks live oder für Sets, achtet auf BPM und Tonart.","tasks":["BPM-Matching","Tonart-Matching (Camelot)"]},
+    {"id":"music_theorist","title":"Musiktheorie-Berater","description":"Erklärt Tonarten, Skalen und Akkordfunktionen, hilft bei Harmonie-Entscheidungen.","tasks":["Tonart bestimmen","Akkordfunktionen"]}
+  ]
+}

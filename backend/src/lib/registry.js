@@ -106,6 +106,8 @@ function status() {
   for (const m of Object.values(live)) out.push({ area: m.meta.area, name: m.meta.name, state: m.meta.state, mode: 'live', actions: m.actions ? Object.keys(m.actions) : [] });
   for (const s of statics) out.push({ ...s, mode: s.state, actions: [] });
   for (const k of skills.skills()) out.push({ area: k.area, name: k.name, state: 'skill', mode: 'skill', actions: [], note: `repo: ${k.repo} · hooks ${k.workflow_hook}` });
+  // Erweiterungsmodule aus backend/modules (Manifest, Freigabe, Lebenszyklus). Ergänzung, keine Ersetzung.
+  for (const e of require('./module_loader').registryEntries()) out.push(e);
   // Area 70 bridge: external manifest-based modules appear in the SAME
   // unified registry view (mode 'pkg') — no parallel registration system.
   try { for (const e of live['70'].registryEntries()) out.push(e); } catch {}
@@ -125,6 +127,8 @@ function get(area) {
   }
   const k = skills.get(area);
   if (k) return { kind: 'skill', entry: { area: k.area, name: k.name, note: `external skill — repo ${k.repo}; integration plan via /api/skills` } };
+  const ext = require('./module_loader').registryEntries().find((x) => x.area === area);
+  if (ext) return { kind: 'module', entry: ext };
   const s = statics.find((x) => x.area === area);
   return s ? { kind: s.state, entry: s } : null;
 }
@@ -140,6 +144,7 @@ module.exports = {
       placeholder: s.filter((m) => m.mode === 'placeholder').length,
       review: s.filter((m) => m.mode === 'review').length,
       restricted: s.filter((m) => m.mode === 'restricted').length,
+      module: s.filter((m) => m.mode === 'module').length,
     };
   },
 };

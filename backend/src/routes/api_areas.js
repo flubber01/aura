@@ -1433,7 +1433,7 @@ async function handle(ctx) {
   // ---- AURA OS Intelligence (deterministic local operating briefings) ----
   if (p === '/api/jarvis' && req.method === 'POST') {
     let body; try { body = JSON.parse(await readBody(req, 2e4)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; }
-    return send(res, 200, 'application/json', JSON.stringify(jarvis.ask(body.msg || body.q || body.text || body.message || ''), null, 2)), true;
+    return send(res, 200, 'application/json', JSON.stringify(await jarvis.askAsync(body.msg || body.q || body.text || body.message || ''), null, 2)), true;
   }
   if (p === '/api/jarvis/memory') return send(res, 200, 'application/json', JSON.stringify(jarvis.memory(), null, 2)), true;
 
