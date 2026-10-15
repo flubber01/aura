@@ -85,6 +85,26 @@ function revive(reason) {
 }
 const isKilled = () => killed.on;
 
+// ---------- restart server now ----------
+// Controlled self re-exec: audit-logged, then a detached replacement process
+// is spawned and this process exits so the supervisor/port frees cleanly.
+// Under systemd (Restart=always) it comes back automatically; the spawned
+// child covers environments without a supervisor.
+function restartNow(reason) {
+  const { spawn } = require('child_process');
+  store.audit({ area: 'OPS', event: 'SERVER_RESTART_REQUESTED', reason: String(reason || 'manual') });
+  logger.error('RESTART: ' + (reason || 'manual'));
+  try {
+    const serverPath = path.join(__dirname, '..', '..', 'server.js');
+    // kurzer Delay, damit der Port frei wird, bevor der Nachfolger bindet
+    const child = spawn('sh', ['-c', 'sleep 1.2; exec ' + JSON.stringify(process.execPath) + ' ' + JSON.stringify(serverPath)], { detached: true, stdio: 'ignore', env: process.env });
+    child.unref();
+  } catch (e) { logger.error('restart spawn failed: ' + e.message); }
+  // give the response a moment to flush, then exit (supervisor restarts)
+  setTimeout(() => process.exit(0), 400);
+  return status();
+}
+
 function status() {
   return { kill_switch: killed, schedule: SCHED, demo_mode: DEMO, last_runs: lastRuns, scheduler_running: timers.length > 0 };
 }
@@ -116,4 +136,4 @@ function telegramKit() {
   };
 }
 
-module.exports = { startScheduler, stopScheduler, runSuper, runOthers, runFullSync, kill, revive, isKilled, status, telegramKit, SCHED };
+module.exports = { startScheduler, stopScheduler, runSuper, runOthers, runFullSync, kill, revive, isKilled, restartNow, status, telegramKit, SCHED };

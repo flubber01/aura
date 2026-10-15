@@ -102,6 +102,15 @@ function drill(area, opts) {
   return { ok: true, area, quarantined: true, until: new Date(c.until).toISOString(), note: 'auto-probe after cooldown' };
 }
 
+// admin force-run helper: clear fail counter + quarantine so a module can be
+// re-tested immediately (Test Lab Area 77). Never throws.
+function resetFails(area) {
+  const c = st(area);
+  c.fails = 0; c.until = 0; if (c.state === 'quarantined') c.state = 'healthy';
+  ev({ level: 'INFO', event: 'container_reset', detail: { area, by: 'admin force-run' } });
+  return { ok: true, area, fails: 0 };
+}
+
 function status() {
   const containers = [];
   for (const m of registry().status().filter((x) => x.mode === 'live')) {
@@ -122,9 +131,10 @@ function status() {
 
 module.exports = {
   meta: { area: '67', id: 'module_container', name: 'Module Containers (crash isolation + circuit breaker)', state: 'live' },
-  run, drill, status,
+  run, drill, status, resetFails,
   actions: {
     status: () => status(),
     drill: (a) => drill((a && a.area) || '16', a || {}),
+    reset: (a) => resetFails(String((a && a.area) || '')),
   },
 };

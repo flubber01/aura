@@ -6,20 +6,41 @@
 // restricted  -> EXCLUDED by policy; every action is refused
 const live = {
   '02': require('./role_registry'),
+  '08': require('./kids_story'),
+  '17': require('./report_daemon'),
   '03': require('./cognitive_learning_core'),
   '04': require('./consensus_logic_core'),
   '05': require('./multi_response_controller'),
   '06': require('./openrouter_pinger_daemon'),
   '07': require('./metadata_shredder'),
+  '09': require('./media_pipeline'),
+  '10': require('./content_incubator'),
+  '11': require('./editorial_incubator'),
+  '12': require('./community_incubator'),
+  '13': require('./omnichannel_dispatcher'),
+  '14': require('./wordpress_bridge'),
+  '15': require('./n8n_bridge'),
   '16': require('./self_healing_logger'),
-  '19': require('./catalog_ingestor'),
+  '18': require('./knowledge_sync'),
+  '19': require('./yellow_pages'),
   '20': require('./mcp_ingestion_core'),
   '21': require('./news_algorithm_analyzer'),
   '22': require('./local_edge_cache'),
   '23': require('./swarm_sync_daemon'),
   '24': require('./chrono_backup_daemon'),
   '25': require('./synaptic_heartbeat_bridge'),
+  '26': require('./hardware_router'),
+  '27': require('./compute_router'),
+  '28': require('./cloud_connector'),
+  '29': require('./mesh_engine'),
+  '30': require('./telemetry_stream'),
+  '31': require('./finance_engine'),
+  '34': require('./gateway_health'),
+  '35': require('./delivery_monitor'),
+  '37': require('./vision_bridge'),
+  '38': require('./vault'),
   '39': require('./algorithm_matrix'),
+  '40': require('./variance_lifecycle'),
   '49': require('./autonomy_loop'),
   '58': require('./omniroute'),
   '59': require('./txt_watcher'),
@@ -33,36 +54,51 @@ const live = {
   '67': require('./module_container'),
   '68': require('./config'),
   '69': require('./learning_core'),
+  '70': require('./module_system'),
+  '71': require('./image_gen'),
+  '72': require('./mcp_manager'),
+  '73': require('./content_forge'),
+  '74': require('./service_fabric'),
+  '75': require('./routine_control'),
+  '76': require('./studio'),
+  '77': require('./test_lab'),
+  '78': require('./telegram_agent'),
+  '79': require('./ollama_manager'),
+  '80': require('./brain_mapper'),
+  '81': require('./control_tower'),
+  '82': require('./crosslink_policy'),
+  '83': require('./function_registry'),
+  '84': require('./agent_intercom'),
+  '85': require('./harness_kit'),
+  '86': require('./sentinel'),
+  '87': require('./content_command'),
+  '88': require('./aura_heart'),
+  '89': require('./creator_desk'),
+  '90': require('./label_desk'),
+  '91': require('./media_newsroom'),
+  '92': require('./social_control'),
+  '93': require('./growth_nexus'),
+  '94': require('./capability_radar'),
+  '95': require('./aura_os'),
+  '96': require('./aura_os_plus'),
+  '97': require('./creator_continuity'),
+  '98': require('./remote_approval'),
+  '99': require('./creator_collaboration'),
+  '100': require('./creator_revenue'),
+  '101': require('./creator_passport'),
+  '102': require('./studio_command'),
 };
 
 const skills = require('./skills_registry');
 
+// Task 20: Areas 09–15, 18, 26–31, 34/35, 37/38, 40 wurden zu echten
+// Live-Modulen ausgebaut (siehe requires oben). Hier bleiben nur Bootstrap
+// und die DAUERHAFT ausgeschlossenen Bereiche.
 const statics = [
   { area: '01', name: 'Bootstrap & container runtime', state: 'live', note: 'served by backend/server.js + deploy/docker-compose.yml' },
-  { area: '08', name: 'Kids Story Pipeline', state: 'placeholder', note: 'UI exists; needs LLM adapter with child-safety review' },
-  { area: '09', name: 'Kids Media / mimetic video pipeline', state: 'placeholder', note: 'plan only; needs image/TTS/video adapters + FFmpeg worker' },
-  { area: '10', name: 'Content incubation engine', state: 'placeholder', note: 'needs lifecycle model + manual review' },
-  { area: '11', name: 'Editorial incubation', state: 'placeholder', note: 'needs durable content model + sign-off flow' },
-  { area: '12', name: 'Community incubation', state: 'placeholder', note: 'official APIs + human approval only; no synthetic engagement' },
-  { area: '13', name: 'Omnichannel dispatcher', state: 'placeholder', note: 'needs platform adapters, consent, idempotency' },
-  { area: '14', name: 'WordPress Gutenberg / REST', state: 'placeholder', note: 'needs dedicated account + duplicate-post protection' },
-  { area: '15', name: 'n8n secure dispatch / Kaggle relay', state: 'placeholder', note: 'needs HMAC, TTL, allowlist, opt-in compute policy' },
-  { area: '17', name: 'Daily report daemon', state: 'placeholder', note: 'on-demand reports via /api/report; scheduler off by default' },
-  { area: '18', name: 'GitHub / NotebookLM knowledge sync', state: 'placeholder', note: 'GitHub as source link only; NotebookLM manual' },
-  { area: '26', name: 'Master hardware router', state: 'placeholder', note: 'no hardware in sandbox' },
-  { area: '27', name: 'Intranet compute router', state: 'placeholder', note: 'no intranet in sandbox' },
-  { area: '28', name: 'Cloud environment connector', state: 'placeholder', note: 'no cloud credentials; explicit opt-in required' },
-  { area: '29', name: 'Sandbox mesh engine', state: 'placeholder', note: 'needs sandbox orchestration layer' },
-  { area: '30', name: 'Streaming telemetry / remote workers', state: 'placeholder', note: 'simulation only until authorized source exists' },
-  { area: '31', name: 'OmniRoute financial engine', state: 'review', note: 'financial logic requires redesign + compliance review before use' },
   { area: '32', name: 'Crypto faucet engines / brokers', state: 'restricted', note: 'excluded by policy' },
   { area: '33', name: 'Mining / unMineable control', state: 'restricted', note: 'excluded by policy: no third-party compute use without explicit permission' },
-  { area: '34', name: 'Proxy / gateway health monitor', state: 'review', note: 'evasion-adjacent; requires redesign and lawful scoping' },
-  { area: '35', name: 'Shadow-ban sentinel', state: 'review', note: 'platform-detection heuristics need redesign; official APIs only' },
   { area: '36', name: 'CAPTCHA learning / bypass hub', state: 'restricted', note: 'excluded: bypassing platform protection is prohibited' },
-  { area: '37', name: 'Visual agent eyes / MCP Vision', state: 'review', note: 'needs consent + data-protection review for screenshot processing' },
-  { area: '38', name: 'Identity vault / inbox orchestration', state: 'review', note: 'no credentials stored anywhere; redesign around a real secret manager' },
-  { area: '40', name: 'Variance lifecycle / swarm evolution', state: 'placeholder', note: 'needs governance model before autonomous variance' },
 ];
 
 function status() {
@@ -70,11 +106,23 @@ function status() {
   for (const m of Object.values(live)) out.push({ area: m.meta.area, name: m.meta.name, state: m.meta.state, mode: 'live', actions: m.actions ? Object.keys(m.actions) : [] });
   for (const s of statics) out.push({ ...s, mode: s.state, actions: [] });
   for (const k of skills.skills()) out.push({ area: k.area, name: k.name, state: 'skill', mode: 'skill', actions: [], note: `repo: ${k.repo} · hooks ${k.workflow_hook}` });
+  // Area 70 bridge: external manifest-based modules appear in the SAME
+  // unified registry view (mode 'pkg') — no parallel registration system.
+  try { for (const e of live['70'].registryEntries()) out.push(e); } catch {}
   return out.sort((a, b) => a.area.localeCompare(b.area));
 }
 
 function get(area) {
   if (live[area]) return { kind: 'live', mod: live[area] };
+  // Area 70 bridge: resolve external package modules by "pkg:<id>"
+  if (String(area).startsWith('pkg:')) {
+    try {
+      const ms = live['70'];
+      const st = ms.moduleStatus(String(area).slice(4));
+      if (st) return { kind: 'pkg', mod: { meta: { area: area, name: st.name, state: st.status }, pkg: st, actions: null } };
+    } catch {}
+    return null;
+  }
   const k = skills.get(area);
   if (k) return { kind: 'skill', entry: { area: k.area, name: k.name, note: `external skill — repo ${k.repo}; integration plan via /api/skills` } };
   const s = statics.find((x) => x.area === area);

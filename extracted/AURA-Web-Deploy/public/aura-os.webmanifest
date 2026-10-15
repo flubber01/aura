@@ -1,0 +1,15 @@
+{
+  "name": "AURA OS Launchpad",
+  "short_name": "AURA OS",
+  "description": "Local-first creator, artist and label operating layer.",
+  "id": "/aura-os/launchpad",
+  "start_url": "/aura-os/launchpad",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050712",
+  "theme_color": "#07101f",
+  "icons": [
+    { "src": "/aura-os-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/aura-os-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

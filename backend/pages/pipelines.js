@@ -36,8 +36,8 @@ select,input{width:100%;background:#0c111d;color:#e8f4ff;border:1px solid #23304
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .tag{font-size:10px;border-radius:10px;padding:1px 8px;background:#132c44;color:#8ab4ff}
 </style></head><body>
-<nav><a href="/hub">Hub</a><a href="/skills">Skills</a><a href="/yellowpages">Yellow Pages</a><a href="/deploy">Deploy</a><a href="/cluster">Cluster</a></nav>
-<header><h1>🚀 MULTI-PIPELINE FAST SETUP</h1><p class="sub">Every pipeline copies a ready setup script · social chain assigns specialists with human gates</p></header>
+<nav><a href="/hub">Hub</a><a href="/workflows">Workflow Control</a><a href="/skills">Skills</a><a href="/yellowpages">Yellow Pages</a><a href="/deploy">Deploy</a><a href="/cluster">Cluster</a></nav>
+<header><h1>🚀 MULTI-PIPELINE MAP</h1><p class="sub">Versioned workflow definitions · each operational handoff requires explicit human approval</p></header>
 <div class="wrap">
 <h2>PIPELINES (skills × areas)</h2><div class="pipes" id="pipes"></div>
 <h2>SOCIAL MEDIA CONNECTION CHAIN · SPECIALISTS</h2>
@@ -63,14 +63,27 @@ select,input{width:100%;background:#0c111d;color:#e8f4ff;border:1px solid #23304
 </div>
 <script>
 const SETUP={
- 'WF-1':['git clone https://github.com/heygen-com/hyperframes','git clone https://github.com/jamiepine/voicebox','docker compose -f deploy/docker-compose.yml up -d','# gate: child-safety + originality + publish approval'],
- 'WF-2':['git clone https://github.com/Panniantong/Agent-Reach  # read-only mode','git clone https://github.com/vectorize-io/hindsight','# ToS check per source; no execution of catalogued scripts'],
- 'WF-3':['node backend/server.js','curl -X POST localhost:8080/api/modules/03/action/submit -d \'{"task":"…"}\''],
- 'WF-4':['git clone https://github.com/NVIDIA/OpenShell','docker compose up -d backend  # MCP tools granted + schema-bound'],
- 'WF-5':['git clone https://github.com/unslothai/unsloth  # own hardware only','# OPENROUTER_API_KEY from secret manager'],
- 'WF-6':['install ui-ux-pro-max-skill + impeccable into harness','npm run build && open /console'],
- 'WF-7':['official platform SDKs only (see chain config)','keys in secret store; adapter per platform'],
- 'WF-8':['open /cluster → enter 4 IPs → copy 1-click kit']
+ 'WF-1':['Create a local content brief and child-safety/originality checklist.','Record a human distribution decision in Workflow Control.'],
+ 'WF-2':['Record allowed sources, terms and freshness window.','Keep research output as a reviewed local brief.'],
+ 'WF-3':['Document consensus inputs and escalation threshold.','Record the human resolution as evidence.'],
+ 'WF-4':['Define the sandbox, explicit grants and rollback plan.','Do not execute tools from this pipeline map.'],
+ 'WF-5':['Document local/cloud data boundary and approved secret-manager handoff.','No model or provider connection is created here.'],
+ 'WF-6':['Create UI acceptance and accessibility evidence.','Hand off release work only after a human quality gate.'],
+ 'WF-7':['Use the Social Control approval path and official-provider review.','No publish action is initiated from this page.'],
+ 'WF-8':['Open /cluster and produce a local infrastructure handoff manifest.','No SSH, provisioning, clustering or host action occurs in AURA.'],
+ 'WF-9':['Document the local image-generation brief and rights boundary.','Only connected local evidence can substantiate a render.'],
+ 'WF-10':['Create an AUTO-DRAFT plan and review checkpoints.','Human approval remains mandatory before any official-channel action.'],
+ 'WF-11':['Create Studio source and rights evidence.','Use Workflow Control to record a reviewed handoff.'],
+ 'WF-12':['Review allowlisted-chat policy and command confirmation gates.','Do not store chat credentials in the workflow record.'],
+ 'WF-13':['Record validation output, known limitations and a rollback note.','Use the Release Candidate quality gate for a decision record.'],
+ 'WF-14':['Create a Video Production Control run in /workflows.','Record rights, script and a human publish decision.'],
+ 'WF-15':['Create a Self-hosted Service Intake run in /workflows.','Use a manual owner-approved handoff; no deployment occurs here.'],
+ 'WF-16':['Create a Local Model and RAG Evaluation run in /workflows.','Keep model and data decisions local and evidence-based.'],
+ 'WF-17':['Create an API and Connector Onboarding run in /workflows.','Keep keys in a separate secret manager and record a revoke plan.'],
+ 'WF-18':['Create a Backup and Restore Drill run in /workflows.','Verify archive checksum and record restore evidence in an isolated location.'],
+ 'WF-19':['Create a Security Incident Triage run in /workflows.','Record evidence references and a human-approved response handoff only.'],
+ 'WF-20':['Create a Release Candidate Quality Gate run in /workflows.','Attach test/archive evidence; release execution is a separate operator action.'],
+ 'WF-21':['Create an Asset Rights and Media Intake run in /workflows.','Keep unclear-rights assets restricted until human review.']
 };
 async function load(){
  const [wf,roles,teams]=await Promise.all([
@@ -78,7 +91,7 @@ async function load(){
  document.getElementById('pipes').innerHTML=wf.map(w=>'<div class="pipe"><h3>'+w.id+' · '+w.name+'</h3>'+
   '<div class="chain">'+w.chain.map(c=>'<span class="step">'+c+'</span>').join('<span class="arr">→</span>')+'</div>'+
   '<div class="gates">🛡 '+w.gates.join(' · ')+'</div>'+
-  '<button class="copy" data-wf="'+w.id+'">⧉ copy setup</button><pre id="pre-'+w.id+'" hidden>'+SETUP[w.id].join('\\n')+'</pre></div>').join('');
+  '<button class="copy" data-wf="'+w.id+'">view safe handoff</button><pre id="pre-'+w.id+'" hidden>'+((SETUP[w.id]||['Review this versioned definition in /workflows.','No external action is performed by this page.']).join('\\n'))+'</pre></div>').join('');
  document.querySelectorAll('[data-wf]').forEach(b=>b.onclick=()=>{const p=document.getElementById('pre-'+b.dataset.wf);p.hidden=!p.hidden;});
  const plats=[['Bluesky','https://docs.bsky.app'],['Mastodon','https://docs.joinmastodon.org/api/'],['Telegram Bot','https://core.telegram.org/bots/api'],['YouTube','https://developers.google.com/youtube'],['WordPress','https://developer.wordpress.org/rest-api/'],['GitHub Releases','https://docs.github.com']];
  document.getElementById('plat').innerHTML=plats.map(p=>'<option value="'+p[0]+'">'+p[0]+'</option>').join('');

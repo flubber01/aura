@@ -25,7 +25,7 @@ th{color:#7d93b8;font-weight:600}pre{background:#060d1d;border:1px solid #1d3a66
 .chk input{width:auto;margin:0}.badge{float:right;font-size:11px}a{color:#7fd0ff}
 nav{margin-bottom:14px;font-size:13px}nav a{margin-right:12px;text-decoration:none}
 </style></head><body><canvas id="stars"></canvas><main>
-<nav><a href="/ignition">⌂ IGNITION</a><a href="/skills">Roles</a><a href="/pipelines">Pipelines</a><a href="/research">Research</a><a href="/seo">SEO</a></nav>
+<nav><a href="/ignition">⌂ IGNITION</a><a href="/workflows">Workflow Control</a><a href="/skills">Roles</a><a href="/pipelines">Pipelines</a><a href="/research">Research</a><a href="/seo">SEO</a></nav>
 <h1>WORKFLOW BUILDER</h1>
 <p class="sub">Area 61 · Rollen aus dem 63-Identitäten-Registry wählen → Kette bauen → Gates setzen → als JSON speichern oder simulieren <span class="pill sim">SIMULATION-LABEL EHRLICH</span></p>
 <div class="grid">

@@ -1,0 +1,18 @@
+{
+  "id": "crash-dummy",
+  "name": "Crash Dummy",
+  "version": "1.0.0",
+  "description": "Testmodul für Fehlerisolierung: wirft kontrolliert Exceptions und überschreitet Timeouts, um die Quarantäne des Modul-Systems zu beweisen. Standardmäßig deaktiviert.",
+  "author": "AURA Core Team",
+  "entry": "index.js",
+  "type": "module",
+  "permissions": [],
+  "configSchema": {},
+  "capabilities": [
+    { "action": "boom", "description": "Wirft immer eine Exception (Isolationstest)", "input": {} },
+    { "action": "slow", "description": "Schläft länger als das Execute-Timeout (Timeout-Test)", "input": {} },
+    { "action": "ok", "description": "Funktioniert immer (Kontroll-Aktion)", "input": {} }
+  ],
+  "dependencies": ["aura-core"],
+  "healthCheck": "healthCheck"
+}

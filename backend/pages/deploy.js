@@ -45,12 +45,12 @@ pre{background:#071120;border:1px dashed #23405e;border-radius:8px;padding:10px;
 <pre id="masterkit"># AURA master install — one command, kein Schnickschnack
 curl -fsSL https://raw.githubusercontent.com/flubber01/aura/arena/0ee9c54c-aura/deploy/master-install.sh | bash
 # Node 22 + Repo + Boot + Health-Check auf :8080
-# danach: /hub · /ignition · /cluster (4-Server-Bind)</pre>
+# danach: /hub · /ignition · /cluster (Infrastructure Control Room / lokale Planung)</pre>
   <button data-c="curl -fsSL https://raw.githubusercontent.com/flubber01/aura/arena/0ee9c54c-aura/deploy/master-install.sh | bash">⧉ copy</button>
  </div>
 </div>
 <div class="card" style="margin-top:12px"><h3>📚 DEPLOYMENT DOCS — jeder Aspekt</h3>
- <p style="font-size:12px;color:#9fb2c8;line-height:1.7">Bare Metal · systemd · Docker · k3s/4-Server · Firebase · Reverse-Proxy/TLS ·
+ <p style="font-size:12px;color:#9fb2c8;line-height:1.7">Bare Metal · systemd · Docker · bewusste k3s-Topologie · Firebase · Reverse-Proxy/TLS ·
  Env-Variablen · Backup/Restore-Runbook · Monitoring &amp; Alerting · Security-Hardening · Troubleshooting · Validierungs-Sweep.</p>
  <p style="font-size:12px;margin-top:6px">Im Repo: <code>docs/DEPLOYMENT.md</code> + <code>deploy/README.md</code> ·
  Downloads: <a href="/api/download/AURA-DEPLOYMENT.md" style="color:#39d7ff">AURA-DEPLOYMENT.md ⬇</a> ·
