@@ -1,8 +1,7 @@
 # runtime churn — regenerated/rotated at boot, never commit
-backend/src/data/aura.log.jsonl*
-backend/src/data/checkpoints/
-backend/src/data/autosave/
-backend/src/data/backups/
+backend/src/data/
+backend/data/sentinel.json
+.cache/
 *.log
 
 # secrets — never commit (deploy/.env.example IS tracked)
@@ -11,3 +10,15 @@ deploy/.env
 
 # tooling
 node_modules/
+
+# Area 71: generated image artifacts stay local (runtime data)
+backend/src/data/imagegen/artifacts/
+
+# runtime secrets — never commit
+backend/src/data/secrets.json
+
+# Download-Exporte (runtime, nicht committen)
+extracted/AURA-Web-Deploy/public/dl/
+
+# Arena/Connector downloads — never commit rescue archives
+google_drive/

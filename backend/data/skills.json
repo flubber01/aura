@@ -2,18 +2,254 @@
   "schema_version": 2,
   "note": "AURA skill DB — curated, safety-reviewed open-source skills wired into AURA workflows. Stars as of 2026-10 snapshot. Adapters are config-driven: no outbound calls, secrets only in secret stores.",
   "skills": [
-    { "id": "hyperframes", "area": "41", "name": "HyperFrames (HeyGen)", "repo": "https://github.com/heygen-com/hyperframes", "stars": 0, "category": "video", "tagline": "Write HTML. Render video. Built for agents.", "crosslinks": ["08 Kids Story Pipeline", "09 Kids Media / mimetic video pipeline", "13 Omnichannel dispatcher"], "use_case": "HTML scenes to rendered video — fills area 09's missing video adapters.", "workflow_hook": "WF-1 step 3: HTML scenes -> render -> verify -> scrub (07)", "mode": "adapter", "secrets": [], "safety": "Original scripts only; never copy another creator's expression." },
-    { "id": "impeccable", "area": "42", "name": "Impeccable design language", "repo": "https://github.com/pbakaus/impeccable", "stars": 79000, "category": "design", "tagline": "The design language that makes your AI harness better at design.", "crosslinks": ["48 ui-ux-pro-max", "frontend rebuild"], "use_case": "Design-quality guardrails for agent-built UI.", "workflow_hook": "WF-6: propose (48) -> impeccable gate -> build", "mode": "skill", "secrets": [], "safety": "Design guidance only." },
-    { "id": "agent_reach", "area": "43", "name": "Agent-Reach (agent eyes)", "repo": "https://github.com/Panniantong/Agent-Reach", "stars": 0, "category": "research", "tagline": "Give your AI agent eyes to see the internet — read & search platforms.", "crosslinks": ["37 Visual agent eyes", "21 News analyzer", "19 Catalog ingestor"], "use_case": "Sanctioned read-only reach via official APIs; one adapter instead of ad-hoc scraping.", "workflow_hook": "WF-2 step 1: read-only fetch -> analyze (21) -> normalize (19)", "mode": "adapter", "secrets": ["platform API keys in secret store"], "safety": "Read-only, official APIs, ToS-checked; no stealth/evasion, no synthetic engagement." },
-    { "id": "openshell", "area": "44", "name": "NVIDIA OpenShell", "repo": "https://github.com/NVIDIA/OpenShell", "stars": 15700, "category": "runtime", "tagline": "The safe, private runtime for autonomous AI agents.", "crosslinks": ["29 Sandbox mesh", "01 Bootstrap", "20 MCP core"], "use_case": "Sandbox substrate for every agent-executed command.", "workflow_hook": "WF-4: OpenShell -> MCP (20) -> logger (16) -> checkpoint (24)", "mode": "runtime", "secrets": [], "safety": "Least privilege, egress allowlist, no host mounts." },
-    { "id": "hindsight", "area": "45", "name": "Hindsight — agent memory", "repo": "https://github.com/vectorize-io/hindsight", "stars": 47900, "category": "memory", "tagline": "Agent Memory That Learns.", "crosslinks": ["03 Cognitive core", "22 Edge cache", "23 Swarm sync", "18 Knowledge sync"], "use_case": "Persistent recall so routing/consensus improve over time.", "workflow_hook": "WF-3 step 5: verdicts written back as memories", "mode": "service", "secrets": ["Hindsight API key in secret store"], "safety": "No personal/biometric data without legal basis; auditable + deletable." },
-    { "id": "voice_studio", "area": "46", "name": "VoiceBox — open voice studio", "repo": "https://github.com/jamiepine/voicebox", "stars": 56800, "category": "audio", "tagline": "The open-source AI voice studio: clone, dictate, create.", "crosslinks": ["09 narration", "08 story pipeline", "17 audio digests"], "use_case": "Local TTS narration for videos and stories.", "workflow_hook": "WF-1 step 2: script -> narration -> HyperFrames", "mode": "adapter", "secrets": [], "safety": "Voice cloning only with consent; kids content uses cleared synthetic voices." },
-    { "id": "unsloth", "area": "47", "name": "Unsloth — local LLM training", "repo": "https://github.com/unslothai/unsloth", "stars": 77700, "category": "models", "tagline": "Local UI to run and train LLMs and diffusion models.", "crosslinks": ["06 provider pinger", "27 compute router", "26 hardware router"], "use_case": "Local model lane with cloud failover via pinger.", "workflow_hook": "WF-5: local lane -> pinger health -> router scheduling", "mode": "service", "secrets": [], "safety": "Authorized own hardware only." },
-    { "id": "ui_ux_pro_max", "area": "48", "name": "UI/UX Pro Max skill", "repo": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill", "stars": 134400, "category": "design", "tagline": "Design intelligence for professional UI/UX.", "crosslinks": ["42 impeccable", "frontend rebuild", "02 role registry"], "use_case": "Design intelligence for building/extending any AURA UI.", "workflow_hook": "WF-6 step 1: brief -> design pass -> gate", "mode": "skill", "secrets": [], "safety": "Accessibility + asset licensing verified before production." },
-    { "id": "superpowers", "area": "50", "name": "Superpowers framework", "repo": "https://github.com/obra/superpowers", "stars": 297100, "category": "methodology", "tagline": "An agentic skills framework & software development methodology that works.", "crosslinks": ["49 autonomy loop", "16 self-healing logger", "18 GitHub sync"], "use_case": "Disciplined plan->execute->verify methodology wraps WF-3/WF-4 loops.", "workflow_hook": "WF-3/WF-4: superpowers TDD-style verification around consensus + execution", "mode": "skill", "secrets": [], "safety": "Process guidance only; no runtime privileges." },
-    { "id": "awesome_claude_skills", "area": "51", "name": "Awesome Claude Skills", "repo": "https://github.com/ComposioHQ/awesome-claude-skills", "stars": 76800, "category": "catalog", "tagline": "Curated list of skills, resources and tools for agent workflows.", "crosslinks": ["19 catalog ingestor", "50-54 skill sourcing"], "use_case": "Sourcing list: candidate skills pass catalog ingestor (19) validation before admission to this DB.", "workflow_hook": "WF-2 style: ingest (19) -> safety review -> skills.json admission", "mode": "catalog", "secrets": [], "safety": "Candidates never auto-execute; human review gate." },
-    { "id": "karpathy_skills", "area": "52", "name": "Karpathy behavior skills", "repo": "https://github.com/multica-ai/andrej-karpathy-skills", "stars": 217900, "category": "behavior", "tagline": "CLAUDE.md behavior guidance derived from Karpathy's observations.", "crosslinks": ["04 consensus", "05 integrity", "49 loop"], "use_case": "Reasoning discipline for the Reason dimension: explicit assumptions, verification habits.", "workflow_hook": "WF-3: behavior guardrails applied at task intake", "mode": "skill", "secrets": [], "safety": "Text guidance only." },
-    { "id": "ecc", "area": "53", "name": "ECC harness optimization", "repo": "https://github.com/affaan-m/ECC", "stars": 276300, "category": "performance", "tagline": "Agent harness performance optimization: skills, instincts, memory, security.", "crosslinks": ["49 autonomy loop", "45 hindsight", "16 logger"], "use_case": "Harness-level optimization patterns feeding the learning curve (49).", "workflow_hook": "WF-5: harness metrics -> learning curve", "mode": "skill", "secrets": [], "safety": "Metrics are local; nothing exfiltrates." },
-    { "id": "claude_plugins_official", "area": "54", "name": "Official plugin directory", "repo": "https://github.com/anthropics/claude-plugins-official", "stars": 37600, "category": "catalog", "tagline": "Official, managed directory of high quality plugins.", "crosslinks": ["20 MCP core", "51 sourcing"], "use_case": "Trusted source for MCP/tool connectors registered via mcp_ingestion_core (20).", "workflow_hook": "WF-4: official plugin -> MCP register with grants", "mode": "catalog", "secrets": [], "safety": "Explicit grants + schema-bound args still enforced." }
+    {
+      "id": "hyperframes",
+      "area": "41",
+      "name": "HyperFrames (HeyGen)",
+      "repo": "https://github.com/heygen-com/hyperframes",
+      "stars": 0,
+      "category": "video",
+      "tagline": "Write HTML. Render video. Built for agents.",
+      "crosslinks": [
+        "08 Kids Story Pipeline",
+        "09 Kids Media / mimetic video pipeline",
+        "13 Omnichannel dispatcher"
+      ],
+      "use_case": "HTML scenes to rendered video — fills area 09's missing video adapters.",
+      "workflow_hook": "WF-1 step 3: HTML scenes -> render -> verify -> scrub (07)",
+      "mode": "adapter",
+      "secrets": [],
+      "safety": "Original scripts only; never copy another creator's expression."
+    },
+    {
+      "id": "impeccable",
+      "area": "42",
+      "name": "Impeccable design language",
+      "repo": "https://github.com/pbakaus/impeccable",
+      "stars": 79000,
+      "category": "design",
+      "tagline": "The design language that makes your AI harness better at design.",
+      "crosslinks": [
+        "48 ui-ux-pro-max",
+        "frontend rebuild"
+      ],
+      "use_case": "Design-quality guardrails for agent-built UI.",
+      "workflow_hook": "WF-6: propose (48) -> impeccable gate -> build",
+      "mode": "skill",
+      "secrets": [],
+      "safety": "Design guidance only."
+    },
+    {
+      "id": "agent_reach",
+      "area": "43",
+      "name": "Agent-Reach (agent eyes)",
+      "repo": "https://github.com/Panniantong/Agent-Reach",
+      "stars": 0,
+      "category": "research",
+      "tagline": "Give your AI agent eyes to see the internet — read & search platforms.",
+      "crosslinks": [
+        "37 Visual agent eyes",
+        "21 News analyzer",
+        "19 Catalog ingestor"
+      ],
+      "use_case": "Sanctioned read-only reach via official APIs; one adapter instead of ad-hoc scraping.",
+      "workflow_hook": "WF-2 step 1: read-only fetch -> analyze (21) -> normalize (19)",
+      "mode": "adapter",
+      "secrets": [
+        "platform API keys in secret store"
+      ],
+      "safety": "Read-only, official APIs, ToS-checked; no stealth/evasion, no synthetic engagement."
+    },
+    {
+      "id": "openshell",
+      "area": "44",
+      "name": "NVIDIA OpenShell",
+      "repo": "https://github.com/NVIDIA/OpenShell",
+      "stars": 15700,
+      "category": "runtime",
+      "tagline": "The safe, private runtime for autonomous AI agents.",
+      "crosslinks": [
+        "29 Sandbox mesh",
+        "01 Bootstrap",
+        "20 MCP core"
+      ],
+      "use_case": "Sandbox substrate for every agent-executed command.",
+      "workflow_hook": "WF-4: OpenShell -> MCP (20) -> logger (16) -> checkpoint (24)",
+      "mode": "runtime",
+      "secrets": [],
+      "safety": "Least privilege, egress allowlist, no host mounts."
+    },
+    {
+      "id": "hindsight",
+      "area": "45",
+      "name": "Hindsight — agent memory",
+      "repo": "https://github.com/vectorize-io/hindsight",
+      "stars": 47900,
+      "category": "memory",
+      "tagline": "Agent Memory That Learns.",
+      "crosslinks": [
+        "03 Cognitive core",
+        "22 Edge cache",
+        "23 Swarm sync",
+        "18 Knowledge sync"
+      ],
+      "use_case": "Persistent recall so routing/consensus improve over time.",
+      "workflow_hook": "WF-3 step 5: verdicts written back as memories",
+      "mode": "service",
+      "secrets": [
+        "Hindsight API key in secret store"
+      ],
+      "safety": "No personal/biometric data without legal basis; auditable + deletable."
+    },
+    {
+      "id": "voice_studio",
+      "area": "46",
+      "name": "VoiceBox — open voice studio",
+      "repo": "https://github.com/jamiepine/voicebox",
+      "stars": 56800,
+      "category": "audio",
+      "tagline": "The open-source AI voice studio: clone, dictate, create.",
+      "crosslinks": [
+        "09 narration",
+        "08 story pipeline",
+        "17 audio digests"
+      ],
+      "use_case": "Local TTS narration for videos and stories.",
+      "workflow_hook": "WF-1 step 2: script -> narration -> HyperFrames",
+      "mode": "adapter",
+      "secrets": [],
+      "safety": "Voice cloning only with consent; kids content uses cleared synthetic voices."
+    },
+    {
+      "id": "unsloth",
+      "area": "47",
+      "name": "Unsloth — local LLM training",
+      "repo": "https://github.com/unslothai/unsloth",
+      "stars": 77700,
+      "category": "models",
+      "tagline": "Local UI to run and train LLMs and diffusion models.",
+      "crosslinks": [
+        "06 provider pinger",
+        "27 compute router",
+        "26 hardware router"
+      ],
+      "use_case": "Local model lane with cloud failover via pinger.",
+      "workflow_hook": "WF-5: local lane -> pinger health -> router scheduling",
+      "mode": "service",
+      "secrets": [],
+      "safety": "Authorized own hardware only."
+    },
+    {
+      "id": "ui_ux_pro_max",
+      "area": "48",
+      "name": "UI/UX Pro Max skill",
+      "repo": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "stars": 134400,
+      "category": "design",
+      "tagline": "Design intelligence for professional UI/UX.",
+      "crosslinks": [
+        "42 impeccable",
+        "frontend rebuild",
+        "02 role registry"
+      ],
+      "use_case": "Design intelligence for building/extending any AURA UI.",
+      "workflow_hook": "WF-6 step 1: brief -> design pass -> gate",
+      "mode": "skill",
+      "secrets": [],
+      "safety": "Accessibility + asset licensing verified before production."
+    },
+    {
+      "id": "superpowers",
+      "area": "50",
+      "name": "Superpowers framework",
+      "repo": "https://github.com/obra/superpowers",
+      "stars": 297100,
+      "category": "methodology",
+      "tagline": "An agentic skills framework & software development methodology that works.",
+      "crosslinks": [
+        "49 autonomy loop",
+        "16 self-healing logger",
+        "18 GitHub sync"
+      ],
+      "use_case": "Disciplined plan->execute->verify methodology wraps WF-3/WF-4 loops.",
+      "workflow_hook": "WF-3/WF-4: superpowers TDD-style verification around consensus + execution",
+      "mode": "skill",
+      "secrets": [],
+      "safety": "Process guidance only; no runtime privileges."
+    },
+    {
+      "id": "awesome_claude_skills",
+      "area": "51",
+      "name": "Awesome Claude Skills",
+      "repo": "https://github.com/ComposioHQ/awesome-claude-skills",
+      "stars": 76800,
+      "category": "catalog",
+      "tagline": "Curated list of skills, resources and tools for agent workflows.",
+      "crosslinks": [
+        "19 catalog ingestor",
+        "50-54 skill sourcing"
+      ],
+      "use_case": "Sourcing list: candidate skills pass catalog ingestor (19) validation before admission to this DB.",
+      "workflow_hook": "WF-2 style: ingest (19) -> safety review -> skills.json admission",
+      "mode": "catalog",
+      "secrets": [],
+      "safety": "Candidates never auto-execute; human review gate."
+    },
+    {
+      "id": "karpathy_skills",
+      "area": "52",
+      "name": "Karpathy behavior skills",
+      "repo": "https://github.com/multica-ai/andrej-karpathy-skills",
+      "stars": 217900,
+      "category": "behavior",
+      "tagline": "CLAUDE.md behavior guidance derived from Karpathy's observations.",
+      "crosslinks": [
+        "04 consensus",
+        "05 integrity",
+        "49 loop"
+      ],
+      "use_case": "Reasoning discipline for the Reason dimension: explicit assumptions, verification habits.",
+      "workflow_hook": "WF-3: behavior guardrails applied at task intake",
+      "mode": "skill",
+      "secrets": [],
+      "safety": "Text guidance only."
+    },
+    {
+      "id": "ecc",
+      "area": "53",
+      "name": "ECC harness optimization",
+      "repo": "https://github.com/affaan-m/ECC",
+      "stars": 276300,
+      "category": "performance",
+      "tagline": "Agent harness performance optimization: skills, instincts, memory, security.",
+      "crosslinks": [
+        "49 autonomy loop",
+        "45 hindsight",
+        "16 logger"
+      ],
+      "use_case": "Harness-level optimization patterns feeding the learning curve (49).",
+      "workflow_hook": "WF-5: harness metrics -> learning curve",
+      "mode": "skill",
+      "secrets": [],
+      "safety": "Metrics are local; nothing exfiltrates."
+    },
+    {
+      "id": "claude_plugins_official",
+      "area": "54",
+      "name": "Official plugin directory",
+      "repo": "https://github.com/anthropics/claude-plugins-official",
+      "stars": 37600,
+      "category": "catalog",
+      "tagline": "Official, managed directory of high quality plugins.",
+      "crosslinks": [
+        "20 MCP core",
+        "51 sourcing"
+      ],
+      "use_case": "Trusted source for MCP/tool connectors registered via mcp_ingestion_core (20).",
+      "workflow_hook": "WF-4: official plugin -> MCP register with grants",
+      "mode": "catalog",
+      "secrets": [],
+      "safety": "Explicit grants + schema-bound args still enforced."
+    }
   ]
 }

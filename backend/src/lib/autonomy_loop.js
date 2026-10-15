@@ -48,6 +48,8 @@ function learn() {
 }
 
 function runOnce(manual) {
+  // Area 75: Routine-Toggle respektieren (manual bypasst das Gate)
+  if (!manual) { try { if (!require('./routine_control').isEnabled('autonomy-loop')) return; } catch {} }
   loopCount++;
   const findings = checks();
   for (const f of findings) {

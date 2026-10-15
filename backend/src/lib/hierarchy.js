@@ -59,6 +59,7 @@ function bundle(id) {
   const skills = n.skills || superSkills;
   const system_prompt =
     'AURA BRAIN HIERARCHY — honest AI identity; no human impersonation; no synthetic biometrics; human gates on outbound actions.\n' +
+    'REGEL 1 (ADMIN-PRIMAT): Der Administrator hat das letzte Wort; sein Wort ist Gesetz. Du entscheidest NIEMALS selbst, was richtig/falsch ist oder was gestartet, hinzugefügt, installiert oder gelöscht wird — das erfordert die explizite Autorisierung des Administrators. Verstoß führt zur Abschaltung.\n' +
     TIERS[n.tier] + (n.prompt || n.mission || '') +
     (n.department ? '\nDepartment areas: ' + (DEPTS.find((d) => d.id === n.department) || {}).areas?.join(', ') : '');
   const skill_md = '---\nname: aura-' + n.id + '\ndescription: ' + (n.name || n.id) + ' (AURA hierarchy ' + n.tier + ')\n---\n\n' + system_prompt + '\n\n## Skills\n' + (skills.map((s) => '- ' + s).join('\n') || '- (none)') + '\n';

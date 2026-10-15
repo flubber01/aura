@@ -11,7 +11,7 @@
 curl -fsSL https://raw.githubusercontent.com/flubber01/aura/arena/0ee9c54c-aura/deploy/master-install.sh | bash
 ```
 
-Startet Backend + UI auf **:8080**. Danach: `/hub` öffnen, `/cluster` für den 4-Server-Bind.
+Startet Backend + UI auf **:8080**. Danach: `/hub` öffnen; `/cluster` zeigt den separaten Infrastructure Control Room für Main Core und optionale Project Arms.
 
 ---
 
@@ -98,7 +98,7 @@ docker compose -f deploy/docker-compose.yml up -d
 als Volumes (`./backend/data`, `./backend/src/data`) — damit überleben Backups,
 Logs und Konfig-DBs Container-Neustarts.
 
-### 2.4 Kubernetes / k3s (4-Server-Collective)
+### 2.4 Kubernetes / k3s (deliberate future topology)
 
 ```bash
 kubectl apply -f deploy/k8s.yml
@@ -110,9 +110,7 @@ JSON-DBs), Service auf 8080 und Health-Probes:
 - **liveness**: `GET /api/health` (muss `status:"ok"` liefern)
 - **readiness**: `GET /api/health`
 
-Für den vollen 4-Server-Bind (k3s + Ansible-Kit) → UI `/cluster`: IPs eintragen,
-1-Click-Kit generieren. **Regeln des Kits:** nur eigene/autorisierte Hardware,
-SSH-Key-only, Control-Plane nie öffentlich.
+`/cluster` ist der **AURA Infrastructure Control Room**, nicht mehr ein One-Click-Cluster-Installer: Main Core und optionale Project Arms lokal inventarisieren, Preflight und verbindungsfreies Handoff-Manifest erzeugen. Er verbindet oder provisioniert keine Server. Für eine spätere echte Cluster-Verbindung: nur eigene/autorisierte Hardware, SSH-Key-only, private Control Plane, separate Secrets, RBAC, Backup/Restore- und Rollback-Review. Siehe [`AURA_INFRASTRUCTURE_CONTROL_ROOM.md`](AURA_INFRASTRUCTURE_CONTROL_ROOM.md).
 
 ### 2.5 Firebase Hosting (nur statische UI-Extrakte)
 

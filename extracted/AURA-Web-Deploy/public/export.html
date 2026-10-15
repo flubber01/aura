@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AURA EXPORT</title>
+<style>
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; background:#05070d; color:#dfe8ff; font-family:system-ui,Segoe UI,Roboto,sans-serif; }
+  .box { max-width:560px; padding:32px; text-align:center; border:1px solid #23304a; border-radius:16px; background:rgba(11,21,38,.9); }
+  h1 { margin:0 0 8px; font-size:26px; color:#7fb4ff; }
+  p { color:#9fb0d0; line-height:1.5; }
+  button { margin-top:18px; padding:18px 34px; font-size:20px; font-weight:700; color:#04101f; background:linear-gradient(135deg,#63e7b2,#38b6ff); border:none; border-radius:12px; cursor:pointer; }
+  button:hover { filter:brightness(1.1); }
+  #status { margin-top:16px; font-size:14px; min-height:20px; color:#ffd479; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>💾 AURA KOMPLETT-EXPORT</h1>
+  <p>86 Areas · 126 Wissenseinträge · 17 Workflows · Sentinel, Harness-Kit, Mega-Listen · Doku &amp; Tests<br><b>Stand 12.10.2026 · 578 KB ZIP</b></p>
+  <button id="dl">⬇ JETZT HERUNTERLADEN</button>
+  <p style="margin-top:14px"><a id="dl2" href="/dl/AURA-KOMPLETT-2026-10-12.zip" style="color:#63e7b2;font-weight:700;font-size:16px">⬇ DIREKTER DOWNLOAD (falls der Button oben nicht lädt — hier klicken)</a></p>
+  <h1 style="font-size:18px;margin-top:30px">📄 TEXT-BUNDLES (für den Arena-Chat-Upload)</h1>
+  <p style="font-size:14px">Diese 4 Dateien im neuen Chat hochladen (ZIP wird dort nicht akzeptiert):</p>
+  <p><a href="/dl/AURA-STAND-v2-TEIL-1.txt" style="color:#7fb4ff;font-weight:700">⬇ AURA-STAND-v2-TEIL-1.txt (521 KB)</a></p>
+  <p><a href="/dl/AURA-STAND-v2-TEIL-2.txt" style="color:#7fb4ff;font-weight:700">⬇ AURA-STAND-v2-TEIL-2.txt (604 KB)</a></p>
+  <p><a href="/dl/AURA-STAND-v2-TEIL-3.txt" style="color:#7fb4ff;font-weight:700">⬇ AURA-STAND-v2-TEIL-3.txt (452 KB)</a></p>
+  <p><a href="/dl/AURA-STAND-v2-TEIL-4.txt" style="color:#7fb4ff;font-weight:700">⬇ AURA-STAND-v2-TEIL-4.txt (280 KB)</a></p>
+  <div id="status"></div>
+  <p style="font-size:12px;margin-top:22px">Falls nichts passiert: Rechtsklick auf den Button → „Link speichern unter" ist hier nicht nötig — der Button lädt die Datei direkt als <b>AURA-KOMPLETT-2026-10-12.zip</b>.</p>
+</div>
+<script>
+document.getElementById('dl').addEventListener('click', async () => {
+  const st = document.getElementById('status');
+  try {
+    st.textContent = 'Lade ZIP vom Server …';
+    const r = await fetch('/dl/AURA-KOMPLETT-2026-10-12.zip', { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'AURA-KOMPLETT-2026-10-12.zip';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    st.textContent = '✅ Download gestartet — prüfe deinen Downloads-Ordner (' + Math.round(blob.size/1024) + ' KB).';
+  } catch (e) {
+    st.textContent = '❌ Fehler: ' + e.message + ' — sag AURA im Chat Bescheid.';
+  }
+});
+</script>
+</body>
+</html>

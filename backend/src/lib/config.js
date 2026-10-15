@@ -30,6 +30,19 @@ const SCHEMA = {
     cooldown_ms: { type: 'number', label: 'Quarantäne-Cooldown (ms)', def: 60000, min: 1000, max: 3600000 },
     timeout_ms: { type: 'number', label: 'Action-Timeout (ms)', def: 15000, min: 500, max: 120000 },
   },
+  forge: {
+    routine_tick_ms: { type: 'number', label: 'Forge/Routine Daemon-Tick (ms)', def: 30000, min: 5000, max: 600000 },
+    max_items: { type: 'number', label: 'Content-Bibliothek max. Einträge', def: 200, min: 20, max: 2000 },
+    require_approval: { type: 'string', label: 'Publish-Gate (on = immer menschliche Freigabe)', def: 'on' },
+  },
+  mcp: {
+    handshake_timeout_ms: { type: 'number', label: 'MCP-Handshake-Timeout (ms)', def: 6000, min: 1000, max: 30000 },
+    allow_stdio: { type: 'string', label: 'stdio-Spawn erlauben (yes/no)', def: 'yes' },
+  },
+  fabric: {
+    probe_timeout_ms: { type: 'number', label: 'Service-Probe-Timeout (ms)', def: 4000, min: 1000, max: 30000 },
+    default_mode: { type: 'string', label: 'Start-Modus (creative/safe/quiet)', def: 'creative' },
+  },
 };
 
 function defaults() {

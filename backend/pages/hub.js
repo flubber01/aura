@@ -7,7 +7,7 @@ module.exports = function hubPageHtml() {
 <style>
 :root{--ink:#e8f4ff}
 *{box-sizing:border-box}body{margin:0;background:#02040a;color:var(--ink);font-family:system-ui,Segoe UI,Roboto,sans-serif;overflow-x:hidden}
-nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;gap:8px;justify-content:center;padding:10px;background:linear-gradient(180deg,rgba(2,4,10,.95),transparent)}
+nav{position:sticky;top:0;left:0;right:0;z-index:50;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px;background:rgba(2,4,10,.96);backdrop-filter:blur(6px);border-bottom:1px solid #12233f}
 nav a,nav button{cursor:pointer;background:#0b1526;border:1px solid #1e3a8a;color:#8ab4ff;border-radius:20px;padding:7px 16px;font-size:12px;letter-spacing:1px;font-weight:700;text-decoration:none}
 nav button.on{background:#12355e;color:#fff;box-shadow:0 0 14px rgba(57,215,255,.5)}
 section{display:none;min-height:100vh;padding-top:64px;position:relative}
@@ -93,10 +93,10 @@ h2.scr{ text-align:center;letter-spacing:4px;font-size:15px;margin:8px 0 4px }
 </section>
 
 <section id="s-jarvis">
- <h2 class="scr" style="color:#ffcf7d">J.A.R.V.I.S. · AT YOUR SERVICE <span class="state live">LIVE</span></h2>
+ <h2 class="scr" style="color:#ffcf7d">AURA OS INTELLIGENCE · LIVE BRIEFINGS <span class="state live">LIVE</span></h2>
  <div class="reactor"><div class="ar a1"></div><div class="ar a2"></div><div class="ar a3"></div><div class="ar a4"></div></div>
  <div class="jdials" id="jdials"></div>
- <p style="text-align:center"><a href="/jarvis" style="color:#ffcf7d;text-decoration:none;border:1px solid #5c4a1e;border-radius:10px;padding:8px 18px;font-size:12px;letter-spacing:2px">→ ZUR ECHTEN J.A.R.V.I.S.-KONSOLE (mit Stimme)</a></p>
+ <p style="text-align:center"><a href="/aura-os#intelligence" style="color:#ffcf7d;text-decoration:none;border:1px solid #5c4a1e;border-radius:10px;padding:8px 18px;font-size:12px;letter-spacing:2px">→ AURA OS INTELLIGENCE ÖFFNEN</a> <a href="/jarvis" style="color:#8fe6ff;text-decoration:none;border:1px solid #28546b;border-radius:10px;padding:8px 18px;font-size:12px;letter-spacing:2px">ADMIN COPILOT</a></p>
 </section>
 
 <section id="s-cmd">
@@ -113,14 +113,39 @@ h2.scr{ text-align:center;letter-spacing:4px;font-size:15px;margin:8px 0 4px }
   <a class="ccard" href="/research"><h3>🔎 Deep Research<span class="state live">LIVE</span></h3><p>echte GitHub-API-Recherche, ranked</p></a>
   <a class="ccard" href="/seo"><h3>📈 SEO Center<span class="state live">LIVE</span></h3><p>On-Site-Audit + sitemap + robots</p></a>
   <a class="ccard" href="/schedule"><h3>🗓 Schedule<span class="state live">LIVE</span></h3><p>wer wann wo · Konflikte · CSV</p></a>
-  <a class="ccard" href="/yellowpages"><h3>📒 Yellow Pages<span class="state live">LIVE</span></h3><p>64 Links · 4 blockiert · 2 review</p></a>
+  <a class="ccard" href="/yellowpages"><h3>📒 Yellow Pages<span class="state live">LIVE</span></h3><p>admin-verwaltete Wissensbasis · Links/Services/Wissen · Brain-Feed</p></a>
+  <a class="ccard" href="/models"><h3>🧭 Model Bay<span class="state live">LIVE</span></h3><p>Area 79 · offene Modelle · Suche · eigene Modelle · Test-Konsole</p></a>
+  <a class="ccard" href="/grid"><h3>🗺 Mission Grid<span class="state live">LIVE</span></h3><p>Areas 09–40 · 19 ausgebaute Live-Module · echte Control-Planes</p></a>
   <a class="ccard" href="/deploy"><h3>📦 Deploy<span class="state live">LIVE</span></h3><p>HF search · 1-click Ollama · MCP</p></a>
   <a class="ccard" href="/hierarchy"><h3>🏛 Hierarchy<span class="state live">LIVE</span></h3><p>Ultra→Heads→Minions · Chat · Vita</p></a>
   <a class="ccard" href="/ops"><h3>🛡 Ops<span class="state live">LIVE</span></h3><p>Kill-Switch · Backups · Telegram <span class="state off">NOT-CONNECTED</span></p></a>
   <a class="ccard" href="/logs"><h3>📜 Logs & Self-Repair<span class="state live">LIVE</span></h3><p>massive JSONL-Logs · Auto-Heal · Repair-Ledger</p></a>
   <a class="ccard" href="/containers"><h3>📦 Module Containers<span class="state live">LIVE</span></h3><p>Crash-Isolation · Circuit Breaker · Quarantäne</p></a>
+  <a class="ccard" href="/containers"><h3>🧩 Module Hub<span class="state live">LIVE</span></h3><p>Area 70 · Manifest-Loader · Lifecycle · Rechte · backend/modules/</p></a>
+  <a class="ccard" href="/imagegen"><h3>🎨 Image Generation<span class="state live">LIVE</span></h3><p>Area 71 · ComfyUI + WebUI Gateway · ehrliche SIM/LIVE-Labels</p></a>
+  <a class="ccard" href="/mcp"><h3>🔌 MCP Manager<span class="state live">LIVE</span></h3><p>Area 72 · AURA als MCP-Server · Server add/install/uninstall + Usage</p></a>
+  <a class="ccard" href="/forge"><h3>⚒ Content Forge<span class="state live">LIVE</span></h3><p>Area 73 · Minion-Automation · auto-create/modify · Publish nur mit Freigabe</p></a>
+  <a class="ccard" href="/aura-heart"><h3>♥ AURA Herzstück<span class="state live">LIVE</span></h3><p>Area 88 · der menschlich geführte Kreislauf: Fund → eigene Arbeit → Review → Freigabe → ehrliche Wirkung</p></a>
+  <a class="ccard" href="/creator-desk"><h3>✦ Creator, Channel & Music Desk<span class="state live">LIVE</span></h3><p>Area 89 · eigene Vorlagen · Artist-/Channel-Profile · Kampagnen · Kalender · DAW/Suno+ → Label-Release-Lane</p></a>
+  <a class="ccard" href="/label-desk"><h3>♛ CreedStreet47 Label Desk<span class="state live">LIVE</span></h3><p>Area 90 · Sabr47 · NasihatBeatZ 47 · Roster · Rechte · Katalog · Promo · Distribution-Plan</p></a>
+  <a class="ccard" href="/media-newsroom"><h3>◉ Media Studio & Newsroom<span class="state live">LIVE</span></h3><p>Area 91 · DAW + Video · MIDI/Stems · Sound Design · DJ-Sets · Avatar · Newswatch · Media Department</p></a>
+  <a class="ccard" href="/social-control"><h3>◈ Social Growth Command<span class="state live">LIVE LOCAL</span></h3><p>Area 92 · Video → Shorts/Reels/Ads · 46 Social-/Music-/Owned-Lanes · Pages/UTM · Account-Registry · Connector-Gates · Paid-Flights</p></a>
+  <a class="ccard" href="/growth-nexus"><h3>⌘ Growth Nexus & Automation<span class="state live">LIVE LOCAL</span></h3><p>Area 93 · Content + Creator + Label + Media + Social + Pages + Ads + Kalender + offizielle Metrics in einem Campaign Graph</p></a>
+  <a class="ccard" href="/capability-radar"><h3>◌ Capability Radar & Adoption Lab<span class="state live">LIVE LOCAL</span></h3><p>Area 94 · Originalquellen → konkrete Workflow-Upgrades · Source Review · Local Prototype · Integration Spec · Freigabe</p></a>
+  <a class="ccard" href="/aura-os"><h3>◉ AURA OS<span class="state live">LIVE LOCAL</span></h3><p>Area 95 · self-hostable Creator Operating Layer · Artist/Label/Creator Cells · Product Flights · ein Operating Profile statt Tool-Chaos</p></a>
+  <a class="ccard" href="/creator-revenue"><h3>◌ Creator Revenue<span class="state live">LIVE LOCAL</span></h3><p>Area 100 · unique referral code · validated creator credits · anti-fraud ledger · payment-provider simulation, no real charge</p></a>
+  <a class="ccard" href="/creator-passport"><h3>✦ Creator Project Passport<span class="state live">LIVE LOCAL</span></h3><p>Area 101 · Release/Product spine · rights + asset/version graph · owner review · Today View · no fake distribution</p></a>
+  <a class="ccard" href="/content-command"><h3>◈ Content Command<span class="state live">LIVE</span></h3><p>Area 87 · Quellen → eigene Pakete → Departments → Admin-gated Release-Plan</p></a>
+  <a class="ccard" href="/forge"><h3>🧵 Service Fabric<span class="state live">LIVE</span></h3><p>Area 74 · selbst einbaubare Services + Modi · echte Probes</p></a>
+  <a class="ccard" href="/control"><h3>⏻ Control Center<span class="state live">LIVE</span></h3><p>Area 75 · Routine-Toggles · Links · Telegram · Force-Run Testlab</p></a>
+  <a class="ccard" href="/studio"><h3>🎭 Creative Studio<span class="state live">LIVE</span></h3><p>Area 76 · 7 Studios: Book · Article · Social · Script · Podcast …</p></a>
+  <a class="ccard" href="/tower"><h3>🗼 Command Tower<span class="state live">LIVE</span></h3><p>Areas 79–83 · Brain-Map · Direktiven · Crosslink-Policy · Funktionen · Ollama · Restart</p></a>
+  <a class="ccard" href="/intercom"><h3>📡 Agent Intercom<span class="state live">LIVE</span></h3><p>Area 84 · Chat der Agenten · Heads · Supers · Ultra Super Brain · Besprechungen</p></a>
+  <a class="ccard" href="/api/harness/claude-md"><h3>🧰 Harness-Kit<span class="state live">LIVE</span></h3><p>Area 85 · CLAUDE.md/AGENTS.md/Hooks/skill-Bundles · Claude Code & Co. unter REGEL 1</p></a>
+  <a class="ccard" href="/api/sentinel/scan"><h3>🛡 Sentinel-Wache<span class="state live">LIVE</span></h3><p>Area 86 · Live-Scanner: offene Ports, Verbindungen, Anomalien · Trace-first-Quarantäne · Rate-Limit gegen DDoS</p></a>
+  <a class="ccard" href="/export.html"><h3>💾 AURA EXPORT<span class="state live">DOWNLOAD</span></h3><p>Komplett-Stand als ZIP (86 Areas, alle Daten, Doku, Tests) — anklicken, dann auf den grünen Button</p></a>
   <a class="ccard" href="/config"><h3>⚙ Config<span class="state live">LIVE</span></h3><p>globale Konfiguration · Hot-Reload · schema-validiert</p></a>
-  <a class="ccard" href="/jarvis"><h3>🎙 J.A.R.V.I.S.<span class="state live">LIVE</span></h3><p>echter Assistent über Live-Daten · mit Stimme</p></a>
+  <a class="ccard" href="/jarvis"><h3>🎙 Admin Copilot<span class="state live">LOCAL</span></h3><p>lokales Ollama-Gespräch · Owner-Workflow-Shortcuts · keine Aktionswerkzeuge</p></a>
   <a class="ccard" href="/terminal"><h3>⌨ Terminal<span class="state live">LIVE</span></h3><p>sandboxed, non-root (root refused)</p></a>
   <a class="ccard" href="/minibot"><h3>🤖 MiniBot<span class="state sim">SIM</span></h3><p>BotFather-Wizard · Bot selbst wartet auf Token</p></a>
   <a class="ccard" href="/cluster"><h3>🖧 Cluster<span class="state off">NOT-CONNECTED</span></h3><p>k3s-Kit ready · 4 Server stehen aus</p></a>

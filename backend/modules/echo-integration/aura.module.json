@@ -1,0 +1,18 @@
+{
+  "id": "echo-integration",
+  "name": "Echo Integration",
+  "version": "1.0.0",
+  "description": "Beispiel-Integration: demonstriert die ehrlichen Verbindungs-Zustände (connected / configured-unreachable / config-required / not-connected / simulation). Keine echte externe Verbindung — klar als SIMULATION markiert.",
+  "author": "AURA Core Team",
+  "entry": "index.js",
+  "type": "integration",
+  "permissions": ["log:write", "config:read"],
+  "configSchema": {
+    "endpoint": { "type": "string", "def": "", "label": "Externer Endpunkt (leer = nicht verbunden)" }
+  },
+  "capabilities": [
+    { "action": "ping", "description": "Simulierter Erreichbarkeits-Test", "input": {} }
+  ],
+  "dependencies": ["aura-core"],
+  "healthCheck": "healthCheck"
+}
