@@ -2,8 +2,9 @@
 // AURA Dispatcher — the server core is a thin HTTP shell; ALL request logic
 // lives in route modules loaded here. Each route module exports
 //   { name, async handle(ctx) }  — handle() returns true when it responded.
-// Order matters: core APIs -> area APIs -> pages -> (static fallback in server.js).
-const ROUTE_MODULES = ['api_core', 'api_areas', 'pages_routes'];
+// Order matters: core APIs -> phase-2 growth/studio APIs -> area APIs -> pages
+// -> (static fallback in server.js).
+const ROUTE_MODULES = ['api_core', 'api_growth_studio', 'api_areas', 'pages_routes'];
 
 const loaded = ROUTE_MODULES.map((n) => {
   const mod = require('./routes/' + n);

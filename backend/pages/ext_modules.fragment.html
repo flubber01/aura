@@ -1,0 +1,94 @@
+<h2 style="margin-top:28px">Erweiterungsmodule</h2>
+<p class="sub">Ordner unter <code>backend/modules/</code> mit einer <code>aura.module.json</code>. Neue Module erscheinen nach „Neu erkennen“, ohne Eintrag in anderen Dateien. Alles Schreibende braucht den Admin-Token. Freigabe, Aktivierung und Konfiguration macht nur ein Mensch.</p>
+<p>
+  <input id="xtok" type="password" placeholder="Admin-Token" style="background:#0d1424;color:#e6edf7;border:1px solid #2a3654;padding:6px;border-radius:6px">
+  <input id="xby" placeholder="Dein Name (für Freigabe)" style="background:#0d1424;color:#e6edf7;border:1px solid #2a3654;padding:6px;border-radius:6px">
+  <button onclick="xDiscover()">Neu erkennen</button>
+  <span id="xmsg" class="sub"></span>
+</p>
+<div id="ext"><p class="sub">Lade Module …</p></div>
+<script>
+(function () {
+  function tok() { var v = document.getElementById('xtok').value; if (v) sessionStorage.setItem('aura_admin', v); return v || sessionStorage.getItem('aura_admin') || ''; }
+  function by() { return document.getElementById('xby').value || ''; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function msg(t, bad) { var e = document.getElementById('xmsg'); e.textContent = t; e.style.color = bad ? '#f87171' : '#86efac'; }
+  function post(path, body) {
+    return fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-aura-token': tok() }, body: JSON.stringify(body || {}) })
+      .then(function (r) { return r.json().then(function (j) { return { status: r.status, body: j }; }); });
+  }
+  function report(label, r) {
+    var ok = r.body && r.body.ok;
+    var extra = r.body && r.body.details ? ' · ' + r.body.details.join('; ') : '';
+    msg(label + ': ' + (ok ? 'ok' : (r.body && r.body.error) || ('HTTP ' + r.status)) + extra, !ok);
+    load();
+  }
+  window.xAct = function (id, sub, body, label) {
+    post('/api/modules/ext/' + id + '/' + sub, body).then(function (r) { report(label, r); }).catch(function (e) { msg('Fehler: ' + e.message, true); });
+  };
+  window.xDiscover = function () {
+    post('/api/modules/ext/discover', {}).then(function (r) { report('Neu erkennen', r); }).catch(function (e) { msg('Fehler: ' + e.message, true); });
+  };
+  window.xSaveCfg = function (id, keys) {
+    var values = {};
+    keys.forEach(function (k) { var el = document.getElementById('cfg-' + id + '-' + k); if (el) values[k] = el.dataset.type === 'number' ? Number(el.value) : (el.dataset.type === 'boolean' ? el.checked : el.value); });
+    post('/api/modules/ext/' + id + '/config', { by: by(), values: values }).then(function (r) { report('Konfiguration', r); }).catch(function (e) { msg('Fehler: ' + e.message, true); });
+  };
+  window.xRun = function (id, action) {
+    var raw = document.getElementById('in-' + id + '-' + action).value || '{}';
+    var input; try { input = JSON.parse(raw); } catch (e) { msg('Eingabe ist kein JSON', true); return; }
+    post('/api/modules/ext/' + id + '/action/' + action, { input: input }).then(function (r) {
+      var out = r.body && r.body.ok ? JSON.stringify(r.body.result) : (r.body && r.body.error) || ('HTTP ' + r.status);
+      msg(action + ': ' + out, !(r.body && r.body.ok));
+      load();
+    }).catch(function (e) { msg('Fehler: ' + e.message, true); });
+  };
+  var COLORS = { bereit: 'live', deaktiviert: 'pending', freigabe_erforderlich: 'review', konfiguration_erforderlich: 'review', fehlerhaft: 'restricted', ungueltig: 'restricted', abhaengigkeit_fehlt: 'restricted', version_konflikt: 'restricted', freigegeben: 'pending' };
+  function card(m) {
+    var id = esc(m.id);
+    var h = '<div style="border:1px solid #2a3654;border-radius:10px;padding:12px;margin:10px 0">';
+    h += '<b>' + esc(m.name) + '</b> <code>' + esc(m.version || '–') + '</code> <span class="pill ' + (COLORS[m.status] || 'pending') + '">' + esc(m.status) + '</span>';
+    if (m.connection) h += ' <span class="pill pending">' + esc(m.connection) + '</span>';
+    h += '<div class="sub">' + esc(m.description || '') + ' · Typ ' + esc(m.type || '–') + ' · von ' + esc(m.author || '–') + ' · Ordner ' + esc(m.folder) + '</div>';
+    if ((m.errors || []).length) h += '<div style="color:#f87171">Fehler: ' + m.errors.map(esc).join(' · ') + '</div>';
+    if ((m.dependency_problems || []).length) h += '<div style="color:#fbbf24">Abhängigkeiten: ' + m.dependency_problems.map(esc).join(' · ') + '</div>';
+    if ((m.missing_config || []).length) h += '<div style="color:#fbbf24">Fehlende Konfiguration: ' + m.missing_config.map(esc).join(', ') + '</div>';
+    h += '<div class="sub">Rechte: ' + (m.permissions || []).map(esc).join(', ') + ' · freigegeben: ' + (m.granted || []).map(esc).join(', ') + '</div>';
+    h += '<div class="sub">Fähigkeiten: ' + (m.capabilities || []).map(function (c) { return '<code>' + esc(c.name) + '</code> ' + esc(c.description); }).join(' · ') + '</div>';
+    var keys = Object.keys(m.config || {});
+    if (keys.length) {
+      h += '<div style="margin-top:6px">';
+      keys.forEach(function (k) {
+        var f = m.config[k];
+        if (f.secret) h += '<div class="sub">' + esc(k) + ': Geheimnis ' + (f.set ? 'gesetzt' : 'FEHLT') + ' (Umgebungsvariable ' + esc(f.env) + ', Wert wird nie angezeigt)</div>';
+        else if (f.type === 'boolean') h += '<div><label class="sub"><input type="checkbox" id="cfg-' + id + '-' + esc(k) + '" data-type="boolean"' + (f.value ? ' checked' : '') + '> ' + esc(k) + '</label></div>';
+        else h += '<div><label class="sub">' + esc(k) + ' <input id="cfg-' + id + '-' + esc(k) + '" data-type="' + esc(f.type) + '" value="' + esc(f.value) + '" style="background:#0d1424;color:#e6edf7;border:1px solid #2a3654;padding:4px;border-radius:6px"></label></div>';
+      });
+      var ks = keys.filter(function (k) { return !m.config[k].secret; });
+      h += '<button onclick=\'xSaveCfg("' + id + '", ' + JSON.stringify(ks) + ')\'>Konfiguration speichern</button></div>';
+    }
+    h += '<p>';
+    h += '<button onclick=\'xAct("' + id + '", "approve", { by: document.getElementById("xby").value }, "Freigabe")\'>Freigeben</button> ';
+    h += '<button onclick=\'xAct("' + id + '", "enable", { by: document.getElementById("xby").value }, "Aktivieren")\'>Aktivieren</button> ';
+    h += '<button onclick=\'xAct("' + id + '", "disable", { by: document.getElementById("xby").value }, "Deaktivieren")\'>Deaktivieren</button> ';
+    h += '<button onclick=\'xAct("' + id + '", "health", {}, "Status prüfen")\'>Status prüfen</button>';
+    h += '</p>';
+    (m.capabilities || []).forEach(function (c) {
+      var first = Object.keys(c.input || {})[0];
+      var ph = first ? '{"' + first + '":"..."}' : '{}';
+      h += '<div><code>' + esc(c.name) + '</code> <input id="in-' + id + '-' + esc(c.name) + '" placeholder="' + esc(ph) + '" style="width:260px;background:#0d1424;color:#e6edf7;border:1px solid #2a3654;padding:4px;border-radius:6px"> <button onclick=\'xRun("' + id + '", "' + esc(c.name) + '")\'>Ausführen</button></div>';
+    });
+    if ((m.last_errors || []).length) h += '<div class="sub">Letzte Fehler: ' + m.last_errors.slice(-3).map(function (e) { return esc(e.at) + ' ' + esc(e.message); }).join(' · ') + '</div>';
+    return h + '</div>';
+  }
+  function load() {
+    fetch('/api/modules/ext').then(function (r) { return r.json(); }).then(function (d) {
+      var mods = d.modules || [];
+      document.getElementById('ext').innerHTML = mods.length ? mods.map(card).join('') : '<p class="sub">Keine Erweiterungsmodule gefunden. Lege einen Ordner unter backend/modules/ mit aura.module.json an.</p>';
+      if (d.duplicates && d.duplicates.length) msg('Doppelte IDs: ' + d.duplicates.join(', '), true);
+    }).catch(function (e) { document.getElementById('ext').textContent = 'Laden fehlgeschlagen: ' + e.message; });
+  }
+  document.getElementById('xtok').value = sessionStorage.getItem('aura_admin') || '';
+  load();
+})();
+</script>

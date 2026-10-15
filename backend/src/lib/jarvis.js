@@ -137,6 +137,27 @@ function think(message) {
 }
 function ask(message) {
   const out = think(message); remember('user', message, out.intent); remember('jarvis', out.reply, out.intent);
-  return { ...out, memory: memory.slice(-12) };
+  return { ...out, memory: memory.slice(-12), llm: { used: false, reason: 'sync-Pfad' } };
 }
-module.exports = { meta: { area: 'JARVIS', id: 'jarvis', name: 'J.A.R.V.I.S. live operating intelligence', state: 'live' }, ask, memory: () => memory.slice(-30), healthSnapshot };
+// Async-Variante: die deterministische Engine liefert die Fakten; ist OLLAMA_URL
+// gesetzt, formuliert Ollama sie aus (lokal, eigener Host). Bei jedem Fehler
+// bleibt die Antwort der Engine unverändert bestehen.
+async function askAsync(message) {
+  const out = think(message);
+  let llm = { used: false, reason: 'keine Frage' };
+  const q = String(message || '').trim();
+  if (q) {
+    const facts = out.reply + (out.data ? '\n' + JSON.stringify(out.data).slice(0, 2000) : '');
+    const p = await require('./ollama_llm').phrase({ question: q, facts });
+    if (p.used) {
+      out.reply = p.text;
+      out.mode = 'LOCAL-LLM · ollama:' + p.model;
+      llm = { used: true, model: p.model };
+    } else {
+      llm = { used: false, reason: p.reason };
+    }
+  }
+  remember('user', message, out.intent); remember('jarvis', out.reply, out.intent);
+  return { ...out, memory: memory.slice(-12), llm };
+}
+module.exports = { meta: { area: 'JARVIS', id: 'jarvis', name: 'J.A.R.V.I.S. live operating intelligence', state: 'live' }, ask, askAsync, memory: () => memory.slice(-30), healthSnapshot };
