@@ -56,8 +56,21 @@ const pageStudioCommand = require('../../pages/studio_command');
 
 const HTML = 'text/html; charset=utf-8';
 
+// Alle Seiten bekommen denselben kleinen fetch-Wrapper: Ist in der Sitzung ein
+// Admin-Token hinterlegt (sessionStorage 'aura_token', wie auf /board und /upload),
+// wird er bei eigenen /api/-Aufrufen automatisch mitgeschickt. Damit bleiben die
+// Seiten bedienbar, sobald AURA_ADMIN_TOKEN im Server gesetzt ist — ohne dass jede
+// Seite einzeln angepasst werden muss.
+const TOKEN_SNIPPET = `<script>(function(){try{var t=function(){try{return sessionStorage.getItem('aura_token')||''}catch(e){return ''}};var f=window.fetch;window.fetch=function(u,o){o=o||{};try{var url=typeof u==='string'?u:(u&&u.url)||'';var tok=t();if(tok&&url.indexOf('/api/')===0){o.headers=Object.assign({},o.headers||{},{'x-aura-token':tok})}}catch(e){}return f.call(this,u,o)}}catch(e){}})();</script>`;
+function withTokenSnippet(html) {
+  return typeof html === 'string' && html.includes('</head>') ? html.replace('</head>', TOKEN_SNIPPET + '</head>') : html;
+}
+
 async function handle(ctx) {
-  const { res, p, send } = ctx;
+  const { res, p } = ctx;
+  // HTML-Antworten laufen durch den Token-Wrapper, alle anderen unverändert.
+  const rawSend = ctx.send;
+  const send = (r, code, type, body, extra) => rawSend(r, code, type, type === HTML ? withTokenSnippet(body) : body, extra);
 
   if (p === '/skills') return send(res, 200, HTML, pageSkills()), true;
   if (p === '/hub') return send(res, 200, HTML, pageHub()), true;

@@ -34,7 +34,7 @@ const PLANS = [
 ];
 
 function empty() { return { profiles: [], subscriptions: [], members: [], newsletter_subscribers: [], newsletter_drafts: [], voice_consents: [], hardware_profiles: [], companions: [], missions: [], presence_kits: [], audit: [] }; }
-function load() { try { const db = JSON.parse(fs.readFileSync(FILE, 'utf8')); return Object.assign(empty(), db, ...Object.keys(empty()).map((k) => ({ [k]: Array.isArray(db[k]) ? db[k] : [] }))); } catch { return empty(); } }
+function load() { try { const db = JSON.parse(fs.readFileSync(FILE, 'utf8')); return Object.assign(empty(), db, ...Object.keys(empty()).map((k) => ({ [k]: Array.isArray(db[k]) ? db[k] : [] }))); } catch { const fresh = empty(); try { if (!fs.existsSync(FILE)) save(fresh); } catch { /* read-only ok */ } return fresh; } }
 function save(db) { fs.mkdirSync(path.dirname(FILE), { recursive: true }); const tmp = FILE + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(db, null, 2)); fs.renameSync(tmp, FILE); }
 function now() { return new Date().toISOString(); }
 function id(prefix) { return prefix + '-' + crypto.randomBytes(4).toString('hex'); }

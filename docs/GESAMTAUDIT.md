@@ -75,7 +75,8 @@ node backend/server.js
 ### 4.5 Ein-Klick-Installation
 `deploy/master-install.sh` (Debian/Ubuntu, nur eigene Hardware).
 
-> **Achtung:** Das Skript nimmt standardmäßig den Branch `arena/0ee9c54c-aura`, nicht `arena/3b63f072-aura`. Vor dem Lauf setzen:
+> **Hinweis:** Das Install-Skript nimmt standardmäßig den Branch `main` (vollständiger Stand).
+> Ein anderer Branch lässt sich vorher setzen: `AURA_BRANCH=<branch> bash master-install.sh`.
 > `AURA_BRANCH=arena/3b63f072-aura bash deploy/master-install.sh`
 > Das Skript startet den Server mit `nohup`, Log in `/var/log/aura-backend.log`. Health-Check über `/api/health`. Mit `RUN_VALIDATE=0` lässt sich die Prüfung überspringen.
 
@@ -106,7 +107,6 @@ Anleitung: [`docs/TERMUX.md`](TERMUX.md). Installation mit `bash deploy/termux/i
 | `PORT` | nein | HTTP-Port des Servers | 8080 |
 | `AURA_ADMIN_TOKEN` | empfohlen | Schreibzugriff auf Board, Upload, Steuerzentrale. Header `x-aura-token` | leer (kein Schutz!) |
 | `AURA_AUTONOMY_AUTO` | nein | `1` = Autonomie-Schleife heilt selbst. Sonst nur Vorschläge | aus |
-| `AURA_SCHED_DEMO` | nein | Demo-Modus: Stunden werden zu Sekunden im Zeitplan | aus |
 | `AURA_CONTROL_FILE` | nein | Pfad der Steuerzentrale-Datei (für Tests) | `backend/src/data/control.json` |
 | `OLLAMA_URL` | nein | Ollama-Endpunkt für JARVIS-Freitext. Ohne Wert: aus | leer |
 | `OLLAMA_MODEL` | nein | Modellname bei Ollama | `llama3.2` |

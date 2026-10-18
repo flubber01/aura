@@ -8,7 +8,10 @@ const path = require('path');
 const { execFile } = require('child_process');
 
 const FILE = path.join(__dirname, '..', 'data', 'media_pipeline.json');
-function load() { try { return JSON.parse(fs.readFileSync(FILE, 'utf8')); } catch { return { projects: [] }; } }
+function defaults() { return { projects: [] }; }
+function load() { try { const db = JSON.parse(fs.readFileSync(FILE, 'utf8')); return { ...defaults(), ...db, projects: Array.isArray(db.projects) ? db.projects : [] }; } catch { return persist(defaults()); } }
+// AURA_SEED_WRITE: fehlende/kaputte Datei wird beim ersten Zugriff einmalig angelegt
+function persist(fresh) { try { if (!fs.existsSync(FILE)) save(fresh); } catch { /* read-only ok */ } return fresh; }
 function save(db) { fs.mkdirSync(path.dirname(FILE), { recursive: true }); const t = FILE + '.tmp'; fs.writeFileSync(t, JSON.stringify(db, null, 2)); fs.renameSync(t, FILE); }
 
 const CAMERA_HINTS = [

@@ -1047,7 +1047,8 @@ async function main() {
     const seSt = jp(await get('/api/sentinel/status'));
     results.items.push({ kind: 'area86', path: 'sentinel live + trace-first-policy', ok: seSt.mode === 'LIVE' && /TRACE-FIRST/.test(seSt.policy || ''), detail: seSt.blocklist.length + ' quarantined' });
     const seScan = jp(await get('/api/sentinel/scan'));
-    results.items.push({ kind: 'area86', path: 'live-scan: offene ports echt aus /proc/net (8080 erlaubt)', ok: Array.isArray(seScan.listeners) && seScan.listeners.some((l) => l.port === 8080 && l.allowed) && ['RUHIG', 'WACHSAM', 'ALARM'].includes(seScan.verdict), detail: 'Lage ' + seScan.verdict + ' · ' + seScan.listeners.length + ' Ports' });
+    const auraPort = Number(new URL(BASE).port || (String(BASE).startsWith('https') ? 443 : 80));
+    results.items.push({ kind: 'area86', path: 'live-scan: offene ports echt aus /proc/net (Server-Port ' + auraPort + ' erlaubt)', ok: Array.isArray(seScan.listeners) && seScan.listeners.some((l) => l.port === auraPort && l.allowed) && ['RUHIG', 'WACHSAM', 'ALARM'].includes(seScan.verdict), detail: 'Lage ' + seScan.verdict + ' · ' + seScan.listeners.length + ' Ports' });
     const seBlock = jp(await post('/api/sentinel/block', { ip: '203.0.113.7', reason: 'sweep-test' }));
     const seStatus2 = jp(await get('/api/sentinel/status'));
     const seLoop = await post('/api/sentinel/block', { ip: '127.0.0.1' });

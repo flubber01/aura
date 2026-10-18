@@ -24,7 +24,7 @@ const BRIDGES = [
   { id: 'discord_slack_matrix', name: 'Discord / Slack / Matrix', state: 'OFFICIAL_OR_SELF_HOSTED_ADAPTER_REQUIRED', note: 'Only an official or self-hosted adapter with identity/permission review may bridge room messages.' },
 ];
 function empty() { return { rooms: [], messages: [], rounds: [], audit: [] }; }
-function load() { try { const db = JSON.parse(fs.readFileSync(FILE, 'utf8')); return { ...empty(), ...db, rooms: Array.isArray(db.rooms) ? db.rooms : [], messages: Array.isArray(db.messages) ? db.messages : [], rounds: Array.isArray(db.rounds) ? db.rounds : [], audit: Array.isArray(db.audit) ? db.audit : [] }; } catch { return empty(); } }
+function load() { try { const db = JSON.parse(fs.readFileSync(FILE, 'utf8')); return { ...empty(), ...db, rooms: Array.isArray(db.rooms) ? db.rooms : [], messages: Array.isArray(db.messages) ? db.messages : [], rounds: Array.isArray(db.rounds) ? db.rounds : [], audit: Array.isArray(db.audit) ? db.audit : [] }; } catch { const fresh = empty(); try { if (!fs.existsSync(FILE)) save(fresh); } catch { /* read-only ok */ } return fresh; } }
 function save(db) { fs.mkdirSync(path.dirname(FILE), { recursive: true }); const tmp = FILE + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(db, null, 2)); fs.renameSync(tmp, FILE); }
 function now() { return new Date().toISOString(); }
 function id(prefix) { return prefix + '-' + crypto.randomBytes(4).toString('hex'); }

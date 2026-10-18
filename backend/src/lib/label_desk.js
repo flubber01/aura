@@ -45,7 +45,10 @@ function load() {
     const db = JSON.parse(fs.readFileSync(FILE, 'utf8'));
     const seed = seeded();
     return { ...seed, ...db, label: db.label || seed.label, artists: Array.isArray(db.artists) ? db.artists : seed.artists, releases: Array.isArray(db.releases) ? db.releases : [], audit: Array.isArray(db.audit) ? db.audit : [], direct_setup_requests: Array.isArray(db.direct_setup_requests) ? db.direct_setup_requests : [] };
-  } catch { return seeded(); }
+  } catch {
+    // AURA_SEED_WRITE: fehlende/kaputte Datei einmalig mit den Defaults anlegen
+    const fresh = seeded(); try { if (!fs.existsSync(FILE)) save(fresh); } catch { /* read-only ok */ } return fresh;
+  }
 }
 function save(db) { fs.mkdirSync(path.dirname(FILE), { recursive: true }); const tmp = FILE + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(db, null, 2)); fs.renameSync(tmp, FILE); }
 function now() { return new Date().toISOString(); }

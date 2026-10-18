@@ -6,7 +6,6 @@
 ## Backend (required, everything else is a page on top)
 ```bash
 node backend/server.js                 # :8080, all pages + APIs
-AURA_SCHED_DEMO=1 node backend/server.js   # demo: hours→seconds for the backup schedule
 ```
 
 ## Docker / compose

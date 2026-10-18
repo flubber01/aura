@@ -6,7 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const FILE = path.join(__dirname, '..', 'data', 'vault.enc.json');
+const FILE = process.env.AURA_VAULT_FILE || path.join(__dirname, '..', 'data', 'vault.enc.json');
 const ENV_FILE = path.join(__dirname, '..', '..', '..', 'deploy', '.env');
 function parseEnvFile(f) { try { return Object.fromEntries(fs.readFileSync(f, 'utf8').split('\n').filter((l) => l.includes('=')).map((l) => [l.slice(0, l.indexOf('=')).trim(), l.slice(l.indexOf('=') + 1).trim()])); } catch { return {}; } }
 

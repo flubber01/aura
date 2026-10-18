@@ -41,7 +41,7 @@ const SHORTCUT_ACTIONS = [
   ['open_today', 'Open AURA Today', '/today'], ['open_passport', 'Open Project Passport', '/creator-passport'], ['open_studio', 'Open Studio Command', '/studio-command'], ['open_collab', 'Open Collaboration Room', '/creator-collaboration'], ['open_revenue', 'Open Creator Revenue', '/creator-revenue'], ['open_launchpad', 'Open Launchpad', '/aura-os/launchpad'], ['open_approval', 'Open Remote Approval', '/remote-approval'], ['open_os', 'Open AURA OS', '/aura-os'],
 ].map(([id, name, href]) => ({ id, name, href }));
 function empty() { return { projects: [], shots: [], sequences: [], notes: [], reviews: [], shortcuts: [], audit: [] }; }
-function load() { try { const db = JSON.parse(fs.readFileSync(FILE, 'utf8')); return { ...empty(), ...db, ...Object.fromEntries(Object.keys(empty()).map((k) => [k, Array.isArray(db[k]) ? db[k] : []])) }; } catch { return empty(); } }
+function load() { try { const db = JSON.parse(fs.readFileSync(FILE, 'utf8')); return { ...empty(), ...db, ...Object.fromEntries(Object.keys(empty()).map((k) => [k, Array.isArray(db[k]) ? db[k] : []])) }; } catch { const fresh = empty(); try { if (!fs.existsSync(FILE)) save(fresh); } catch { /* read-only ok */ } return fresh; } }
 function save(db) { fs.mkdirSync(path.dirname(FILE), { recursive: true }); const tmp = FILE + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(db, null, 2)); fs.renameSync(tmp, FILE); }
 function now() { return new Date().toISOString(); }
 function id(prefix) { return prefix + '-' + crypto.randomBytes(5).toString('hex'); }

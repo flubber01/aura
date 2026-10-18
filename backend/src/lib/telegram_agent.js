@@ -78,7 +78,14 @@ async function handleMsg(msg, transportReceipt = '') {
   const base = 'http://127.0.0.1:' + (process.env.PORT || 8080);
   if (allow.length && !allow.includes(chat)) return tgCall('sendMessage', { chat_id: msg.chat.id, text: '⛔ Chat nicht auf der Allowlist (TELEGRAM_ALLOWED_CHATS setzen)' });
   const cmd = String(msg.text || '').split('@')[0].replace('/', '').split(' ')[0];
-  const grab = async (p, opts) => { const r = await fetch(base + p, opts); return r.json(); };
+  // Serverinterne Aufrufe: bei gesetztem AURA_ADMIN_TOKEN den Header mitschicken,
+  // sonst antworten geschuetzte Routen mit 401.
+  const adminTok = process.env.AURA_ADMIN_TOKEN || '';
+  const grab = async (p, opts) => {
+    const o = Object.assign({}, opts || {});
+    if (adminTok) o.headers = Object.assign({}, o.headers || {}, { 'x-aura-token': adminTok });
+    const r = await fetch(base + p, o); return r.json();
+  };
   let out;
   try {
     if (cmd === 'status') out = JSON.stringify(await grab('/api/ops'));

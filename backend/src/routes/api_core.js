@@ -105,7 +105,7 @@ async function handle(ctx) {
   // ---- 1-click reproduction report ----
   if (p === '/api/repro') {
     let commit = 'unknown';
-    try { commit = require('child_process').execSync('git rev-parse --short HEAD', { cwd: ROOT, timeout: 3000 }).toString().trim(); } catch {}
+    try { commit = require('child_process').execSync('git rev-parse --short HEAD', { cwd: ROOT, timeout: 3000, stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim(); } catch {}
     const dataOk = watcher.backups().verified > 0;
     return send(res, 200, 'application/json', JSON.stringify({
       ok: true, mode: 'LIVE', at: new Date().toISOString(), commit,
