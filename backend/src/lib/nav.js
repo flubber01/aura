@@ -30,6 +30,7 @@ const GROUPS = [
       { label: 'Config', href: '/config' },
       { label: 'Admin', href: '/admin' },
       { label: 'Cluster', href: '/cluster' },
+      { label: 'Selbstbearbeitung', href: '/selfwork' },
     ],
   },
   {
