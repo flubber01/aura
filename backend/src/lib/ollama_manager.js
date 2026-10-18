@@ -177,10 +177,20 @@ async function pull(name) {
   return new Promise((resolve) => {
     const u = new URL(OLLAMA_URL() + '/api/pull');
     const req = http.request({ hostname: u.hostname, port: u.port, path: u.pathname, method: 'POST', headers: { 'Content-Type': 'application/json' } }, (res) => {
-      let d = ''; res.on('data', (c) => d += c);
-      res.on('end', () => { const db = load(); if (!db.installed.includes(name)) { db.installed.push(name); save(db); } resolve({ ok: res.statusCode === 200, model: name, raw: d.slice(0, 300) }); });
+      let d = ''; let answered = false;
+      res.on('data', (c) => {
+        d += c;
+        // LIVE-Pfad: Ollama hat den Pull angenommen (200 + Stream läuft) —
+        // sofort als ehrlich "im Hintergrund laufend" antworten, statt bis
+        // zum Download-Ende zu blockieren (Timeouts auf CPU-Hosts).
+        if (!answered && res.statusCode === 200) {
+          answered = true;
+          resolve({ ok: true, queued: true, model: name, state: 'LIVE', note: 'echter Pull auf dem Host angestoßen — läuft im Hintergrund weiter', raw: d.slice(0, 200) });
+        }
+      });
+      res.on('end', () => { const db = load(); if (!db.installed.includes(name)) { db.installed.push(name); save(db); } if (!answered) { answered = true; resolve({ ok: res.statusCode === 200, model: name, state: 'LIVE', raw: d.slice(0, 300) }); } });
     });
-    req.on('error', (e) => resolve({ ok: false, model: name, error: e.message }));
+    req.on('error', (e) => resolve({ ok: false, model: name, state: 'LIVE', error: e.message }));
     req.write(JSON.stringify({ name })); req.end();
   });
 }
