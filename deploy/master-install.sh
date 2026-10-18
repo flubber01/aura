@@ -21,6 +21,9 @@
 #   PORT         HTTP-Port (Standard: 8080)
 #   AURA_LOG     Logdatei (Standard: /var/log/aura-backend.log, wenn root, sonst ./aura-backend.log)
 #   RUN_VALIDATE 1 = Repro-Sweep am Ende (Standard), 0 = überspringen
+#   OLLAMA_URL / OLLAMA_MODEL / OLLAMA_TIMEOUT_MS
+#                werden NICHT überschrieben; ohne Vorgabe findet das Skript ein
+#                laufendes Ollama auf 127.0.0.1:11434 selbst (Auto-Fund unten)
 set -uo pipefail   # bewusst OHNE -e: jeder Schritt meldet selbst und wir wollen den Log sehen
 
 BRANCH="${AURA_BRANCH:-main}"
@@ -108,10 +111,28 @@ if have ss && ss -ltn 2>/dev/null | grep -q ":$PORT "; then
   warn "Anderen Dienst stoppen/umstellen oder mit PORT=8090 erneut starten."
 fi
 
+# ---------- Ollama-Auto-Fund (lokales LLM für JARVIS) ----------
+# Läuft auf dem Host schon ein Ollama (127.0.0.1:11434), wird es gefunden und
+# dem Backend per Env übergeben — kein Modell wird installiert oder gepullt.
+# Bereits gesetzte Env-Variablen haben Vorrang und werden nie überschrieben.
+OLLAMA_TAGS="$(curl -s -m 3 http://127.0.0.1:11434/api/tags 2>/dev/null || true)"
+if printf '%s' "$OLLAMA_TAGS" | grep -q '"models"'; then
+  export OLLAMA_URL="${OLLAMA_URL:-http://127.0.0.1:11434}"
+  if [ -z "${OLLAMA_MODEL:-}" ]; then
+    # Erstes Nicht-Embedding-Modell aus der echten Liste (Embedder können nicht chatten).
+    OLLAMA_MODEL="$(printf '%s' "$OLLAMA_TAGS" | node -e 'let d="";process.stdin.on("data",c=>d+=c);process.stdin.on("end",()=>{try{const names=(JSON.parse(d).models||[]).map(m=>m.name||m.model||"").filter(Boolean);const chat=names.find(n=>{const s=n.toLowerCase();return !/(-embed|embed-)$/.test(s)&&!s.includes("all-minilm")&&!s.includes("nomic-embed-text");});process.stdout.write(chat||"");}catch{process.stdout.write("");}})' 2>/dev/null || true)"
+    export OLLAMA_MODEL="${OLLAMA_MODEL:-phi3:mini}"
+  fi
+  export OLLAMA_TIMEOUT_MS="${OLLAMA_TIMEOUT_MS:-60000}"   # CPU-Boxen sind langsam
+  say "Ollama gefunden auf 127.0.0.1:11434 ✔ — Backend startet mit OLLAMA_URL=$OLLAMA_URL · OLLAMA_MODEL=${OLLAMA_MODEL:-<Env>} · OLLAMA_TIMEOUT_MS=$OLLAMA_TIMEOUT_MS"
+else
+  say "Ollama: kein Dienst auf 127.0.0.1:11434 gefunden — Backend startet ohne lokales LLM (JARVIS meldet dann ehrlich NOT-CONNECTED, bis OLLAMA_URL gesetzt wird)"
+fi
+
 # ---------- Starten ----------
 if [ -n "$SUDO" ] && [ -d /var/log ] && [ -w /var/log ]; then LOG="${AURA_LOG:-/var/log/aura-backend.log}"; else LOG="${AURA_LOG:-$PWD/aura-backend.log}"; fi
 say "starte Backend (Log: $LOG)"
-setsid nohup env PORT="$PORT" node backend/server.js >>"$LOG" 2>&1 < /dev/null &
+setsid nohup env PORT="$PORT" OLLAMA_URL="${OLLAMA_URL:-}" OLLAMA_MODEL="${OLLAMA_MODEL:-}" OLLAMA_TIMEOUT_MS="${OLLAMA_TIMEOUT_MS:-}" node backend/server.js >>"$LOG" 2>&1 < /dev/null &
 PID=$!
 disown 2>/dev/null || true
 sleep 2
