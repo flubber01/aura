@@ -12,8 +12,17 @@
 Umgebungsvariablen · Backup/Restore-Runbook · Monitoring · Hardening ·
 Troubleshooting · Validierung (`node test/validate.js`).
 
-Eine Zeile, ohne Schnickschnack:
+Eine Zeile, ohne Schnickschnack (öffentliches Repo):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/flubber01/aura/arena/0ee9c54c-aura/deploy/master-install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/flubber01/aura/main/deploy/master-install.sh | bash
+```
+
+**Privates Repo (aktueller Zustand):** ohne Token liefert `raw.githubusercontent.com` **404** und es passiert nichts.
+
+```bash
+TOKEN=<github_pat_...>   # fein granular, nur "Contents: Read"
+curl -fsSL -H "Authorization: Bearer $TOKEN" \
+  https://raw.githubusercontent.com/flubber01/aura/main/deploy/master-install.sh \
+  | AURA_TOKEN="$TOKEN" bash
 ```

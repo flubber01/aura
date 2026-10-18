@@ -108,7 +108,9 @@ function collectSafeProjectFiles() {
     }
   }
   for (const file of FULL_ROOT_FILES) if (fs.existsSync(path.join(ROOT, file))) found.push(file);
-  for (const directory of FULL_ROOTS) walk(path.join(ROOT, directory));
+  // Fehlende Wurzelverzeichnisse (z. B. in einem isolierten Test-/Deploy-Verzeichnis)
+  // werden übersprungen statt die ganze Backup-Erzeugung mit 500 abzubrechen.
+  for (const directory of FULL_ROOTS) { const abs = path.join(ROOT, directory); if (fs.existsSync(abs)) walk(abs); }
   return [...new Set(found)].sort();
 }
 function readAllowed(relative) {

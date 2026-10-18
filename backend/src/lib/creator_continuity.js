@@ -49,7 +49,7 @@ const MOTION_TREATMENTS = [
 ];
 
 function empty() { return { settings: [], plans: [], cycles: [], asset_drops: [], audit: [] }; }
-function load() { try { const db = JSON.parse(fs.readFileSync(FILE, 'utf8')); return { ...empty(), ...db, settings: Array.isArray(db.settings) ? db.settings : [], plans: Array.isArray(db.plans) ? db.plans : [], cycles: Array.isArray(db.cycles) ? db.cycles : [], asset_drops: Array.isArray(db.asset_drops) ? db.asset_drops : [], audit: Array.isArray(db.audit) ? db.audit : [] }; } catch { return empty(); } }
+function load() { try { const db = JSON.parse(fs.readFileSync(FILE, 'utf8')); return { ...empty(), ...db, settings: Array.isArray(db.settings) ? db.settings : [], plans: Array.isArray(db.plans) ? db.plans : [], cycles: Array.isArray(db.cycles) ? db.cycles : [], asset_drops: Array.isArray(db.asset_drops) ? db.asset_drops : [], audit: Array.isArray(db.audit) ? db.audit : [] }; } catch { const fresh = empty(); try { if (!fs.existsSync(FILE)) save(fresh); } catch { /* read-only ok */ } return fresh; } }
 function save(db) { fs.mkdirSync(path.dirname(FILE), { recursive: true }); const tmp = FILE + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(db, null, 2)); fs.renameSync(tmp, FILE); }
 function now() { return new Date().toISOString(); }
 function id(prefix) { return prefix + '-' + crypto.randomBytes(4).toString('hex'); }

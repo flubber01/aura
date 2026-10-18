@@ -1,6 +1,6 @@
 # AURA — DEPLOYMENT HANDBOOK (every aspect)
 
-> Branch `arena/0ee9c54c-aura` · Node ≥ 22 · zero npm dependencies (built-ins only).
+> Branch `main` · Node ≥ 22 · zero npm dependencies (built-ins only).
 > Alles LIVE-gelabelt, was echt ist. SIM/Demo-Modi sind markiert. Keine Fake-Zahlen.
 
 ---
@@ -8,7 +8,11 @@
 ## 0. TL;DR — eine Zeile, ohne Schnickschnack
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/flubber01/aura/arena/0ee9c54c-aura/deploy/master-install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/flubber01/aura/main/deploy/master-install.sh | bash
+
+# privates Repo: Token nötig (ohne -> 404 auf raw.githubusercontent.com)
+# TOKEN=<github_pat_...>
+# curl -fsSL -H "Authorization: Bearer $TOKEN" https://raw.githubusercontent.com/flubber01/aura/main/deploy/master-install.sh | AURA_TOKEN="$TOKEN" bash
 ```
 
 Startet Backend + UI auf **:8080**. Danach: `/hub` öffnen; `/cluster` zeigt den separaten Infrastructure Control Room für Main Core und optionale Project Arms.
@@ -38,7 +42,7 @@ Feedback, Schedule, Log-Vault). Das macht Deploy, Backup und Restore trivial.
 
 ```bash
 git clone https://github.com/flubber01/aura.git && cd aura
-git checkout arena/0ee9c54c-aura
+git checkout main
 node backend/server.js          # oder: PORT=9000 node backend/server.js
 ```
 

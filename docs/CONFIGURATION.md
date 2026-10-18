@@ -10,6 +10,7 @@
 | `backend/src/data/config.json` | Overrides (wird bei erstem Speichern angelegt) |
 | Code-Defaults (`src/lib/config.js` SCHEMA) | gelten, solange kein Override existiert |
 | Env-Variablen | schlagen Datei-Werte, wo angegeben (`PORT`, `OPENROUTER_API_KEY`, `TELEGRAM_BOT_TOKEN`) |
+| Weitere Env-Variablen | `OLLAMA_URL`, `OLLAMA_MODEL`, `OLLAMA_TIMEOUT_MS` (J.A.R.V.I.S.), `AURA_ADMIN_TOKEN` (Agent Board), `AURA_AUTONOMY_AUTO` (Standard aus: der Autonomy-Loop schlägt nur vor, heilt nicht selbst; `1` = automatisch). Details: [`BOARD-JARVIS.md`](BOARD-JARVIS.md) |
 
 **Priorität:** Env > config.json > Default.
 

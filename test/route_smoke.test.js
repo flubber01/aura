@@ -13,16 +13,32 @@ const net = require('net');
 
 const ROOT = path.resolve(__dirname, '..');
 const BACKEND = path.join(ROOT, 'backend');
-const server = fs.readFileSync(path.join(BACKEND, 'server.js'), 'utf8');
-const ROUTES = [...new Set([...server.matchAll(/p === '(\/api[^']*)'/g)].map((m) => m[1]))].sort();
-// Schreibrouten: die Zeile mit der Route prüft POST
-const WRITE_ROUTES = new Set(ROUTES.filter((r) => (server.split('\n').find((l) => l.includes(`p === '${r}'`)) || '').includes("'POST'")));
+// Routen liegen seit dem Dispatcher-Umbau nicht mehr nur in server.js, sondern in src/routes/*.js.
+// Deshalb wird der komplette Quelltext der Routendateien gescannt (sonst findet der Test 0 Routen
+// und prüft still nichts — genau das war der Fall).
+const ROUTE_DIR = path.join(BACKEND, 'src', 'routes');
+const SOURCES = [path.join(BACKEND, 'server.js')]
+  .concat(fs.existsSync(ROUTE_DIR) ? fs.readdirSync(ROUTE_DIR).filter((f) => f.endsWith('.js')).sort().map((f) => path.join(ROUTE_DIR, f)) : [])
+  .map((file) => ({ file, text: fs.readFileSync(file, 'utf8') }));
+const ROUTES = [...new Set(SOURCES.flatMap(({ text }) => [...text.matchAll(/p === '(\/api[^']*)'/g)].map((m) => m[1])))].sort();
+// Schreibrouten: dieselbe Zeile prüft zusätzlich die Methode POST (präzise, damit
+// GET-Routen nicht fälschlich als Schreibpfad gelten)
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const WRITE_ROUTES = new Set(ROUTES.filter((r) => SOURCES.some(({ text }) => new RegExp(`p === '${esc(r)}'\\s*&&\\s*req\\.method === 'POST'`).test(text))));
+if (ROUTES.length === 0) { console.error('route_smoke FEHLER: 0 Routen gefunden — Scan der Quelltextdateien prüfen: ' + SOURCES.map((s) => path.relative(ROOT, s.file)).join(', ')); process.exit(1); }
 
 // Bekannte offene Punkte: schreibende POST-Routen ohne Admin-Token-Prüfung. Sichtbar als WARN, nicht still.
 // Entscheidung ausstehend (Token-Pflicht würde bestehende Seiten ändern).
-const KNOWN_OPEN = new Set(['/api/builder/simulate', '/api/config/reset', '/api/containers/drill', '/api/learning/outcome', '/api/learning/simulate', '/api/ops/others', '/api/ops/super', '/api/ops/sync', '/api/schedule/add', '/api/schedule/remove', '/api/selfrepair/drill', '/api/selfrepair/run']);
+// Früher hier gelistete Schreibpfade sind jetzt ebenfalls durch adminSoft geschützt
+// (AURA_ADMIN_TOKEN gesetzt -> Header x-aura-token oder angemeldeter Besitzer).
+const KNOWN_OPEN = new Set([]);
 // Bewusst öffentliche Lesepfade (kein Schreiben, keine Freigabe nötig)
-const PUBLIC_WRITES = new Set(['/api/jarvis', '/api/jarvis/llm', '/api/yellowpages/suggest', '/api/yellowpages/help', '/api/studio/groove', '/api/studio/orchestrate', '/api/terminal', '/api/ultra/chat']);
+// /api/auth/logout muss ohne Token funktionieren (Abmelden darf nie am Token scheitern)
+const PUBLIC_WRITES = new Set(['/api/auth/logout', '/api/jarvis', '/api/jarvis/llm', '/api/yellowpages/suggest', '/api/yellowpages/help', '/api/studio/groove', '/api/studio/orchestrate', '/api/terminal', '/api/ultra/chat', '/api/video/preview',
+  // Reine Rechenpfade: prüfen/ausrechnen, speichern nichts (kein Zustand, keine Freigabe nötig).
+  '/api/audio/license', '/api/plugins/audio/validate', '/api/plugins/audio/build', '/api/speech/plan', '/api/speech/podcast', '/api/media/preview',
+  '/api/human/guard', '/api/avatar/check', '/api/ads/check']);
+// /api/video/preview rechnet nur die ffmpeg-Filterkette aus und speichert nichts — reiner Lesepfad.
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'aura-smoke-'));
 const port = () => new Promise((res, rej) => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); }); s.on('error', rej); });
@@ -37,12 +53,19 @@ async function main() {
     AURA_CREATORS_FILE: path.join(tmp, 'creators.json'), AURA_CHANNELS_FILE: path.join(tmp, 'channels.json'),
     AURA_CONTROL_FILE: path.join(tmp, 'control.json'), AURA_ULTRA_FILE: path.join(tmp, 'ultra.json'),
   };
-  // Server läuft auf einer Kopie des Backends, damit der Test keine Repo-Dateien verändert
+  // Server läuft auf einer Kopie des Projekts, damit der Test keine Repo-Dateien verändert.
+  // Wichtig: die komplette Wurzel kopieren (nicht nur backend/) — die Download-Routen bauen
+  // ZIP-Bundles aus Allowlists, die auch README/docs/deploy/scripts enthalten.
+  const SKIP = new Set(['.git', 'node_modules', '_uploads', 'google_drive']);
   const copy = path.join(tmp, 'backend');
-  fs.cpSync(BACKEND, copy, { recursive: true, filter: (src) => !src.includes(`${path.sep}node_modules`) });
-  // Der Server liest Dateien relativ zu ../extracted, deshalb wird der Ordner mitkopiert
-  const extracted = path.join(ROOT, 'extracted');
-  if (fs.existsSync(extracted)) fs.cpSync(extracted, path.join(tmp, 'extracted'), { recursive: true });
+  for (const entry of fs.readdirSync(ROOT, { withFileTypes: true })) {
+    if (SKIP.has(entry.name)) continue;
+    if (entry.isFile() && /\.zip$/i.test(entry.name)) continue; // große Artefakte, für den Test nicht nötig
+    fs.cpSync(path.join(ROOT, entry.name), path.join(tmp, entry.name), {
+      recursive: true,
+      filter: (src) => !src.includes(`${path.sep}node_modules`) && !src.includes(`${path.sep}_uploads`),
+    });
+  }
   env.AURA_MODULES_DIR = path.join(copy, 'modules');
   const child = spawn(process.execPath, ['server.js'], { cwd: copy, env, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = '';

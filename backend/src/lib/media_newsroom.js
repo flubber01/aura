@@ -40,7 +40,7 @@ const MEDIA_SKILLS = [
   'MIDI- und Stem-Katalogisierung', 'BPM/Key/Energie-Setplanung', 'Audio-/Video-Synchronisationsbrief', 'Untertitel- und Shot-Plan', 'Sound-Design- und FX-Cue-Sheet', 'Rights-/Attribution-Tracking', 'Avatar-Skript und Voice-Consent', 'Ticker-/Newsbrief mit Quellenkontext', 'Multi-Format-Content-Packaging', 'Render- und Export-Checkliste',
 ];
 function empty() { return { assets: [], projects: [], watchlists: [], links: [], audit: [] }; }
-function load() { try { const db = JSON.parse(fs.readFileSync(FILE, 'utf8')); return { ...empty(), ...db, assets: Array.isArray(db.assets) ? db.assets : [], projects: Array.isArray(db.projects) ? db.projects : [], watchlists: Array.isArray(db.watchlists) ? db.watchlists : [], links: Array.isArray(db.links) ? db.links : [], audit: Array.isArray(db.audit) ? db.audit : [] }; } catch { return empty(); } }
+function load() { try { const db = JSON.parse(fs.readFileSync(FILE, 'utf8')); return { ...empty(), ...db, assets: Array.isArray(db.assets) ? db.assets : [], projects: Array.isArray(db.projects) ? db.projects : [], watchlists: Array.isArray(db.watchlists) ? db.watchlists : [], links: Array.isArray(db.links) ? db.links : [], audit: Array.isArray(db.audit) ? db.audit : [] }; } catch { const fresh = empty(); try { if (!fs.existsSync(FILE)) save(fresh); } catch { /* read-only ok */ } return fresh; } }
 function save(db) { fs.mkdirSync(path.dirname(FILE), { recursive: true }); const tmp = FILE + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(db, null, 2)); fs.renameSync(tmp, FILE); }
 function now() { return new Date().toISOString(); }
 function id(prefix) { return prefix + '-' + crypto.randomBytes(4).toString('hex'); }

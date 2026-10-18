@@ -22,7 +22,10 @@ function load() {
   try {
     const db = JSON.parse(fs.readFileSync(FILE, 'utf8'));
     return { ...empty(), ...db, blueprints: Array.isArray(db.blueprints) ? db.blueprints : [], automations: Array.isArray(db.automations) ? db.automations : [], audit: Array.isArray(db.audit) ? db.audit : [] };
-  } catch { return empty(); }
+  } catch {
+    // AURA_SEED_WRITE: fehlende/kaputte Datei einmalig mit den Defaults anlegen
+    const fresh = empty(); try { if (!fs.existsSync(FILE)) save(fresh); } catch { /* read-only ok */ } return fresh;
+  }
 }
 function save(db) { fs.mkdirSync(path.dirname(FILE), { recursive: true }); const tmp = FILE + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(db, null, 2)); fs.renameSync(tmp, FILE); }
 function now() { return new Date().toISOString(); }

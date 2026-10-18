@@ -1,6 +1,66 @@
 'use strict';
 // Route module: area-specific APIs (moved verbatim from server.js).
+
+// Admin-Token-Gate (gleiche Logik wie in api_growth_studio.js): ist AURA_ADMIN_TOKEN
+// gesetzt, verlangen schreibende Routen den Header x-aura-token. Ohne gesetzten Token
+// bleibt der lokale Betrieb unveraendert.
+const adminSoft = (req, ctx) => {
+  const t = process.env.AURA_ADMIN_TOKEN || '';
+  if (!t) return true;                                                        // kein Token konfiguriert: lokaler Betrieb
+  if (String(req.headers['x-aura-token'] || '') === t) return true;            // Header-Token stimmt
+  return !!(ctx && ctx.actor);                                                // oder angemeldeter Besitzer (/login-Session)
+};
+
 const fs = require('fs');
+const controlCenter = require('../lib/control_center'); // Steuerzentrale: Aktionsschalter + menschliche Freigaben
+const webEmpire = require('../lib/web_empire');
+const watchdog = require('../lib/watchdog');
+const connectors = require('../lib/connectors');
+const songbook = require('../lib/songbook'); // Song-Werkstatt: Prompt→Ton (lokal gerendert) + Varianten/Stems
+const artists = require('../lib/artist_accounts');
+const videoStudio = require('../lib/video_studio'); // Video-Effektketten (ffmpeg)
+const resources = require('../lib/resources');
+const campaignPlanner = require('../lib/campaign_planner'); // Kampagnen-Planer: Pitch → Release → Pipelines
+const calendarLib = require('../lib/calendar'); // Kalender: Termine aus allen Bereichen + ICS-Export
+const handbooks = require('../lib/handbooks'); // Handbücher, aus dem laufenden System erzeugt
+const royaltyFree = require('../lib/royalty_free'); // Lizenzfreie/offene Tonquellen mit Lizenzprüfung
+const dawPlugins = require('../lib/daw_plugins'); // Tonstudio-Plug-ins: Kette, Parameter, Kriterien
+const speech = require('../lib/speech'); // Sprachfunktion: Sprechen/Hören, Motoren ehrlich geprüft
+const videoDepartment = require('../lib/video_department'); // Video-Abteilung: nur Video, mit messbarer Abnahme
+const eyes = require('../lib/eyes'); // Augen: Bilder messen, Bildschirm-Ordner ansehen
+// ---- Runde 6: Stile · Verteiler · gesprochenes Wort · Duett · Kamera · Effekte · Rohrleitungen · Sicherheit ----
+const styles = require('../lib/styles_catalog');            // Stilkatalog: jeder gängige Stil mit Zahlen und Renderer-Zuordnung
+const distributors = require('../lib/distributors');        // Verteiler mit originalen Adressen, geraden Wegen und Kennungen
+const spoken = require('../lib/spoken_word');               // Podcast, Hörbuch, Audiobibel: Plan, Kapitel, Feed, Tonmessung
+const duet = require('../lib/duet');                        // Duett: ausrichten, stimmen, Harmonie, Dopplung, mischen
+const camera = require('../lib/camera_director');           // Kamera-Regie: Optik, Bewegung, Schnitt, Licht, Drehplan
+const effects = require('../lib/visual_effects');           // Effekte und Specials als geprüfte Filterketten
+const pipes = require('../lib/workflow_pipes');             // Alle Rohrleitungen des Hauses
+const security = require('../lib/security_center');         // Sicherheit: prüfen, isolieren, entscheiden
+const agenticIntro = require('../lib/agentic_intro');       // Intro nach Vorlage: Hirn-Hub, fünf Felder mit laufendem Workflow, Fundament
+const milestones = require('../lib/milestones');             // Meilensteine: Zeit, Sessions, Tage, Werke, Klicks
+const verbundLib = require('../lib/verbund');                // Verbund: Concat-Repos, Cross-Chain, Montage, n8n-Katalog
+
+// Schutz-Kopfzeilen, die der Server wirklich setzt (siehe backend/server.js).
+const securityHeadersForInfo = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Content-Security-Policy': "default-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'self' https:; base-uri 'self'; form-action 'self'",
+  'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+  'Cross-Origin-Resource-Policy': 'same-site',
+  note: 'frame-ancestors erlaubt die eigene Vorschau ausdrücklich; über AURA_FRAME_ANCESTORS einschränkbar.',
+};
+const mediaImport = require('../lib/media_import'); // Medien-Import: Link → Entwurf, Rechte benannt
+const agentCalls = require('../lib/agent_calls'); // Agenten rufen Agenten (Tiefe, Sperrliste, Protokoll)
+const brainConsole = require('../lib/brain_console'); // Gehirn-Konsole: Mensch spricht mit Gehirn und Köpfen
+const humanFinal = require('../lib/human_final'); // Letztes Wort des Menschen als Prüftür
+const securityResponse = require('../lib/security_response'); // Erkennen → isolieren → prüfen → ausschließen
+const selfCall = require('../lib/self_call'); // Alarmleiter bis zum Anruf beim Menschen
+const plugins = require('../lib/plugins'); // Plug-in-System mit Rechten und Register
+const avatarStudio = require('../lib/avatar_studio'); // Avatar/Kunstfigur + Podcast + Kurzvideo
+const billingPlans = require('../lib/billing_plans'); // Bezahlpläne, Grenzen, Belege
+const advertising = require('../lib/advertising'); // Werbeflächen und Kampagnen (ohne Klickkauf)
+const hermes = require('../lib/hermes_bridge'); // Hermes: Vertrag + Fähigkeitsschicht (einzeln, befristet) // Katalog freier Werkzeuge und Listen // Artist-Konten mit eigenem Login (Multi-Login, getrennte Sicht) // Anbieter-Anbindung: eigene Kanäle + autorisierte Partner, Keys im Vault // Aufsicht: 3-Strike-Neustart, Sleep-Mode, Live-Uebersicht // Web Empire / Eigene Seiten: Registry, Link-Slots, ehrliche Messwerte
 const path = require('path');
 const { execFile } = require('child_process');
 const { teams } = require('../lib/datasets');
@@ -79,6 +139,35 @@ const brainMapper = require('../lib/brain_mapper');
 const controlTower = require('../lib/control_tower');
 const crosslinkPolicy = require('../lib/crosslink_policy');
 const functionRegistry = require('../lib/function_registry');
+const support = require('../lib/support');
+const contentStore = require('../lib/content_store');
+const analytics = require('../lib/analytics_forecast');
+const autoMonitor = require('../lib/auto_monitor');
+const messenger = require('../lib/artist_messenger');
+const userArea = require('../lib/user_area');
+const socialLogin = require('../lib/social_login');
+const dawDevices = require('../lib/daw_devices');
+const uiKit = require('../lib/ui_kit');
+const bootIntro = require('../lib/boot_intro');
+const siteProjects = require('../lib/site_projects');
+const hermesFlow = require('../lib/hermes_process');
+const payments = require('../lib/payment_providers');
+const i18n = require('../lib/i18n');
+const themes = require('../lib/themes');
+const branding = require('../lib/branding');
+const adEngine = require('../lib/ad_engine');
+const sponsor = require('../lib/sponsor');
+const referral = require('../lib/referral');
+const logs = require('../lib/logs_analytics');
+const lyricWriter = require('../lib/lyric_writer');
+const musicDepartments = require('../lib/music_departments');
+const orchestrator = require('../lib/song_orchestrator');
+const newsletter = require('../lib/newsletter');
+const legal = require('../lib/legal');
+const whitepaper = require('../lib/whitepaper');
+const ideaCatalog = require('../lib/idea_catalog');
+const flashIntro = require('../lib/flash_intro');
+const paymentCheck = require('../lib/payment_validation');
 const { dailyReport } = require('../lib/report');
 
 const ROOT = path.join(__dirname, '..', '..', '..');
@@ -90,7 +179,7 @@ async function handle(ctx) {
   // ---------- Area 71: Image Generation Gateway (ComfyUI + WebUI) ----------
   if (p === '/api/imagegen/status') return send(res, 200, 'application/json', JSON.stringify(await imageGen.status(), null, 2)), true;
   if (p === '/api/imagegen/config' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify((await imageGen.status()).config, null, 2)), true;
-  if (p === '/api/imagegen/config' && req.method === 'POST') {
+  if (p === '/api/imagegen/config' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED — config locked' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
     try { return send(res, 200, 'application/json', JSON.stringify({ ok: true, config: imageGen.saveCfg(body) }, null, 2)), true; }
@@ -143,8 +232,8 @@ async function handle(ctx) {
     } catch (e) { reply.error = { code: -32603, message: String(e && e.message || e) }; }
     return send(res, 200, 'application/json', JSON.stringify(reply)), true;
   };
-  if (p === '/api/mcp' && req.method === 'POST') return mcpJsonRpc();
-  if (p === '/api/mcp/builtin-used' && req.method === 'POST') { await readBody(req, 1e4); return send(res, 200, 'application/json', JSON.stringify({ ok: true })), true; }
+  if (p === '/api/mcp' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; return mcpJsonRpc(); }
+  if (p === '/api/mcp/builtin-used' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; await readBody(req, 1e4); return send(res, 200, 'application/json', JSON.stringify({ ok: true })), true; }
   if (p === '/api/mcp/status') return send(res, 200, 'application/json', JSON.stringify(mcpManager.status(), null, 2)), true;
   if (p === '/api/mcp/servers') return send(res, 200, 'application/json', JSON.stringify({ servers: mcpManager.listServers() }, null, 2)), true;
   if (p === '/api/mcp/servers/add' && req.method === 'POST') {
@@ -775,18 +864,1291 @@ async function handle(ctx) {
   }
 
   // ---------- Areas 08 + 17 (voll ausgebaut) ----------
-  if (p === '/api/kids-story' && req.method === 'POST') {
+  if (p === '/api/kids-story' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
     try { return send(res, 200, 'application/json', JSON.stringify(kidsStory.generate(body), null, 2)), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
   if (p === '/api/kids-story/status') return send(res, 200, 'application/json', JSON.stringify(kidsStory.status(), null, 2)), true;
   if (p === '/api/report-daemon') return send(res, 200, 'application/json', JSON.stringify(reportDaemon.status(), null, 2)), true;
-  if (p === '/api/report-daemon/enable' && req.method === 'POST') {
+  if (p === '/api/report-daemon/enable' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { body = {}; }
     return send(res, 200, 'application/json', JSON.stringify(reportDaemon.setEnabled(body.on !== false), null, 2)), true;
   }
-  if (p === '/api/report-daemon/run' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(reportDaemon.runNow(), null, 2)), true;
+  if (p === '/api/report-daemon/run' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; return send(res, 200, 'application/json', JSON.stringify(reportDaemon.runNow(), null, 2)), true; }
+
+
+  // ---------- Steuerzentrale (control_center): Schalter pro Aktion + Freigaben nur durch Menschen ----------
+  // Eigener Pfad (/api/control-center), damit /api/control (Routine-Schalter, Area 75) unveraendert bleibt.
+  if (p === '/api/control-center') return send(res, 200, 'application/json', JSON.stringify({
+    area: 'CTRL', mode: 'LIVE', human_only: true,
+    note: 'Riskante Aktionen erzeugen eine Freigabe; nur ein Mensch entscheidet. Der Kill-Switch sperrt alles.',
+    actions: controlCenter.actions(), pending: controlCenter.pending(),
+  }, null, 2)), true;
+
+  {
+    const ccGate = (res, out) => send(res, out.ok ? 200 : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const ccBy = (body, fallback) => String((body && body.by) || fallback || '').slice(0, 60);
+    const ccSwitch = p.match(/^\/api\/control-center\/action\/([a-z_]+)\/(enable|disable)$/);
+    if (ccSwitch && req.method === 'POST') {
+      if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })), true;
+      let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { body = {}; }
+      const who = ccBy(body, ctx && ctx.actor && ctx.actor.name) || '';
+      return ccGate(res, controlCenter.setEnabled(ccSwitch[1], ccSwitch[2] === 'enable', who)), true;
+    }
+    const ccRun = p.match(/^\/api\/control-center\/run\/([a-z_]+)$/);
+    if (ccRun && req.method === 'POST') {
+      if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })), true;
+      let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { body = {}; }
+      const who = ccBy(body, ctx && ctx.actor && ctx.actor.name) || '';
+      const out = controlCenter.gate(ccRun[1], { by: who, args: (body && body.args) || {}, killed: ops.isKilled() });
+      return ccGate(res, out), true;
+    }
+    const ccDecide = p.match(/^\/api\/control-center\/(approve|deny)\/(AP-[a-z0-9]+)$/);
+    if (ccDecide && req.method === 'POST') {
+      if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })), true;
+      let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { body = {}; }
+      const who = ccBy(body, ctx && ctx.actor && ctx.actor.name) || '';
+      return ccGate(res, controlCenter.decide(ccDecide[2], ccDecide[1] === 'approve' ? 'approve' : 'deny', who)), true;
+    }
+  }
+
+  // ---------- Web Empire / Eigene Seiten (Erweiterung des Analyseboards, kein zweites Master-Panel) ----------
+  // Spez: nur freigegebene eigene/autorisierten Seiten, Rotation nur im freigegebenen Pool,
+  // ehrliche Labels LIVE/SIM/NOT-CONNECTED, KEINE automatische Traffic-/Klick-Erzeugung.
+  if (p === '/api/web-empire') return send(res, 200, 'application/json', JSON.stringify(webEmpire.status(), null, 2)), true;
+  {
+    const weSend = (res, out) => {
+      const { ok, code, ...rest } = out || {};
+      return send(res, ok ? (code || 200) : (code || 400), 'application/json', JSON.stringify(out, null, 2));
+    };
+    const weBy = (body, ctx) => String((body && body.by) || (ctx && ctx.actor && ctx.actor.name) || '').slice(0, 60);
+    const weBody = async (req, limit) => { try { return JSON.parse((await readBody(req, limit || 1e5)) || '{}'); } catch { return {}; } };
+    const needAdmin = (req, ctx, res) => {
+      if (adminSoft(req, ctx)) return false;
+      send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' }));
+      return true;
+    };
+
+    // Registrierung: erzeugt PENDING + Freigabe (REGEL 1). Fremde Seiten werden abgelehnt.
+    if (p === '/api/web-empire/sites/register' && req.method === 'POST') {
+      if (needAdmin(req, ctx, res)) return true;
+      const body = await weBody(req);
+      return weSend(res, webEmpire.registerSite(body, weBy(body, ctx))), true;
+    }
+    // Freigabe-Entscheidung: nur ein Mensch.
+    const weDecide = p.match(/^\/api\/web-empire\/approvals\/(AP-[a-z0-9]+)\/(approve|deny)$/);
+    if (weDecide && req.method === 'POST') {
+      if (needAdmin(req, ctx, res)) return true;
+      const body = await weBody(req);
+      return weSend(res, webEmpire.decide(weDecide[1], weDecide[2], weBy(body, ctx))), true;
+    }
+    if (p === '/api/web-empire/approvals') return send(res, 200, 'application/json', JSON.stringify({ pending: webEmpire.pending() }, null, 2)), true;
+    // Seiten-Konfiguration: Module-Flags, genau eine der fuenf Stilvarianten, Blanko-Header/Footer zentral.
+    const weUpdate = p.match(/^\/api\/web-empire\/sites\/([a-z0-9._-]+)\/update$/);
+    if (weUpdate && req.method === 'POST') {
+      if (needAdmin(req, ctx, res)) return true;
+      const body = await weBody(req);
+      return weSend(res, webEmpire.updateSite(weUpdate[1], body, weBy(body, ctx))), true;
+    }
+    // Messwerte lesen (ehrliche Labels).
+    const weMetrics = p.match(/^\/api\/web-empire\/sites\/([a-z0-9._-]+)\/metrics$/);
+    if (weMetrics && req.method === 'GET') return weSend(res, webEmpire.metrics(weMetrics[1])), true;
+    // Messwerte einliefern: Auth ist der Seiten-Schluessel (signiert), nicht der Admin-Token.
+    if (weMetrics && req.method === 'POST') {
+      const body = await weBody(req, 1e6);
+      const key = String((body && body.key) || req.headers['x-aura-site-key'] || '');
+      return weSend(res, webEmpire.ingest(weMetrics[1], key, body, body && body.signature)), true;
+    }
+    // Slots: anlegen, Pool vorschlagen (Freigabe), ausliefern, Health setzen.
+    if (p === '/api/web-empire/slots/add' && req.method === 'POST') {
+      if (needAdmin(req, ctx, res)) return true;
+      const body = await weBody(req);
+      return weSend(res, webEmpire.addSlot(body, weBy(body, ctx))), true;
+    }
+    const wePool = p.match(/^\/api\/web-empire\/slots\/([A-Za-z0-9_]{3,48})\/pool$/);
+    if (wePool && req.method === 'POST') {
+      if (needAdmin(req, ctx, res)) return true;
+      const body = await weBody(req);
+      return weSend(res, webEmpire.setPool(wePool[1].toUpperCase(), body.pool, weBy(body, ctx))), true;
+    }
+    const weResolve = p.match(/^\/api\/web-empire\/slots\/([A-Za-z0-9_]{3,48})\/resolve$/);
+    if (weResolve && req.method === 'GET') return weSend(res, webEmpire.resolveSlot(weResolve[1].toUpperCase(), ctx && ctx.actor && ctx.actor.name)), true;
+    const weHealth = p.match(/^\/api\/web-empire\/slots\/([A-Za-z0-9_]{3,48})\/health$/);
+    if (weHealth && req.method === 'POST') {
+      if (needAdmin(req, ctx, res)) return true;
+      const body = await weBody(req);
+      return weSend(res, webEmpire.markHealth(weHealth[1].toUpperCase(), body.partner, body.up !== false, weBy(body, ctx))), true;
+    }
+  }
+
+  // ---------- Watchdog: Dienst-Aufsicht (3-Strike, Sleep-Mode, Live-Uebersicht) ----------
+  // Startet eigene Dienste neu. Erzeugt keinen Traffic, kein Engagement, ueberwacht keine fremden Systeme.
+  if (p === '/api/watchdog') return send(res, 200, 'application/json', JSON.stringify(watchdog.status(), null, 2)), true;
+  if (p === '/api/watchdog/preflight') return send(res, 200, 'application/json', JSON.stringify(watchdog.preflight(), null, 2)), true;
+  {
+    const wdSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const wdBy = (body, ctx) => String((body && body.by) || (ctx && ctx.actor && ctx.actor.name) || '').slice(0, 60);
+    const wdBody = async (req) => { try { return JSON.parse((await readBody(req, 1e4)) || '{}'); } catch { return {}; } };
+    const wdGuard = (req, ctx, res) => {
+      if (adminSoft(req, ctx)) return false;
+      send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' }));
+      return true;
+    };
+    const wdAct = p.match(/^\/api\/watchdog\/service\/([a-z0-9-]{2,48})\/(start|stop|revive|beat)$/);
+    if (wdAct && req.method === 'POST') {
+      if (wdGuard(req, ctx, res)) return true;
+      const body = await wdBody(req);
+      const who = wdBy(body, ctx);
+      const name = wdAct[1];
+      if (wdAct[2] === 'start') return wdSend(res, watchdog.startService(name, { by: who })), true;
+      if (wdAct[2] === 'stop') return wdSend(res, watchdog.stopService(name, who)), true;
+      if (wdAct[2] === 'revive') return wdSend(res, watchdog.revive(name, who)), true;
+      return wdSend(res, watchdog.beat(name, body.note)), true;
+    }
+    if (p === '/api/watchdog/sleep' && req.method === 'POST') {
+      if (wdGuard(req, ctx, res)) return true;
+      const body = await wdBody(req);
+      return wdSend(res, watchdog.sleep(body.reason, wdBy(body, ctx))), true;
+    }
+    if (p === '/api/watchdog/wake' && req.method === 'POST') {
+      if (wdGuard(req, ctx, res)) return true;
+      const body = await wdBody(req);
+      return wdSend(res, watchdog.wake(wdBy(body, ctx))), true;
+    }
+    // Absturz melden (z. B. von einem Dienst selbst): zaehlt Strikes und startet ggf. neu.
+    if (p === '/api/watchdog/report' && req.method === 'POST') {
+      if (wdGuard(req, ctx, res)) return true;
+      const body = await wdBody(req);
+      const name = String((body && body.name) || '');
+      if (!name) return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'name fehlt' })), true;
+      return wdSend(res, watchdog.crash(name, new Error(String((body && body.error) || 'gemeldeter Fehler')), { by: wdBy(body, ctx) })), true;
+    }
+  }
+
+  // ---------- Connectoren: eigene Kanäle + autorisierte Partner über offizielle APIs ----------
+  // Schlüssel liegen nur verschlüsselt im Vault und erscheinen in keiner Ausgabe.
+  // Veröffentlichen ist Freigabe-pflichtig (REGEL 1). Anbieter, die Engagement verkaufen, sind gesperrt.
+  if (p === '/api/connectors') return send(res, 200, 'application/json', JSON.stringify(connectors.list(), null, 2)), true;
+  if (p === '/api/connectors/status') return send(res, 200, 'application/json', JSON.stringify(connectors.status(), null, 2)), true;
+  if (p === '/api/connectors/assess') {
+    const q = (url.searchParams.get('provider') || '');
+    return send(res, 200, 'application/json', JSON.stringify(connectors.assessProvider(q), null, 2)), true;
+  }
+  {
+    const coSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const coBy = (body, ctx) => String((body && body.by) || (ctx && ctx.actor && ctx.actor.name) || '').slice(0, 60);
+    const coBody = async (req, limit) => { try { return JSON.parse((await readBody(req, limit || 2e5)) || '{}'); } catch { return {}; } };
+    const coGuard = (req, ctx, res) => {
+      if (adminSoft(req, ctx)) return false;
+      send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' }));
+      return true;
+    };
+    const coAct = p.match(/^\/api\/connectors\/([a-z0-9-]{2,40})\/(connect|disconnect|test|publish)$/);
+    if (coAct && req.method === 'POST') {
+      if (coGuard(req, ctx, res)) return true;
+      const body = await coBody(req);
+      const who = coBy(body, ctx);
+      const id = coAct[1];
+      if (coAct[2] === 'connect') return coSend(res, connectors.connect(id, body.keys || {}, who)), true;
+      if (coAct[2] === 'disconnect') return coSend(res, connectors.disconnect(id, who)), true;
+      if (coAct[2] === 'test') return coSend(res, connectors.test(id, who)), true;
+      return coSend(res, connectors.requestPublish(id, body.payload || {}, who)), true;
+    }
+  }
+
+  // ---------- Songbook: Song-Werkstatt (lokaler Ton + KI über eigenen Schlüssel) ----------
+  if (p === '/api/songbook') return send(res, 200, 'application/json', JSON.stringify(songbook.list(url.searchParams.get('artist') ? { artist: url.searchParams.get('artist') } : {}), null, 2)), true;
+  if (p === '/api/songbook/status') return send(res, 200, 'application/json', JSON.stringify(songbook.status(), null, 2)), true;
+  if (p === '/api/music/render/info') return send(res, 200, 'application/json', JSON.stringify(require('../lib/music_render').info(), null, 2)), true;
+  {
+    const sbSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const sbBy = (body, ctx) => String((body && body.by) || (ctx && ctx.actor && ctx.actor.name) || '').slice(0, 60);
+    const sbBody = async (req, limit) => { try { return JSON.parse((await readBody(req, limit || 1e5)) || '{}'); } catch { return {}; } };
+    const sbGuard = (req, ctx, res) => {
+      if (adminSoft(req, ctx)) return false;
+      send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' }));
+      return true;
+    };
+    if (p === '/api/songbook/create' && req.method === 'POST') {
+      if (sbGuard(req, ctx, res)) return true;
+      const body = await sbBody(req);
+      return sbSend(res, songbook.create(body, sbBy(body, ctx))), true;
+    }
+    const sbAct = p.match(/^\/api\/songbook\/(song-[a-f0-9]{8})\/(render|variations|extend|stems|lyrics|status)$/);
+    if (sbAct && req.method === 'POST') {
+      if (sbGuard(req, ctx, res)) return true;
+      const body = await sbBody(req);
+      const who = sbBy(body, ctx);
+      if (sbAct[2] === 'render') return sbSend(res, songbook.render(sbAct[1], who)), true;
+      if (sbAct[2] === 'variations') return sbSend(res, songbook.variations(sbAct[1], body.count, who)), true;
+      if (sbAct[2] === 'extend') return sbSend(res, songbook.extend(sbAct[1], body.bars, who)), true;
+      if (sbAct[2] === 'stems') return sbSend(res, songbook.stems(sbAct[1], who)), true;
+      if (sbAct[2] === 'lyrics') return sbSend(res, songbook.lyrics(sbAct[1], body.lyrics || body.text, who)), true;
+      return sbSend(res, songbook.setStatus(sbAct[1], body.status, who)), true;
+    }
+    if (p === '/api/songbook/playlist/add' && req.method === 'POST') {
+      if (sbGuard(req, ctx, res)) return true;
+      const body = await sbBody(req);
+      return sbSend(res, songbook.playlistAdd(body.name, body.songs, sbBy(body, ctx))), true;
+    }
+    // Audio ausliefern (nur aus dem Ausgabeverzeichnis — kein Pfad-Durchgriff)
+    const mxFile = p.match(/^\/api\/music\/audio\/(mx-[a-f0-9]{8}(?:\.[a-z]+)?\.wav)$/);
+    if (mxFile && req.method === 'GET') {
+      const mr = require('../lib/music_render');
+      const file = path.join(mr.OUT_DIR, mxFile[1]);
+      if (!fs.existsSync(file)) return send(res, 404, 'application/json', JSON.stringify({ error: 'Datei nicht gefunden' })), true;
+      const st = fs.statSync(file);
+      res.writeHead(200, { 'content-type': 'audio/wav', 'content-length': st.size, 'cache-control': 'no-store' });
+      fs.createReadStream(file).pipe(res);
+      return true;
+    }
+  }
+
+  // ---------- Artist-Konten: eigener Login je Künstler, getrennte Sicht (Multi-Login) ----------
+  if (p === '/api/artists') return send(res, 200, 'application/json', JSON.stringify(artists.status(), null, 2)), true;
+  if (p === '/api/artists/sessions') return send(res, 200, 'application/json', JSON.stringify(artists.sessionList(), null, 2)), true;
+  {
+    const arSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const arBody = async (req, limit) => { try { return JSON.parse((await readBody(req, limit || 5e4)) || '{}'); } catch { return {}; } };
+    const arGuard = (req, ctx, res) => {
+      if (adminSoft(req, ctx)) return false;
+      send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' }));
+      return true;
+    };
+    if (p === '/api/artists/create' && req.method === 'POST') {
+      if (arGuard(req, ctx, res)) return true;
+      const body = await arBody(req);
+      return arSend(res, artists.createArtist(body, String(body.by || ''))), true;
+    }
+    if (p === '/api/artists/login' && req.method === 'POST') {
+      const body = await arBody(req);
+      return arSend(res, artists.login(body.artist || body.id, body.password, { ip: (req.socket && req.socket.remoteAddress) || '' })), true;
+    }
+    if (p === '/api/artists/logout' && req.method === 'POST') {
+      const body = await arBody(req);
+      return arSend(res, artists.logout(String(body.token || req.headers['x-aura-artist-token'] || ''), body.by)), true;
+    }
+    if (p === '/api/artists/whoami') {
+      const t = String((url.searchParams.get('token') || req.headers['x-aura-artist-token'] || ''));
+      return arSend(res, artists.whoami(t)), true;
+    }
+    const arView = p.match(/^\/api\/artists\/([a-z0-9._-]{3,40})\/view$/);
+    if (arView) {
+      const t = String((url.searchParams.get('token') || req.headers['x-aura-artist-token'] || ''));
+      const me = artists.whoami(t);
+      const who = me.ok ? me.artist.id : '';
+      return arSend(res, artists.view(arView[1], who)), true;
+    }
+    const arCh = p.match(/^\/api\/artists\/([a-z0-9._-]{3,40})\/channels\/link$/);
+    if (arCh && req.method === 'POST') {
+      if (arGuard(req, ctx, res)) return true;
+      const body = await arBody(req);
+      return arSend(res, artists.linkChannel(arCh[1], body, String(body.by || ''))), true;
+    }
+    const arPw = p.match(/^\/api\/artists\/([a-z0-9._-]{3,40})\/password$/);
+    if (arPw && req.method === 'POST') {
+      if (arGuard(req, ctx, res)) return true;
+      const body = await arBody(req);
+      return arSend(res, artists.resetPassword(arPw[1], body.password, String(body.by || ''))), true;
+    }
+    if (p === '/api/artists/sessions/kill' && req.method === 'POST') {
+      if (arGuard(req, ctx, res)) return true;
+      const body = await arBody(req);
+      return arSend(res, artists.killSession(body.artist, String(body.by || ''))), true;
+    }
+  }
+
+  // ---------- Video-Werkstatt: Effekt-Ketten auf ffmpeg ----------
+  if (p === '/api/video/status') return send(res, 200, 'application/json', JSON.stringify(videoStudio.status(), null, 2)), true;
+  if (p === '/api/video/effects') return send(res, 200, 'application/json', JSON.stringify({ ok: true, effects: videoStudio.effects(), ffmpeg: videoStudio.ffmpegStatus() }, null, 2)), true;
+  {
+    const vsSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const vsBody = async (req, limit) => { try { return JSON.parse((await readBody(req, limit || 5e4)) || '{}'); } catch { return {}; } };
+    const vsGuard = (req, ctx, res) => {
+      if (adminSoft(req, ctx)) return false;
+      send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' }));
+      return true;
+    };
+    if (p === '/api/video/preview' && req.method === 'GET') {
+      return send(res, 200, 'application/json', JSON.stringify({ ok: true, effects: videoStudio.effects(), ffmpeg: videoStudio.ffmpegStatus(), note: 'POST mit {input, effects:[...]} liefert die fertige Filterkette und den Befehl.' }, null, 2)), true;
+    }
+    if (p === '/api/video/preview' && req.method === 'POST') {
+      const body = await vsBody(req);
+      return vsSend(res, videoStudio.preview(body)), true;
+    }
+    if (p === '/api/video/jobs' && req.method === 'POST') {
+      if (vsGuard(req, ctx, res)) return true;
+      const body = await vsBody(req);
+      return vsSend(res, videoStudio.createJob(body, String(body.by || (ctx && ctx.actor && ctx.actor.name) || ''))), true;
+    }
+    const vjRun = p.match(/^\/api\/video\/jobs\/(vj-[a-f0-9]{8})\/run$/);
+    if (vjRun && req.method === 'POST') {
+      if (vsGuard(req, ctx, res)) return true;
+      const body = await vsBody(req);
+      const out = await videoStudio.run(vjRun[1], String(body.by || ''));
+      return vsSend(res, out), true;
+    }
+  }
+
+  // ---------- Ressourcen-Katalog (Nachschlagewerk, installiert nichts) ----------
+  if (p === '/api/resources') {
+    const q = url.searchParams;
+    return send(res, 200, 'application/json', JSON.stringify(resources.list({ cat: q.get('cat'), q: q.get('q') }), null, 2)), true;
+  }
+  if (p === '/api/resources/status') return send(res, 200, 'application/json', JSON.stringify(resources.status(), null, 2)), true;
+  if (p === '/api/resources/assess') return send(res, 200, 'application/json', JSON.stringify(resources.assess(url.searchParams.get('item') || url.searchParams.get('url') || ''), null, 2)), true;
+
+  // ---------- Kampagnen-Planer, Kalender, Handbücher ----------
+  if (p === '/api/campaigns/status') return send(res, 200, 'application/json', JSON.stringify(campaignPlanner.status(), null, 2)), true;
+  if (p === '/api/campaigns/board') return send(res, 200, 'application/json', JSON.stringify(campaignPlanner.releaseBoard(), null, 2)), true;
+  if (p === '/api/campaigns/list') return send(res, 200, 'application/json', JSON.stringify(campaignPlanner.list({ artist: url.searchParams.get('artist'), state: url.searchParams.get('state') }), null, 2)), true;
+  if (p === '/api/campaigns/plan') {
+    const out = campaignPlanner.plan(url.searchParams.get('id'));
+    return send(res, out.ok ? 200 : 404, 'application/json', JSON.stringify(out, null, 2)), true;
+  }
+  if (p === '/api/calendar/status') return send(res, 200, 'application/json', JSON.stringify(calendarLib.status(), null, 2)), true;
+  if (p === '/api/calendar') {
+    const out = calendarLib.events(url.searchParams.get('from'), Number(url.searchParams.get('days')) || 30);
+    return send(res, 200, 'application/json', JSON.stringify(out, null, 2)), true;
+  }
+  if (p === '/api/calendar/conflicts') return send(res, 200, 'application/json', JSON.stringify(calendarLib.conflicts(url.searchParams.get('from'), Number(url.searchParams.get('days')) || 30), null, 2)), true;
+  if (p === '/api/calendar/ics') return send(res, 200, 'text/calendar; charset=utf-8', calendarLib.ics(url.searchParams.get('from'), Number(url.searchParams.get('days')) || 60)), true;
+  if (p === '/api/handbooks/status') return send(res, 200, 'application/json', JSON.stringify(handbooks.status(), null, 2)), true;
+  if (p === '/api/handbooks') return send(res, 200, 'application/json', JSON.stringify(handbooks.chapters(), null, 2)), true;
+  if (p === '/api/handbooks/module') {
+    const out = handbooks.actions.module({ id: url.searchParams.get('id') });
+    return send(res, out.ok ? 200 : 404, 'application/json', JSON.stringify(out, null, 2)), true;
+  }
+  if (p === '/api/handbooks/markdown') return send(res, 200, 'text/markdown; charset=utf-8', handbooks.markdown()), true;
+  {
+    const cpSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const cpBody = async (req) => { try { return JSON.parse((await readBody(req, 5e4)) || '{}'); } catch { return {}; } };
+    const cpGuard = (req, ctx, res) => { if (adminSoft(req, ctx)) return false; send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })); return true; };
+    if (p === '/api/campaigns/create' && req.method === 'POST') {
+      if (cpGuard(req, ctx, res)) return true;
+      const body = await cpBody(req);
+      return cpSend(res, campaignPlanner.create({ ...body, by: String(body.by || (ctx && ctx.actor && ctx.actor.name) || '') })), true;
+    }
+    if (p === '/api/campaigns/advance' && req.method === 'POST') {
+      if (cpGuard(req, ctx, res)) return true;
+      const body = await cpBody(req);
+      return cpSend(res, campaignPlanner.advance(body.id, body.stage, { ...body, by: String(body.by || '') })), true;
+    }
+    if (p === '/api/calendar/add' && req.method === 'POST') {
+      if (cpGuard(req, ctx, res)) return true;
+      return cpSend(res, calendarLib.add(await cpBody(req))), true;
+    }
+    if (p === '/api/calendar/remove' && req.method === 'POST') {
+      if (cpGuard(req, ctx, res)) return true;
+      const body = await cpBody(req);
+      return cpSend(res, calendarLib.remove(body.id)), true;
+    }
+  }
+
+  // ---------- Ton: lizenzfreie Quellen, Plug-in-Ketten, Sprache ----------
+  if (p === '/api/audio/sources') return send(res, 200, 'application/json', JSON.stringify(royaltyFree.list({ kind: url.searchParams.get('kind'), q: url.searchParams.get('q'), commercial: url.searchParams.get('commercial') }), null, 2)), true;
+  if (p === '/api/audio/sources/status') return send(res, 200, 'application/json', JSON.stringify(royaltyFree.status(), null, 2)), true;
+  if (p === '/api/plugins/audio') return send(res, 200, 'application/json', JSON.stringify({ ok: true, plugins: dawPlugins.status().builtin, list: dawPlugins.actions.plugins().plugins }, null, 2)), true;
+  if (p === '/api/plugins/audio/status') return send(res, 200, 'application/json', JSON.stringify(dawPlugins.status(), null, 2)), true;
+  if (p === '/api/plugins/audio/presets') return send(res, 200, 'application/json', JSON.stringify(dawPlugins.actions.presets(), null, 2)), true;
+  if (p === '/api/plugins/audio/chains') return send(res, 200, 'application/json', JSON.stringify(dawPlugins.actions.chains(), null, 2)), true;
+  if (p === '/api/speech/status') return send(res, 200, 'application/json', JSON.stringify(speech.status(), null, 2)), true;
+  if (p === '/api/speech/engines') return send(res, 200, 'application/json', JSON.stringify(speech.engines(), null, 2)), true;
+  if (p === '/api/speech/voices') return send(res, 200, 'application/json', JSON.stringify(speech.actions.voices(), null, 2)), true;
+  {
+    const txSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const txBody = async (req) => { try { return JSON.parse((await readBody(req, 2e5)) || '{}'); } catch { return {}; } };
+    const txGuard = (req, ctx, res) => { if (adminSoft(req, ctx)) return false; send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })); return true; };
+    if (p === '/api/audio/license' && req.method === 'POST') return txSend(res, royaltyFree.assess(await txBody(req))), true;
+    if (p === '/api/plugins/audio/validate' && req.method === 'POST') return txSend(res, dawPlugins.validate((await txBody(req)).chain)), true;
+    if (p === '/api/plugins/audio/build' && req.method === 'POST') return txSend(res, dawPlugins.buildFilters((await txBody(req)).chain)), true;
+    if (p === '/api/plugins/audio/save' && req.method === 'POST') {
+      if (txGuard(req, ctx, res)) return true;
+      return txSend(res, dawPlugins.saveChain(await txBody(req))), true;
+    }
+    if (p === '/api/speech/plan' && req.method === 'POST') return txSend(res, speech.plan(await txBody(req))), true;
+    if (p === '/api/speech/podcast' && req.method === 'POST') return txSend(res, speech.podcastOutline((await txBody(req)).parts)), true;
+    if (p === '/api/speech/project' && req.method === 'POST') {
+      if (txGuard(req, ctx, res)) return true;
+      return txSend(res, speech.createProject(await txBody(req))), true;
+    }
+  }
+
+  // ---------- Video-Abteilung, Augen, Medien-Import ----------
+  if (p === '/api/video/dept/status') return send(res, 200, 'application/json', JSON.stringify(videoDepartment.status(), null, 2)), true;
+  if (p === '/api/video/dept') return send(res, 200, 'application/json', JSON.stringify(videoDepartment.board(), null, 2)), true;
+  if (p === '/api/video/dept/roles') return send(res, 200, 'application/json', JSON.stringify(videoDepartment.actions.roles(), null, 2)), true;
+  if (p === '/api/eyes/status') return send(res, 200, 'application/json', JSON.stringify(eyes.status(), null, 2)), true;
+  if (p === '/api/eyes/notes') return send(res, 200, 'application/json', JSON.stringify(eyes.notes(url.searchParams.get('limit')), null, 2)), true;
+  if (p === '/api/eyes/scan') return send(res, 200, 'application/json', JSON.stringify(eyes.scan(url.searchParams.get('dir')), null, 2)), true;
+  if (p === '/api/eyes/look') {
+    const out = eyes.look({ file: url.searchParams.get('file') });
+    return send(res, out.ok ? 200 : 400, 'application/json', JSON.stringify(out, null, 2)), true;
+  }
+  if (p === '/api/media/status') return send(res, 200, 'application/json', JSON.stringify(mediaImport.status(), null, 2)), true;
+  if (p === '/api/media/platforms') return send(res, 200, 'application/json', JSON.stringify(mediaImport.actions.platforms(), null, 2)), true;
+  if (p === '/api/media/imports') return send(res, 200, 'application/json', JSON.stringify(mediaImport.list({ platform: url.searchParams.get('platform'), state: url.searchParams.get('state') }), null, 2)), true;
+  {
+    const vdSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const vdBody = async (req) => { try { return JSON.parse((await readBody(req, 2e5)) || '{}'); } catch { return {}; } };
+    const vdGuard = (req, ctx, res) => { if (adminSoft(req, ctx)) return false; send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })); return true; };
+    if (p === '/api/video/dept/ticket' && req.method === 'POST') {
+      if (vdGuard(req, ctx, res)) return true;
+      return vdSend(res, videoDepartment.ticket(await vdBody(req))), true;
+    }
+    if (p === '/api/video/dept/deliver' && req.method === 'POST') {
+      if (vdGuard(req, ctx, res)) return true;
+      const body = await vdBody(req);
+      return vdSend(res, videoDepartment.deliver(body.id, body.station, body)), true;
+    }
+    if (p === '/api/video/dept/qa' && req.method === 'POST') {
+      if (vdGuard(req, ctx, res)) return true;
+      const body = await vdBody(req);
+      return vdSend(res, videoDepartment.qa(body.id, body.probe)), true;
+    }
+    if (p === '/api/media/preview' && req.method === 'POST') {
+      const body = await vdBody(req);
+      return vdSend(res, await mediaImport.preview(body)), true;
+    }
+    if (p === '/api/media/draft' && req.method === 'POST') {
+      if (vdGuard(req, ctx, res)) return true;
+      return vdSend(res, mediaImport.draft(await vdBody(req))), true;
+    }
+  }
+
+  // ---------- Agenten-Rufe, Gehirn-Konsole, letztes Wort ----------
+  if (p === '/api/agentcalls/status') return send(res, 200, 'application/json', JSON.stringify(agentCalls.status(), null, 2)), true;
+  if (p === '/api/agentcalls/catalog') return send(res, 200, 'application/json', JSON.stringify(agentCalls.actions.catalog(), null, 2)), true;
+  if (p === '/api/agentcalls/trace') return send(res, 200, 'application/json', JSON.stringify(agentCalls.trace(url.searchParams.get('limit')), null, 2)), true;
+  if (p === '/api/agentcalls/blocked') return send(res, 200, 'application/json', JSON.stringify(agentCalls.actions.blocked(), null, 2)), true;
+  if (p === '/api/console/status') return send(res, 200, 'application/json', JSON.stringify(brainConsole.status(), null, 2)), true;
+  if (p === '/api/console/heads') return send(res, 200, 'application/json', JSON.stringify(brainConsole.directory(), null, 2)), true;
+  if (p === '/api/console/transcript') return send(res, 200, 'application/json', JSON.stringify(brainConsole.transcript(url.searchParams.get('session')), null, 2)), true;
+  if (p === '/api/human/status') return send(res, 200, 'application/json', JSON.stringify(humanFinal.status(), null, 2)), true;
+  if (p === '/api/human/open') return send(res, 200, 'application/json', JSON.stringify(humanFinal.open(), null, 2)), true;
+  if (p === '/api/human/require') return send(res, 200, 'application/json', JSON.stringify(humanFinal.actions.require(), null, 2)), true;
+  if (p === '/api/human/ledger') return send(res, 200, 'application/json', JSON.stringify(humanFinal.ledger({ status: url.searchParams.get('status') }), null, 2)), true;
+  {
+    const hfSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const hfBody = async (req) => { try { return JSON.parse((await readBody(req, 2e5)) || '{}'); } catch { return {}; } };
+    const hfGuard = (req, ctx, res) => { if (adminSoft(req, ctx)) return false; send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })); return true; };
+    if (p === '/api/human/propose' && req.method === 'POST') {
+      if (hfGuard(req, ctx, res)) return true;
+      return hfSend(res, humanFinal.propose(await hfBody(req))), true;
+    }
+    if (p === '/api/human/decide' && req.method === 'POST') {
+      if (hfGuard(req, ctx, res)) return true;
+      const body = await hfBody(req);
+      return hfSend(res, humanFinal.decide(body.id, body)), true;
+    }
+    if (p === '/api/human/guard' && req.method === 'GET') {
+      return send(res, 200, 'application/json', JSON.stringify({ ok: true, kinds: humanFinal.REQUIRES_HUMAN, note: 'POST {kind, id?} prüft, ob für dieses Vorhaben eine menschliche Freigabe vorliegt.' }, null, 2)), true;
+    }
+    if (p === '/api/human/guard' && req.method === 'POST') return hfSend(res, humanFinal.guard(await hfBody(req))), true;
+    if (p === '/api/agentcalls/call' && req.method === 'POST') {
+      if (hfGuard(req, ctx, res)) return true;
+      return hfSend(res, await agentCalls.call(await hfBody(req))), true;
+    }
+    if (p === '/api/agentcalls/chain' && req.method === 'POST') {
+      if (hfGuard(req, ctx, res)) return true;
+      return hfSend(res, await agentCalls.chain(await hfBody(req))), true;
+    }
+    if (p === '/api/console/session' && req.method === 'POST') {
+      if (hfGuard(req, ctx, res)) return true;
+      return hfSend(res, brainConsole.openSession(await hfBody(req))), true;
+    }
+    if (p === '/api/console/say' && req.method === 'POST') {
+      if (hfGuard(req, ctx, res)) return true;
+      return hfSend(res, brainConsole.say(await hfBody(req))), true;
+    }
+  }
+
+  // ---------- Sicherheit, Selbst-Anruf, Plug-ins ----------
+  if (p === '/api/security/status') return send(res, 200, 'application/json', JSON.stringify(securityResponse.status(), null, 2)), true;
+  if (p === '/api/security/signals') return send(res, 200, 'application/json', JSON.stringify(securityResponse.actions.signals(), null, 2)), true;
+  if (p === '/api/security/cases') return send(res, 200, 'application/json', JSON.stringify(securityResponse.cases({ stage: url.searchParams.get('stage') }), null, 2)), true;
+  if (p === '/api/security/sweep') return send(res, 200, 'application/json', JSON.stringify(securityResponse.sweep(), null, 2)), true;
+  if (p === '/api/selfcall/status') return send(res, 200, 'application/json', JSON.stringify(selfCall.status(), null, 2)), true;
+  if (p === '/api/selfcall/providers') return send(res, 200, 'application/json', JSON.stringify(selfCall.providerState(), null, 2)), true;
+  if (p === '/api/selfcall/triggers') return send(res, 200, 'application/json', JSON.stringify(selfCall.actions.triggers(), null, 2)), true;
+  if (p === '/api/selfcall/log') return send(res, 200, 'application/json', JSON.stringify(selfCall.actions.log(), null, 2)), true;
+  if (p === '/api/plugins/status') return send(res, 200, 'application/json', JSON.stringify(plugins.status(), null, 2)), true;
+  if (p === '/api/plugins/list') return send(res, 200, 'application/json', JSON.stringify(plugins.list({ kind: url.searchParams.get('kind') }), null, 2)), true;
+  if (p === '/api/plugins/register') return send(res, 200, 'application/json', JSON.stringify(plugins.register(), null, 2)), true;
+  if (p === '/api/plugins/kinds') return send(res, 200, 'application/json', JSON.stringify(plugins.actions.kinds(), null, 2)), true;
+  {
+    const secSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const secBody = async (req) => { try { return JSON.parse((await readBody(req, 2e5)) || '{}'); } catch { return {}; } };
+    const secGuard = (req, ctx, res) => { if (adminSoft(req, ctx)) return false; send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })); return true; };
+    if (p === '/api/security/report' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      return secSend(res, securityResponse.report(await secBody(req))), true;
+    }
+    if (p === '/api/security/isolate' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      const body = await secBody(req);
+      return secSend(res, securityResponse.isolate(body.id, body)), true;
+    }
+    if (p === '/api/security/undo' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      const body = await secBody(req);
+      return secSend(res, securityResponse.undo(body.id, body)), true;
+    }
+    if (p === '/api/security/review' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      return secSend(res, securityResponse.review((await secBody(req)).id)), true;
+    }
+    if (p === '/api/security/eject' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      const body = await secBody(req);
+      return secSend(res, securityResponse.eject(body.id, body)), true;
+    }
+    if (p === '/api/selfcall/alert' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      return secSend(res, selfCall.alert(await secBody(req))), true;
+    }
+    if (p === '/api/selfcall/ack' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      const body = await secBody(req);
+      return secSend(res, selfCall.ack(body.id, body)), true;
+    }
+    if (p === '/api/plugins/propose' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      return secSend(res, plugins.propose(await secBody(req))), true;
+    }
+    if (p === '/api/plugins/install' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      const body = await secBody(req);
+      return secSend(res, plugins.install(body.id, body)), true;
+    }
+    if (p === '/api/plugins/enable' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      const body = await secBody(req);
+      return secSend(res, plugins.toggle(body.id, true, body)), true;
+    }
+    if (p === '/api/plugins/disable' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      const body = await secBody(req);
+      return secSend(res, plugins.toggle(body.id, false, body)), true;
+    }
+    if (p === '/api/plugins/remove' && req.method === 'POST') {
+      if (secGuard(req, ctx, res)) return true;
+      const body = await secBody(req);
+      return secSend(res, plugins.remove(body.id, body)), true;
+    }
+  }
+
+  // ---------- Avatar/Podcast, Bezahlpläne, Werbung ----------
+  if (p === '/api/avatar/status') return send(res, 200, 'application/json', JSON.stringify(avatarStudio.status(), null, 2)), true;
+  if (p === '/api/avatar/list') return send(res, 200, 'application/json', JSON.stringify(avatarStudio.list({}), null, 2)), true;
+  if (p === '/api/avatar/archetypes') return send(res, 200, 'application/json', JSON.stringify(avatarStudio.actions.archetypes(), null, 2)), true;
+  if (p === '/api/billing/status') return send(res, 200, 'application/json', JSON.stringify(billingPlans.status(), null, 2)), true;
+  if (p === '/api/billing/plans') return send(res, 200, 'application/json', JSON.stringify(billingPlans.actions.plans(), null, 2)), true;
+  if (p === '/api/billing/payment') return send(res, 200, 'application/json', JSON.stringify(billingPlans.paymentState(), null, 2)), true;
+  if (p === '/api/billing/list') return send(res, 200, 'application/json', JSON.stringify(billingPlans.actions.list(), null, 2)), true;
+  if (p === '/api/ads/status') return send(res, 200, 'application/json', JSON.stringify(advertising.status(), null, 2)), true;
+  if (p === '/api/ads/inventory') return send(res, 200, 'application/json', JSON.stringify(advertising.inventory(), null, 2)), true;
+  if (p === '/api/ads/positions') return send(res, 200, 'application/json', JSON.stringify(advertising.actions.positions(), null, 2)), true;
+  if (p === '/api/ads/campaigns') return send(res, 200, 'application/json', JSON.stringify(advertising.actions.campaigns(), null, 2)), true;
+  {
+    const bizSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const bizBody = async (req) => { try { return JSON.parse((await readBody(req, 2e5)) || '{}'); } catch { return {}; } };
+    const bizGuard = (req, ctx, res) => { if (adminSoft(req, ctx)) return false; send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })); return true; };
+    if (p === '/api/avatar/create' && req.method === 'POST') {
+      if (bizGuard(req, ctx, res)) return true;
+      return bizSend(res, avatarStudio.create(await bizBody(req))), true;
+    }
+    if (p === '/api/avatar/check' && req.method === 'GET') {
+      return send(res, 200, 'application/json', JSON.stringify({ ok: true, avatars: avatarStudio.list({}).items, note: 'POST {avatar, text} prüft einen Text gegen die Persona (verbotene Wörter, Kennzeichnung).' }, null, 2)), true;
+    }
+    if (p === '/api/avatar/check' && req.method === 'POST') {
+      const body = await bizBody(req);
+      return bizSend(res, avatarStudio.checkText(body.avatar, body.text)), true;
+    }
+    if (p === '/api/avatar/episode' && req.method === 'POST') {
+      if (bizGuard(req, ctx, res)) return true;
+      return bizSend(res, avatarStudio.episode(await bizBody(req))), true;
+    }
+    if (p === '/api/billing/quote' && req.method === 'POST') return bizSend(res, billingPlans.quote(await bizBody(req))), true;
+    if (p === '/api/billing/subscribe' && req.method === 'POST') {
+      if (bizGuard(req, ctx, res)) return true;
+      return bizSend(res, billingPlans.subscribe(await bizBody(req))), true;
+    }
+    if (p === '/api/billing/cancel' && req.method === 'POST') {
+      if (bizGuard(req, ctx, res)) return true;
+      const body = await bizBody(req);
+      return bizSend(res, billingPlans.cancel(body.who)), true;
+    }
+    if (p === '/api/billing/invoice' && req.method === 'POST') {
+      if (bizGuard(req, ctx, res)) return true;
+      return bizSend(res, billingPlans.invoice(await bizBody(req))), true;
+    }
+    if (p === '/api/billing/limits' && req.method === 'POST') return bizSend(res, billingPlans.checkLimits(await bizBody(req))), true;
+    if (p === '/api/ads/check' && req.method === 'GET') {
+      return send(res, 200, 'application/json', JSON.stringify({ ok: true, positions: advertising.SLOT_POSITIONS, rules: advertising.REFUSED_REQUESTS.map((r) => r.why), note: 'POST {text} prüft einen Wunsch gegen die Sperrliste (keine Klick-/Reichweiten-Erzeugung).' }, null, 2)), true;
+    }
+    if (p === '/api/ads/check' && req.method === 'POST') {
+      const body = await bizBody(req);
+      return bizSend(res, advertising.checkRequest(body.text)), true;
+    }
+    if (p === '/api/ads/slot' && req.method === 'POST') {
+      if (bizGuard(req, ctx, res)) return true;
+      return bizSend(res, advertising.slot(await bizBody(req))), true;
+    }
+    if (p === '/api/ads/campaign' && req.method === 'POST') {
+      if (bizGuard(req, ctx, res)) return true;
+      return bizSend(res, advertising.campaign(await bizBody(req))), true;
+    }
+    if (p === '/api/ads/measure' && req.method === 'POST') {
+      if (bizGuard(req, ctx, res)) return true;
+      const body = await bizBody(req);
+      return bizSend(res, advertising.measure(body.id, body)), true;
+    }
+  }
+
+  // ---------- Hermes-Fähigkeiten ----------
+  if (p === '/api/hermes/status') return send(res, 200, 'application/json', JSON.stringify(hermes.status(), null, 2)), true;
+  if (p === '/api/hermes/preflight') return send(res, 200, 'application/json', JSON.stringify(hermes.preflight(), null, 2)), true;
+  if (p === '/api/hermes/skills') return send(res, 200, 'application/json', JSON.stringify(hermes.skills(), null, 2)), true;
+  if (p === '/api/hermes/skills/status') return send(res, 200, 'application/json', JSON.stringify(hermes.skillStatus(), null, 2)), true;
+  if (p === '/api/hermes/skills/use') {
+    return send(res, 200, 'application/json', JSON.stringify(hermes.useSkill({ skill: url.searchParams.get('skill') }), null, 2)), true;
+  }
+  {
+    const hSend = (res, out) => send(res, out.ok ? (out.code || 200) : (out.code || 400), 'application/json', JSON.stringify(out, null, 2));
+    const hBody = async (req) => { try { return JSON.parse((await readBody(req, 2e5)) || '{}'); } catch { return {}; } };
+    const hGuard = (req, ctx, res) => { if (adminSoft(req, ctx)) return false; send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })); return true; };
+    if (p === '/api/hermes/skills/grant' && req.method === 'POST') {
+      if (hGuard(req, ctx, res)) return true;
+      return hSend(res, hermes.grantSkill(await hBody(req))), true;
+    }
+    if (p === '/api/hermes/skills/revoke' && req.method === 'POST') {
+      if (hGuard(req, ctx, res)) return true;
+      return hSend(res, hermes.revokeSkill(await hBody(req))), true;
+    }
+  }
+
+  // ---------- Zweite Ausbaustufe: Support · Inhalt · Analyse · Überwachung · Messenger · Nutzer · Social · DAW · Design · Startvideo · Projekte · Hermes-Ablauf · Zahlungen ----------
+  // Muster wie in den übrigen Blöcken: GET erklärt den Pfad (immer 200), POST arbeitet und ist ohne
+  // Admin-Token gesperrt. Body wird genau einmal gelesen.
+  {
+    const r4Body = async (req) => { try { return JSON.parse((await readBody(req, 2e5)) || '{}'); } catch { return {}; } };
+    const r4Send = (res, out) => send(res, out && out.code ? out.code : (out && out.ok === false ? 400 : 200), 'application/json', JSON.stringify(out, null, 2));
+    const r4Guard = (req, ctx, res) => { if (adminSoft(req, ctx)) return false; send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })); return true; };
+    const r4Info = (path, does, body) => ({ ok: true, path, method: 'POST mit JSON-Body (Admin-Token im Header x-aura-token)', does, body_example: body || null, hint: 'Ohne Token: 401. Schreiben erst nach Prüfung.' });
+
+    // ---- Support / Kontaktieren Sie uns ----
+    if (p === '/api/support/status') return send(res, 200, 'application/json', JSON.stringify(support.status(), null, 2)), true;
+    if (p === '/api/support/categories') return send(res, 200, 'application/json', JSON.stringify(support.actions.categories(), null, 2)), true;
+    if (p === '/api/support/contact') return send(res, 200, 'application/json', JSON.stringify(support.contact(), null, 2)), true;
+    if (p === '/api/support/tickets') return send(res, 200, 'application/json', JSON.stringify(support.list({ state: url.searchParams.get('state') || undefined }), null, 2)), true;
+    if (p === '/api/support/ticket') {
+      const id = url.searchParams.get('id');
+      if (!id) return send(res, 200, 'application/json', JSON.stringify({ ok: true, hint: '?id=A-0001 anhängen', open: support.list({ state: 'NEU' }).count }, null, 2)), true;
+      return send(res, 200, 'application/json', JSON.stringify(support.get({ id }), null, 2)), true;
+    }
+    if (p === '/api/support/submit' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, support.submit(body)), true; }
+    if (p === '/api/support/submit') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/support/submit', 'Anliegen anlegen (Nummer, Zustand, Belege automatisch)', { subject: 'Fehler beim Rendern', text: 'Was passiert ist', category: 'FEHLER', priority: 'hoch' }), null, 2)), true;
+    if (p === '/api/support/reply' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, support.reply(String(body.id || ''), body)), true; }
+    if (p === '/api/support/reply') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/support/reply', 'Antwort an den Melder anhängen', { id: 'A-0001', text: 'Wir haben es gefunden.' }), null, 2)), true;
+    if (p === '/api/support/state' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, support.setState(String(body.id || ''), body.state, body)), true; }
+    if (p === '/api/support/state') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/support/state', 'Zustand eines Anliegens setzen (NEU → IN_ARBEIT → … → GESCHLOSSEN)', { id: 'A-0001', state: 'IN_ARBEIT' }), null, 2)), true;
+    if (p === '/api/support/diagnostics') return send(res, 200, 'application/json', JSON.stringify(support.diagnostics(), null, 2)), true;
+
+    // ---- Inhalt: Ablage mit Fassungen ----
+    if (p === '/api/store/status') return send(res, 200, 'application/json', JSON.stringify(contentStore.status(), null, 2)), true;
+    if (p === '/api/store/kinds') return send(res, 200, 'application/json', JSON.stringify(contentStore.actions.kinds(), null, 2)), true;
+    if (p === '/api/store/list') return send(res, 200, 'application/json', JSON.stringify(contentStore.search({ q: url.searchParams.get('q') || undefined, kind: url.searchParams.get('kind') || undefined, tag: url.searchParams.get('tag') || undefined }), null, 2)), true;
+    if (p === '/api/store/item') {
+      const id = url.searchParams.get('id');
+      if (!id) return send(res, 200, 'application/json', JSON.stringify({ ok: true, hint: '?id=<kennung> anhängen' }, null, 2)), true;
+      return send(res, 200, 'application/json', JSON.stringify(contentStore.get({ id }), null, 2)), true;
+    }
+    if (p === '/api/store/bundles') return send(res, 200, 'application/json', JSON.stringify(contentStore.actions.bundles(), null, 2)), true;
+    if (p === '/api/store/retention') return send(res, 200, 'application/json', JSON.stringify(contentStore.retention(), null, 2)), true;
+    if (p === '/api/store/register' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, contentStore.register(body)), true; }
+    if (p === '/api/store/register') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/store/register', 'Inhalt ablegen (Ablage JAHR/MONAT/ART, Prüfsumme, Fassung 1)', { title: 'Song: Creed Street', kind: 'text', text: 'Inhalt…', tags: ['song'] }), null, 2)), true;
+    if (p === '/api/store/version' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, contentStore.version(String(body.id || ''), body)), true; }
+    if (p === '/api/store/version') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/store/version', 'Neue Fassung anlegen statt überschreiben', { id: '<kennung>', text: 'geänderter Inhalt', note: 'zweiter Durchlauf' }), null, 2)), true;
+    if (p === '/api/store/state' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, contentStore.setState(String(body.id || ''), body.state, body)), true; }
+    if (p === '/api/store/state') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/store/state', 'Zustand setzen — VEROEFFENTLICHT nur mit human: true', { id: '<kennung>', state: 'VEROEFFENTLICHT', human: true, by: 'Name' }), null, 2)), true;
+    if (p === '/api/store/bundle' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, contentStore.bundle(body)), true; }
+    if (p === '/api/store/bundle') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/store/bundle', 'Sammelausgabe mit Manifest und Prüfsumme schnüren', { kind: 'video', name: 'Monatsausgabe' }), null, 2)), true;
+
+    // ---- Analyse: Traffic, Charts, Vorhersage ----
+    if (p === '/api/analytics/status') return send(res, 200, 'application/json', JSON.stringify(analytics.status(), null, 2)), true;
+    if (p === '/api/analytics/sources') return send(res, 200, 'application/json', JSON.stringify(analytics.actions.sources(), null, 2)), true;
+    if (p === '/api/analytics/overview') return send(res, 200, 'application/json', JSON.stringify(analytics.overview(Number(url.searchParams.get('days')) || 30), null, 2)), true;
+    if (p === '/api/analytics/analyze') return send(res, 200, 'application/json', JSON.stringify(analytics.analyze({ page: url.searchParams.get('page') || undefined }), null, 2)), true;
+    if (p === '/api/analytics/charts') return send(res, 200, 'application/json', JSON.stringify(analytics.actions.charts(), null, 2)), true;
+    if (p === '/api/analytics/forecast') return send(res, 200, 'application/json', JSON.stringify(analytics.forecast({ page: url.searchParams.get('page') || undefined, weeks: Number(url.searchParams.get('weeks')) || 4 }), null, 2)), true;
+    if (p === '/api/analytics/briefing') return send(res, 200, 'application/json', JSON.stringify(analytics.trendBriefing(), null, 2)), true;
+    if (p === '/api/analytics/traffic' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, analytics.traffic(body)), true; }
+    if (p === '/api/analytics/traffic') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/analytics/traffic', 'Einen echten Messwert eintragen (Datum, Aufrufe, Besucher, Quelle)', { page: '/master-web-empire/01_igaming_toplists', date: '2026-10-16', views: 120, visitors: 95, source: 'webserver', side_product: 'vergleich' }), null, 2)), true;
+    if (p === '/api/analytics/chart' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, analytics.chartEntry(body)), true; }
+    if (p === '/api/analytics/chart') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/analytics/chart', 'Chart-Eintrag erfassen (Rang, Genre, Neueinstieg)', { chart: 'de-singles', rank: 12, title: 'Beispiel', genre: 'pop' }), null, 2)), true;
+
+    // ---- Selbstüberwachung ----
+    if (p === '/api/monitor/status') return send(res, 200, 'application/json', JSON.stringify(autoMonitor.status(), null, 2)), true;
+    if (p === '/api/monitor/rules') return send(res, 200, 'application/json', JSON.stringify(autoMonitor.rules(), null, 2)), true;
+    if (p === '/api/monitor/findings') return send(res, 200, 'application/json', JSON.stringify(autoMonitor.findings(), null, 2)), true;
+    if (p === '/api/monitor/runs') return send(res, 200, 'application/json', JSON.stringify(autoMonitor.actions.runs(), null, 2)), true;
+    if (p === '/api/monitor/run' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, autoMonitor.run(body)), true; }
+    if (p === '/api/monitor/run') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/monitor/run', 'Alle Regeln prüfen (liest nur, schaltet nichts)', { alert: true }), null, 2)), true;
+
+    // ---- Messenger mit Künstlern (Brainstorming) ----
+    if (p === '/api/messenger/status') return send(res, 200, 'application/json', JSON.stringify(messenger.status(), null, 2)), true;
+    if (p === '/api/messenger/list') return send(res, 200, 'application/json', JSON.stringify(messenger.list(), null, 2)), true;
+    if (p === '/api/messenger/history') return send(res, 200, 'application/json', JSON.stringify(messenger.history(url.searchParams.get('channel') || null), null, 2)), true;
+    if (p === '/api/messenger/result' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, messenger.result(body.channel || body.id, body)), true; }
+    if (p === '/api/messenger/result') {
+      const cid = url.searchParams.get('channel');
+      if (!cid) return send(res, 200, 'application/json', JSON.stringify({ ok: true, hint: 'POST mit { channel } hält das Ergebnis fest; GET ?channel=<kennung> liest es' }, null, 2)), true;
+      return send(res, 200, 'application/json', JSON.stringify(messenger.result(cid), null, 2)), true;
+    }
+    if (p === '/api/messenger/channel' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, messenger.channel(body)), true; }
+    if (p === '/api/messenger/channel') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/messenger/channel', 'Kanal anlegen: direkt, crew oder brainstorm', { kind: 'brainstorm', topic: 'Trap mit Schlager-Piano?', members: ['Sabr47'] }), null, 2)), true;
+    if (p === '/api/messenger/post' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, messenger.post(body)), true; }
+    if (p === '/api/messenger/post') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/messenger/post', 'Beitrag schreiben (eine Stimme pro Person)', { channel: 'brainstorm-…', user: 'Sabr47', text: 'Ich finde die Idee gut.' }), null, 2)), true;
+    if (p === '/api/messenger/vote' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, messenger.vote(body)), true; }
+    if (p === '/api/messenger/vote') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/messenger/vote', 'Punkte vergeben (1–5, einmal pro Person und Idee)', { channel: 'brainstorm-…', user: 'Sabr47', post: '<kennung>', points: 5 }), null, 2)), true;
+    if (p === '/api/messenger/advance' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, messenger.advance(body.channel || body.id)), true; }
+    if (p === '/api/messenger/advance') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/messenger/advance', 'Runde weiterschalten: ideen → bewerten → ergebnis', { channel: 'brainstorm-…' }), null, 2)), true;
+    if (p === '/api/messenger/draft' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, messenger.toDraft(body)), true; }
+    if (p === '/api/messenger/draft') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/messenger/draft', 'Aus dem Ergebnis einen Entwurf machen (song, video, campaign, content)', { channel: 'brainstorm-…', what: 'song', style: 'trap' }), null, 2)), true;
+
+    // ---- Nutzerbereich: Rollen, Rechte, Übersicht ----
+    if (p === '/api/users/status') return send(res, 200, 'application/json', JSON.stringify(userArea.status(), null, 2)), true;
+    if (p === '/api/users/list') return send(res, 200, 'application/json', JSON.stringify(userArea.list(), null, 2)), true;
+    if (p === '/api/users/roles') return send(res, 200, 'application/json', JSON.stringify(userArea.actions.roles(), null, 2)), true;
+    if (p === '/api/users/dashboard') return send(res, 200, 'application/json', JSON.stringify(userArea.dashboard(url.searchParams.get('user') || undefined), null, 2)), true;
+    if (p === '/api/users/check') return send(res, 200, 'application/json', JSON.stringify(userArea.check({ user: url.searchParams.get('user') || undefined, action: url.searchParams.get('action') || 'view' }), null, 2)), true;
+    if (p === '/api/users/create' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, userArea.create(body)), true; }
+    if (p === '/api/users/create') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/users/create', 'Nutzer mit Rolle anlegen (owner, admin, artist, editor, viewer)', { name: 'Sabr47', role: 'artist' }), null, 2)), true;
+    if (p === '/api/users/role' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, userArea.setRole(body.user || body.id, body.role)), true; }
+    if (p === '/api/users/role') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/users/role', 'Rolle ändern — wird protokolliert', { user: 'Sabr47', role: 'editor', by: 'Auraos' }), null, 2)), true;
+    if (p === '/api/users/preferences' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, userArea.preferences(body.user || body.id, body.values || body)), true; }
+    if (p === '/api/users/preferences' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(userArea.preferences(url.searchParams.get('user') || undefined), null, 2)), true;
+
+    // ---- Login über Social-Media-Kanäle ----
+    if (p === '/api/social/status') return send(res, 200, 'application/json', JSON.stringify(socialLogin.status(), null, 2)), true;
+    if (p === '/api/social/providers') return send(res, 200, 'application/json', JSON.stringify(socialLogin.providerState(), null, 2)), true;
+    if (p === '/api/social/links') return send(res, 200, 'application/json', JSON.stringify(socialLogin.actions.links(), null, 2)), true;
+    if (p === '/api/social/start' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, socialLogin.start(body)), true; }
+    if (p === '/api/social/start') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/social/start', 'Anmeldung beginnen (state, nonce, PKCE-Verfahren) — ohne Vault-Schlüssel ehrlich NOT-CONNECTED', { provider: 'google', redirect: '/konto' }), null, 2)), true;
+    if (p === '/api/social/callback' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, socialLogin.callback(body)), true; }
+    if (p === '/api/social/callback') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/social/callback', 'Rückmeldung des Anbieters prüfen (state + nonce müssen stimmen)', { state: '<state>', code: '<code>' }), null, 2)), true;
+    if (p === '/api/social/link' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, socialLogin.link(body)), true; }
+    if (p === '/api/social/link') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/social/link', 'Kanal verknüpfen — nur mit menschlicher Bestätigung (human: true)', { user: 'Sabr47', provider: 'youtube', handle: '@meinkanal', human: true }), null, 2)), true;
+    if (p === '/api/social/unlink' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, socialLogin.unlink(body.user || body.id, body)), true; }
+    if (p === '/api/social/unlink') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/social/unlink', 'Verknüpfung lösen — braucht ebenfalls einen Menschen', { user: 'Sabr47', provider: 'youtube', handle: '@meinkanal', human: true }), null, 2)), true;
+
+    // ---- Externe Geräte an der DAW ----
+    if (p === '/api/daw/status') return send(res, 200, 'application/json', JSON.stringify(dawDevices.status(), null, 2)), true;
+    if (p === '/api/daw/kinds') return send(res, 200, 'application/json', JSON.stringify(dawDevices.actions.kinds(), null, 2)), true;
+    if (p === '/api/daw/devices') return send(res, 200, 'application/json', JSON.stringify(dawDevices.list(), null, 2)), true;
+    if (p === '/api/daw/mappings') return send(res, 200, 'application/json', JSON.stringify(dawDevices.actions.mappings(), null, 2)), true;
+    if (p === '/api/daw/probe') return send(res, 200, 'application/json', JSON.stringify(dawDevices.probe(), null, 2)), true;
+    if (p === '/api/daw/latency') return send(res, 200, 'application/json', JSON.stringify(dawDevices.latency({ buffer: Number(url.searchParams.get('buffer')) || 256, rate: Number(url.searchParams.get('rate')) || 48000 }), null, 2)), true;
+    if (p === '/api/daw/add' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, dawDevices.addDevice(body)), true; }
+    if (p === '/api/daw/add') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/daw/add', 'Gerät eintragen (Klasse: keyboard, pad, fader, mikrofon, interface, …)', { kind: 'keyboard', name: 'Mein MIDI-Keyboard', port: 'Midi Through' }), null, 2)), true;
+    if (p === '/api/daw/learn' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, dawDevices.learn(body)), true; }
+    if (p === '/api/daw/learn') return send(res, 200, 'application/json', JSON.stringify({ ok: true, hint: 'POST mit { signal: "CC 74", fx: "reverb", param: "mix" } — bindet einen echten Regler an einen echten Effekt.' }), true);
+    if (p === '/api/daw/apply' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, dawDevices.apply(body)), true; }
+    if (p === '/api/daw/apply') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/daw/apply', 'Wert anwenden (7 Bit, 14 Bit, Pitch Bend; Kurven linear/log/exp)', { signal: 'CC 74', value: 96, fx: 'reverb', param: 'mix' }), null, 2)), true;
+    if (p === '/api/daw/note' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, dawDevices.note(body)), true; }
+    if (p === '/api/daw/note') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/daw/note', 'Note rechnen (MIDI-Nummer → Name und Frequenz)', { note: 60 }), null, 2)), true;
+
+    // ---- Design-Bausteine (Knöpfe, Regler, Flächen) ----
+    if (p === '/api/design/status') return send(res, 200, 'application/json', JSON.stringify(uiKit.status(), null, 2)), true;
+    if (p === '/api/design/components' || p === '/design') return send(res, 200, 'text/html; charset=utf-8', uiKit.componentsPage()), true;
+    if (p === '/start') return send(res, 200, 'text/html; charset=utf-8', uiKit.startPage()), true;
+    if (p === '/api/design/css') return send(res, 200, 'text/css; charset=utf-8', uiKit.CSS), true;
+    if (p === '/api/design/js') return send(res, 200, 'application/javascript; charset=utf-8', uiKit.CLIENT_JS), true;
+    if (p === '/api/design/nav') return send(res, 200, 'application/json', JSON.stringify({ ok: true, nav: uiKit.NAV }, null, 2)), true;
+
+    // ---- Startvideo (10 Sekunden) ----
+    if (p === '/api/intro/status') return send(res, 200, 'application/json', JSON.stringify(bootIntro.status(), null, 2)), true;
+    if (p === '/api/intro/palettes') return send(res, 200, 'application/json', JSON.stringify(bootIntro.actions.palettes(), null, 2)), true;
+    if (p === '/api/intro/list') return send(res, 200, 'application/json', JSON.stringify(bootIntro.list(), null, 2)), true;
+    if (p === '/api/intro/frames') return send(res, 200, 'application/json', JSON.stringify(bootIntro.actions.frames_dir(), null, 2)), true;
+    if (p === '/api/intro/render' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, await bootIntro.render(body)), true; }
+    if (p === '/api/intro/render') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/intro/render', 'Startvideo rendern (10 s, 24 Bilder/s, Ton aus dem eigenen Renderer, ffmpeg kodiert)', { seconds: 10, title: 'AURA', subtitle: 'SYSTEM STARTET', music_style: 'cinematic', palette: 'aurora' }), null, 2)), true;
+
+    // ---- Seiten-Projekte (Server, Betrieb, Prüflauf) ----
+    if (p === '/api/projects/status') return send(res, 200, 'application/json', JSON.stringify(siteProjects.status(), null, 2)), true;
+    if (p === '/api/projects/list') return send(res, 200, 'application/json', JSON.stringify(siteProjects.list(), null, 2)), true;
+    if (p === '/api/projects/stacks') return send(res, 200, 'application/json', JSON.stringify(siteProjects.actions.stacks(), null, 2)), true;
+    if (p === '/api/projects/get') {
+      const id = url.searchParams.get('id');
+      if (!id) return send(res, 200, 'application/json', JSON.stringify(siteProjects.list(), null, 2)), true;
+      return send(res, 200, 'application/json', JSON.stringify(siteProjects.get(id), null, 2)), true;
+    }
+    if (p === '/api/projects/pack' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, siteProjects.deploymentPack(body.id)), true; }
+    if (p === '/api/projects/pack') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/projects/pack', 'Deploy-Paket: nginx-Block, Dienst-Datei, Befehle — zum Ausführen durch einen Menschen', { id: '<projekt>', domain: 'beispiel.de' }), null, 2)), true;
+    if (p === '/api/projects/create' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, siteProjects.create(body)), true; }
+    if (p === '/api/projects/create') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/projects/create', 'Seiten-Projekt anlegen (Art, Domain, Verzeichnis, Startbefehl, Port)', { name: 'igaming-toplists', stack: 'node', domain: 'beispiel.de', dir: '/var/www/seite', port: 3000, start_cmd: 'node server.js' }), null, 2)), true;
+    if (p === '/api/projects/verify' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, siteProjects.verify(body.id)), true; }
+    if (p === '/api/projects/verify') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/projects/verify', 'Prüflauf: Verzeichnis, Port, Domain, Startbefehl — sagt ehrlich, was lokal prüfbar ist', { id: '<projekt>' }), null, 2)), true;
+    if (p === '/api/projects/import-empire' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, siteProjects.importEmpire(body)), true; }
+    if (p === '/api/projects/import-empire') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/projects/import-empire', 'Seiten aus dem Web-Empire als Projekte übernehmen', { domain: 'beispiel.de', owner: 'Auraos' }), null, 2)), true;
+
+    // ---- Hermes im ganzen Prozess ----
+    if (p === '/api/hermes/flow/status') return send(res, 200, 'application/json', JSON.stringify(hermesFlow.status(), null, 2)), true;
+    if (p === '/api/hermes/flow/processes') return send(res, 200, 'application/json', JSON.stringify(hermesFlow.processes(), null, 2)), true;
+    if (p === '/api/hermes/flow/plan') return send(res, 200, 'application/json', JSON.stringify(hermesFlow.plan({ process: url.searchParams.get('process') || 'song' }), null, 2)), true;
+    if (p === '/api/hermes/flow/trace') return send(res, 200, 'application/json', JSON.stringify(hermesFlow.trace({ id: url.searchParams.get('id') || undefined }), null, 2)), true;
+    if (p === '/api/hermes/flow/run' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, hermesFlow.run(body)), true; }
+    if (p === '/api/hermes/flow/run') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/hermes/flow/run', 'Ablauf durchlaufen lassen — hält an jeder Menschenschwelle an; human: true fährt darüber', { process: 'song', human: false, input: {} }), null, 2)), true;
+
+    // ---- Zahlungsdienstleister ----
+    if (p === '/api/payments/status') return send(res, 200, 'application/json', JSON.stringify(payments.status(), null, 2)), true;
+    if (p === '/api/payments/providers') return send(res, 200, 'application/json', JSON.stringify(payments.state(), null, 2)), true;
+    if (p === '/api/payments/purposes') return send(res, 200, 'application/json', JSON.stringify(payments.actions.purposes(), null, 2)), true;
+    if (p === '/api/payments/checkouts') return send(res, 200, 'application/json', JSON.stringify(payments.actions.checkouts(), null, 2)), true;
+    if (p === '/api/payments/choose') return send(res, 200, 'application/json', JSON.stringify(payments.choose({ purpose: url.searchParams.get('purpose') || 'einmalig', region: url.searchParams.get('region') || 'DE' }), null, 2)), true;
+    if (p === '/api/payments/checkout' && req.method === 'POST') { if (r4Guard(req, ctx, res)) return true; const body = await r4Body(req); return r4Send(res, payments.checkout(body)), true; }
+    if (p === '/api/payments/checkout') return send(res, 200, 'application/json', JSON.stringify(r4Info('/api/payments/checkout', 'Zahlung planen und rechnen — ohne Schlüssel und ohne Mensch wird nichts ausgelöst', { provider: 'stripe', amount: 29.99, currency: 'EUR', purpose: 'Monatsabo', human: false }), null, 2)), true;
+  }
+
+  // ---------- Dritte Ausbaustufe: Sprachen · Aussehen · Marke · Werbung im OS · Empfehlungen · Förderung · Protokoll · Text&Reim · Musik-Abteilungen · Song-Orchester · Rundbrief · Recht · Weißbuch · Ideenkatalog · Startintro ----------
+  {
+    const r5Body = async (req) => { try { return JSON.parse((await readBody(req, 2e6)) || '{}'); } catch { return {}; } };
+    // Achtung: manche Module liefern ein Feld „code“ (Werbecode!). Als Statuscode gilt nur eine Zahl.
+    const r5Send = (res, out) => { const st = out && typeof out.code === 'number' ? out.code : (out && out.ok === false ? 400 : 200); return send(res, st, 'application/json', JSON.stringify(out, null, 2)); };
+    const r5Guard = (req, ctx, res) => { if (adminSoft(req, ctx)) return false; send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })); return true; };
+    const r5Info = (path, does, body) => ({ ok: true, path, method: 'POST mit JSON-Body (Admin-Token im Header x-aura-token)', does, body_example: body || null });
+
+    // ---- Sprachen des Betriebssystems ----
+    if (p === '/api/i18n/status') return send(res, 200, 'application/json', JSON.stringify(i18n.status(), null, 2)), true;
+    if (p === '/api/i18n/languages') return send(res, 200, 'application/json', JSON.stringify(i18n.actions.languages(), null, 2)), true;
+    if (p === '/api/i18n/coverage') return send(res, 200, 'application/json', JSON.stringify(i18n.coverage(), null, 2)), true;
+    if (p === '/api/i18n/catalog') return send(res, 200, 'application/json', JSON.stringify(i18n.catalog(url.searchParams.get('lang') || undefined), null, 2)), true;
+    if (p === '/api/i18n/translate' && req.method === 'POST') { const body = await r5Body(req); return r5Send(res, i18n.actions.translate(body)), true; }
+    if (p === '/api/i18n/translate') return send(res, 200, 'application/json', JSON.stringify({ ok: true, hint: 'POST { key:"nav.support", lang:"tr" } oder GET ?key=&lang=', result: url.searchParams.get('key') ? i18n.actions.translate({ key: url.searchParams.get('key'), lang: url.searchParams.get('lang') }) : null }, null, 2)), true;
+    if (p === '/api/i18n/default' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, i18n.setDefault(body.lang, body)), true; }
+    if (p === '/api/i18n/default') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/i18n/default', 'Grundsprache setzen', { lang: 'de' }), null, 2)), true;
+    if (p === '/api/i18n/text' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, i18n.setText(body.key, body.lang, body.value, body)), true; }
+    if (p === '/api/i18n/text') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/i18n/text', 'Einen Satz in einer Sprache überschreiben', { key: 'nav.support', lang: 'tr', value: 'Destek' }), null, 2)), true;
+
+    // ---- Aussehen: Themes und Hintergründe ----
+    if (p === '/api/themes/status') return send(res, 200, 'application/json', JSON.stringify(themes.status(), null, 2)), true;
+    if (p === '/api/themes/list') return send(res, 200, 'application/json', JSON.stringify(themes.actions.list(), null, 2)), true;
+    if (p === '/api/themes/css') return send(res, 200, 'text/css; charset=utf-8', themes.css(url.searchParams.get('theme') || undefined, url.searchParams.get('background') || undefined)), true;
+    if (p === '/api/themes/for-user') return send(res, 200, 'application/json', JSON.stringify(themes.forUser(url.searchParams.get('user') || undefined), null, 2)), true;
+    if (p === '/api/themes/set' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, themes.set(body)), true; }
+    if (p === '/api/themes/set') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/themes/set', 'Aussehen je Nutzer wählen', { user: 'Sabr47', theme: 'neon', background: 'stage' }), null, 2)), true;
+
+    // ---- Marke: Zeichen, Copyright, Kennzeichnung, Fußzeile ----
+    if (p === '/api/branding/status') return send(res, 200, 'application/json', JSON.stringify(branding.status(), null, 2)), true;
+    if (p === '/api/branding/logo.svg' || p === '/api/branding/svg') return send(res, 200, 'image/svg+xml; charset=utf-8', branding.logoSvg({ size: Number(url.searchParams.get('size')) || 240, transparent: url.searchParams.get('transparent') === '1', mono: url.searchParams.get('mono') === '1' })), true;
+    if (p === '/api/branding/logo') return send(res, 200, 'application/json', JSON.stringify({ ok: true, svg: branding.logoSvg({ size: 240 }), brand: branding.BRAND.owner, year: branding.BRAND.year, copyright: branding.BRAND.line }, null, 2)), true;
+    if (p === '/api/branding/footer') return send(res, 200, 'application/json', JSON.stringify(branding.footer({ lang: url.searchParams.get('lang') || undefined }), null, 2)), true;
+    if (p === '/api/branding/marks') return send(res, 200, 'application/json', JSON.stringify(branding.actions.marks(), null, 2)), true;
+    if (p === '/api/branding/mark' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, branding.watermark(body)), true; }
+    if (p === '/api/branding/mark') return send(res, 200, 'application/json', JSON.stringify(Object.assign(r5Info('/api/branding/mark', 'Kennzeichnung planen (Bild, Video, Ton, Text, Seite)', { kind: 'VIDEO', target: 'clip.mp4', opacity: 0.3 }), { preview: branding.watermark({ kind: url.searchParams.get('kind') || 'SEITE' }) }), null, 2)), true;
+
+    // ---- Werbung im OS: Kurzmeldung alle 6 Minuten, Anzeige alle 11 ----
+    if (p === '/api/adsched/status') return send(res, 200, 'application/json', JSON.stringify(adEngine.status(), null, 2)), true;
+    if (p === '/api/adsched/rhythms') return send(res, 200, 'application/json', JSON.stringify(adEngine.actions.rhythms(), null, 2)), true;
+    if (p === '/api/adsched/stats') return send(res, 200, 'application/json', JSON.stringify(adEngine.stats(), null, 2)), true;
+    if (p === '/api/adsched/client.js') return send(res, 200, 'application/javascript; charset=utf-8', adEngine.client()), true;
+    if (p === '/api/adsched/schedule' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); if (typeof body.enabled === 'boolean') return r5Send(res, adEngine.setEnabled(body.enabled, body)), true; return r5Send(res, adEngine.schedule(body)), true; }
+    if (p === '/api/adsched/schedule') return send(res, 200, 'application/json', JSON.stringify(adEngine.schedule({ minutes: Number(url.searchParams.get('minutes')) || 60 }), null, 2)), true;
+    if (p === '/api/adsched/slot' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, adEngine.slot(body)), true; }
+    if (p === '/api/adsched/slot') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/adsched/slot', 'Meldung einsetzen: rhythm flash (alle 6 Min, nicht wegklickbar) oder banner (alle 11 Min, wegklickbar)', { rhythm: 'flash', headline: 'Neuer Song ist draußen', body: 'Creed Street · ab jetzt überall', target: '/musik' }), null, 2)), true;
+    if (p === '/api/adsched/record' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, adEngine.record(body)), true; }
+    if (p === '/api/adsched/record') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/adsched/record', 'Echtes Ereignis zählen (view, watched, click) — nur was wirklich passiert', { what: 'view', slot_id: '<kennung>', rhythm: 'flash' }), null, 2)), true;
+
+    // ---- Förderung / Foundry ----
+    if (p === '/api/sponsor/status') return send(res, 200, 'application/json', JSON.stringify(sponsor.status(), null, 2)), true;
+    if (p === '/api/sponsor/tiers') return send(res, 200, 'application/json', JSON.stringify(sponsor.tiers(), null, 2)), true;
+    if (p === '/api/sponsor/list') return send(res, 200, 'application/json', JSON.stringify(sponsor.actions.list(), null, 2)), true;
+    if (p === '/api/sponsor/ticker') return send(res, 200, 'application/json', JSON.stringify(sponsor.footerTicker({ lang: url.searchParams.get('lang') || undefined }), null, 2)), true;
+    if (p === '/api/sponsor/page') return send(res, 200, 'application/json', JSON.stringify(sponsor.page({ lang: url.searchParams.get('lang') || undefined }), null, 2)), true;
+    if (p === '/api/sponsor/foerdern') { const pg = sponsor.page({ lang: url.searchParams.get('lang') || undefined }); return send(res, 200, 'text/html; charset=utf-8', pg.html), true; }
+    if (p === '/api/sponsor/add' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, sponsor.add(body)), true; }
+    if (p === '/api/sponsor/add') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/sponsor/add', 'Förderer aufnehmen (Stufe: freund, foerderer, partner, foundry, einmalig)', { name: 'Beispiel GmbH', tier: 'partner', link: 'https://beispiel.de', paid: false }), null, 2)), true;
+    if (p === '/api/sponsor/state' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, sponsor.setState(body)), true; }
+    if (p === '/api/sponsor/state') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/sponsor/state', 'Zustand setzen — BEZAHLT nur mit Beleg', { id: '<kennung>', state: 'BEZAHLT', proof: 'Rechnung 2026-014' }), null, 2)), true;
+
+    // ---- Empfehlungen: Freund werben, beide profitieren ----
+    if (p === '/api/referral/status') return send(res, 200, 'application/json', JSON.stringify(referral.status(), null, 2)), true;
+    if (p === '/api/referral/program') return send(res, 200, 'application/json', JSON.stringify(referral.actions.program(), null, 2)), true;
+    if (p === '/api/referral/codes') return send(res, 200, 'application/json', JSON.stringify(referral.actions.codes(), null, 2)), true;
+    if (p === '/api/referral/ranking') return send(res, 200, 'application/json', JSON.stringify(referral.ranking(), null, 2)), true;
+    if (p === '/api/referral/code' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, referral.code(body)), true; }
+    if (p === '/api/referral/code') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/referral/code', 'Werbecode anlegen (Link zum Weitergeben)', { user: 'Sabr47' }), null, 2)), true;
+    if (p === '/api/referral/event' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, referral.event(body)), true; }
+    if (p === '/api/referral/event') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/referral/event', 'Echtes Ereignis buchen — Selbstwerbung und Doppelbuchung werden abgelehnt', { code: 'SABR47-XXXX', who: 'neuer-freund', type: 'signup' }), null, 2)), true;
+    if (p === '/api/referral/claim' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, referral.claim(body)), true; }
+    if (p === '/api/referral/claim') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/referral/claim', 'Prämien im Konto einlösen — nur mit Mensch (human: true)', { code: 'SABR47-XXXX', human: true, by: 'Auraos' }), null, 2)), true;
+
+    // ---- Protokoll, Klick-Bewertung, Einnahmen-Bewertung ----
+    if (p === '/api/logs/status') return send(res, 200, 'application/json', JSON.stringify(logs.status(), null, 2)), true;
+    if (p === '/api/logs/sources') return send(res, 200, 'application/json', JSON.stringify(logs.actions.sources(), null, 2)), true;
+    if (p === '/api/logs/search') return send(res, 200, 'application/json', JSON.stringify(logs.search({ text: url.searchParams.get('q') || undefined, source: url.searchParams.get('source') || undefined, limit: Number(url.searchParams.get('limit')) || 60 }), null, 2)), true;
+    if (p === '/api/logs/classes') return send(res, 200, 'application/json', JSON.stringify(logs.classes(), null, 2)), true;
+    if (p === '/api/logs/retention') return send(res, 200, 'application/json', JSON.stringify(logs.retention({ days: Number(url.searchParams.get('days')) || 90 }), null, 2)), true;
+    if (p === '/api/logs/clicks') return send(res, 200, 'application/json', JSON.stringify(logs.clickReport({ days: Number(url.searchParams.get('days')) || 30 }), null, 2)), true;
+    if (p === '/api/logs/revenue') return send(res, 200, 'application/json', JSON.stringify(logs.revenueReport({ months: Number(url.searchParams.get('months')) || 12 }), null, 2)), true;
+    if (p === '/api/logs/summary') return send(res, 200, 'application/json', JSON.stringify(logs.summary(), null, 2)), true;
+    if (p === '/api/logs/click' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, logs.recordClick(body)), true; }
+    if (p === '/api/logs/click') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/logs/click', 'Gemessenen Klick-Wert eintragen (Aufrufe, Klicks, Verweildauer, Absprünge)', { page: '/master-web-empire/01_igaming_toplists', date: '2026-10-16', views: 240, clicks: 31, dwell_s: 84, bounces: 90 }), null, 2)), true;
+    if (p === '/api/logs/revenue-row' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, logs.recordRevenue(body)), true; }
+    if (p === '/api/logs/revenue-row') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/logs/revenue-row', 'Einnahme erfassen (Art: ABO, VERKAUF, WERBUNG, FOERDERUNG, PLATTFORM, LIZENZ, SONSTIG)', { month: '2026-10', kind: 'ABO', amount: 129.0, costs: 22.0, proof: 'Beleg 2026-014' }), null, 2)), true;
+
+    // ---- Text und Reim ----
+    if (p === '/api/music/lyrics/status') return send(res, 200, 'application/json', JSON.stringify(lyricWriter.status(), null, 2)), true;
+    if (p === '/api/music/lyrics/structures') return send(res, 200, 'application/json', JSON.stringify(lyricWriter.actions.structures(), null, 2)), true;
+    if (p === '/api/music/lyrics/drafts') return send(res, 200, 'application/json', JSON.stringify(lyricWriter.actions.drafts(), null, 2)), true;
+    if (p === '/api/music/lyrics/draft') return send(res, 200, 'application/json', JSON.stringify(lyricWriter.actions.draft({ id: url.searchParams.get('id') }), null, 2)), true;
+    if (p === '/api/music/lyrics/rhymes') return send(res, 200, 'application/json', JSON.stringify(lyricWriter.rhymes({ word: url.searchParams.get('word') || 'Nacht', lang: url.searchParams.get('lang') || 'de' }), null, 2)), true;
+    if (p === '/api/music/lyrics/rhyme-add' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, lyricWriter.actions.rhyme_add(body)), true; }
+    if (p === '/api/music/lyrics/rhyme-add') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/music/lyrics/rhyme-add', 'Reime ergänzen', { ending: 'acht', words: ['Pracht', 'Schlacht'], lang: 'de' }), null, 2)), true;
+    if (p === '/api/music/lyrics/write' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, lyricWriter.write(body)), true; }
+    if (p === '/api/music/lyrics/write') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/music/lyrics/write', 'Textgerüst schreiben (Aufbau, Reim, Silben, Haken)', { subject: 'Aufbruch aus der Creed Street', structure: 'popsong', mood: 'aufbruch', lang: 'de' }), null, 2)), true;
+
+    // ---- Musik-Abteilungen ----
+    if (p === '/api/music/departments/status') return send(res, 200, 'application/json', JSON.stringify(musicDepartments.status(), null, 2)), true;
+    if (p === '/api/music/departments/list') return send(res, 200, 'application/json', JSON.stringify(musicDepartments.actions.departments(), null, 2)), true;
+    if (p === '/api/music/departments/board') return send(res, 200, 'application/json', JSON.stringify(musicDepartments.board(), null, 2)), true;
+    if (p === '/api/music/departments/tickets') return send(res, 200, 'application/json', JSON.stringify(musicDepartments.actions.list({ department: url.searchParams.get('department') || undefined }), null, 2)), true;
+    if (p === '/api/music/departments/ticket' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, musicDepartments.ticket(body)), true; }
+    if (p === '/api/music/departments/ticket') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/music/departments/ticket', 'Vorgang in einer Abteilung anlegen', { department: 'mischung', task: 'Creed Street Mix v3', song: 'Creed Street' }), null, 2)), true;
+    if (p === '/api/music/departments/advance' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, musicDepartments.advance(body)), true; }
+    if (p === '/api/music/departments/advance') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/music/departments/advance', 'Nächsten Schritt gehen — Abschluss nur mit Mensch (human: true)', { id: '<kennung>', human: false }), null, 2)), true;
+
+    // ---- Song-Orchester („Suno"-Arbeitsweise) ----
+    if (p === '/api/music/orchestrator/status') return send(res, 200, 'application/json', JSON.stringify(orchestrator.status(), null, 2)), true;
+    if (p === '/api/music/orchestrator/styles') return send(res, 200, 'application/json', JSON.stringify(orchestrator.actions.styles(), null, 2)), true;
+    if (p === '/api/music/orchestrator/plans') return send(res, 200, 'application/json', JSON.stringify(orchestrator.actions.plans(), null, 2)), true;
+    if (p === '/api/music/orchestrator/renders') return send(res, 200, 'application/json', JSON.stringify(orchestrator.actions.renders(), null, 2)), true;
+    if (p === '/api/music/orchestrator/plan' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, orchestrator.plan(body)), true; }
+    if (p === '/api/music/orchestrator/plan') {
+      const pid = url.searchParams.get('id');
+      if (pid) return send(res, 200, 'application/json', JSON.stringify(orchestrator.actions.plan_get({ id: pid }), null, 2)), true;
+      return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/music/orchestrator/plan', 'Aus einer Beschreibung einen vollständigen Bauplan machen (Aufbau, Ketten, Text, Prüfschritte)', { prompt: 'dunkler Trap mit Schlager-Piano, 140 bpm', minutes: 3, variants: 3, lyrics: true }), null, 2)), true;
+    }
+    if (p === '/api/music/orchestrator/render' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, orchestrator.render(body)), true; }
+    if (p === '/api/music/orchestrator/render') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/music/orchestrator/render', 'Plan rendern: Varianten + Stems als echte Dateien, Prüflauf, Ablage im Speicher', { id: '<plan>', variants: 3, stems: true, department: 'produktion' }), null, 2)), true;
+
+    // ---- Rundbrief ----
+    if (p === '/api/newsletter/status') return send(res, 200, 'application/json', JSON.stringify(newsletter.status(), null, 2)), true;
+    if (p === '/api/newsletter/campaigns') return send(res, 200, 'application/json', JSON.stringify(newsletter.actions.campaigns(), null, 2)), true;
+    if (p === '/api/newsletter/sends') return send(res, 200, 'application/json', JSON.stringify(newsletter.actions.sends(), null, 2)), true;
+    if (p === '/api/newsletter/list') return send(res, 200, 'application/json', JSON.stringify(newsletter.actions.list({ state: url.searchParams.get('state') || undefined }), null, 2)), true;
+    if (p === '/api/newsletter/provider') return send(res, 200, 'application/json', JSON.stringify(newsletter.actions.provider(), null, 2)), true;
+    if (p === '/api/newsletter/confirm') return send(res, 200, 'application/json', JSON.stringify(newsletter.confirm({ token: url.searchParams.get('token') }), null, 2)), true;
+    if (p === '/api/newsletter/subscribe' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, newsletter.subscribe(body)), true; }
+    if (p === '/api/newsletter/subscribe') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/newsletter/subscribe', 'Anmelden mit doppelter Bestätigung (ohne Klick wird nichts gesendet)', { mail: 'freund@beispiel.de', topics: ['MUSIK', 'WERKSTATT'], source: 'webseite' }), null, 2)), true;
+    if (p === '/api/newsletter/unsubscribe' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, newsletter.unsubscribe(body)), true; }
+    if (p === '/api/newsletter/unsubscribe') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/newsletter/unsubscribe', 'Abmelden in einem Klick, ohne Rückfrage', { mail: 'freund@beispiel.de' }), null, 2)), true;
+    if (p === '/api/newsletter/campaign' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, newsletter.campaign(body)), true; }
+    if (p === '/api/newsletter/campaign') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/newsletter/campaign', 'Rundbrief anlegen (Betreff, Text, Interessengebiet)', { subject: 'Neuer Song ist draußen', body: 'Creed Street im Oktober …', topic: 'MUSIK' }), null, 2)), true;
+    if (p === '/api/newsletter/send' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, newsletter.send(body)), true; }
+    if (p === '/api/newsletter/send') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/newsletter/send', 'Versandplan bauen — ohne Versandweg wird nichts verschickt', { id: '<rundbrief>' }), null, 2)), true;
+
+    // ---- Recht: AGB, Datenschutz, Impressum, Widerruf, Lizenzen, Support-Knopf ----
+    if (p === '/api/legal/status') return send(res, 200, 'application/json', JSON.stringify(legal.status(), null, 2)), true;
+    if (p === '/api/legal/list') return send(res, 200, 'application/json', JSON.stringify(legal.list(), null, 2)), true;
+    if (p === '/api/legal/digest') return send(res, 200, 'application/json', JSON.stringify(legal.actions.digest({ id: url.searchParams.get('id') || 'agb' }), null, 2)), true;
+    if (p === '/api/legal/markdown') return send(res, 200, 'text/markdown; charset=utf-8', legal.markdown(url.searchParams.get('id') || undefined, {}).markdown), true;
+    if (p === '/api/legal/licenses') return send(res, 200, 'application/json', JSON.stringify({ ok: true, doc: legal.digest('lizenzen'), markdown: legal.markdown('lizenzen', { with_support: false }).markdown }, null, 2)), true;
+    if (p === '/api/legal/button') return send(res, 200, 'application/json', JSON.stringify(legal.supportButton({ lang: url.searchParams.get('lang') || undefined }), null, 2)), true;
+    if (p === '/api/legal/accepted') return send(res, 200, 'application/json', JSON.stringify(legal.accepted(url.searchParams.get('who') || undefined), null, 2)), true;
+    if (p === '/api/legal/accept' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, legal.accept(body)), true; }
+    if (p === '/api/legal/accept') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/legal/accept', 'Zustimmung festhalten (an die Fassung gebunden)', { who: 'Sabr47', docs: ['agb', 'datenschutz'] }), null, 2)), true;
+
+    // ---- Weißbuch mit Prüfbericht und Fahrplan ----
+    if (p === '/api/whitepaper/status') return send(res, 200, 'application/json', JSON.stringify(whitepaper.status(), null, 2)), true;
+    if (p === '/api/whitepaper/markdown') return send(res, 200, 'text/markdown; charset=utf-8', whitepaper.markdown({}).markdown), true;
+    if (p === '/api/whitepaper/page') { const pg = whitepaper.page({}); return send(res, 200, 'text/html; charset=utf-8', pg.html), true; }
+    if (p === '/api/whitepaper/audit') return send(res, 200, 'application/json', JSON.stringify(whitepaper.audit(), null, 2)), true;
+    if (p === '/api/whitepaper/roadmap') return send(res, 200, 'application/json', JSON.stringify(whitepaper.roadmap(), null, 2)), true;
+    if (p === '/api/whitepaper/versions') return send(res, 200, 'application/json', JSON.stringify(whitepaper.actions.versions(), null, 2)), true;
+
+    // ---- Ideenkatalog (5 Nischen × 50) ----
+    if (p === '/api/ideas/status') return send(res, 200, 'application/json', JSON.stringify(ideaCatalog.status(), null, 2)), true;
+    if (p === '/api/ideas/niches') return send(res, 200, 'application/json', JSON.stringify(ideaCatalog.actions.niches(), null, 2)), true;
+    if (p === '/api/ideas/adopted') return send(res, 200, 'application/json', JSON.stringify(ideaCatalog.adopted(), null, 2)), true;
+    if (p === '/api/ideas/item') return send(res, 200, 'application/json', JSON.stringify(ideaCatalog.actions.item({ name: url.searchParams.get('name') }), null, 2)), true;
+    if (p === '/api/ideas/list') return send(res, 200, 'application/json', JSON.stringify(ideaCatalog.list({ niche: url.searchParams.get('niche') || undefined, full: url.searchParams.get('full') === '1' }), null, 2)), true;
+
+    // ---- Zahlungs-Validierungen (rechnen, nicht raten) ----
+    if (p === '/api/paycheck/status') return send(res, 200, 'application/json', JSON.stringify(paymentCheck.status(), null, 2)), true;
+    if (p === '/api/paycheck/procedures') return send(res, 200, 'application/json', JSON.stringify(paymentCheck.actions.procedures(), null, 2)), true;
+    if (p === '/api/paycheck/history') return send(res, 200, 'application/json', JSON.stringify(paymentCheck.actions.history(), null, 2)), true;
+    if (p === '/api/paycheck/iban') return send(res, 200, 'application/json', JSON.stringify(paymentCheck.iban(url.searchParams.get('iban')), null, 2)), true;
+    if (p === '/api/paycheck/bic') return send(res, 200, 'application/json', JSON.stringify(paymentCheck.bic(url.searchParams.get('bic')), null, 2)), true;
+    if (p === '/api/paycheck/vat') return send(res, 200, 'application/json', JSON.stringify(paymentCheck.vatDe(url.searchParams.get('vat')), null, 2)), true;
+    if (p === '/api/paycheck/amount') return send(res, 200, 'application/json', JSON.stringify(paymentCheck.amount({ amount: url.searchParams.get('amount'), currency: url.searchParams.get('currency') || 'EUR' }), null, 2)), true;
+    if (p === '/api/paycheck/coupon') return send(res, 200, 'application/json', JSON.stringify(paymentCheck.coupon(url.searchParams.get('coupon')), null, 2)), true;
+    if (p === '/api/paycheck/validate' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, paymentCheck.validate(body)), true; }
+    if (p === '/api/paycheck/validate') return send(res, 200, 'application/json', JSON.stringify(r5Info('/api/paycheck/validate', 'Zahlungsdaten prüfen: Karte (Luhn), IBAN (Mod 97), BIC, USt-IdNr., Betrag, Mandat, Gutschein. Kartennummern werden nach der Prüfung verworfen — nur Marke und letzte vier Stellen kommen zurück.', { method: 'karte', purpose: 'ABO', amount: '29,99', currency: 'EUR', card: { number: '4111111111111111', cvc: '123', exp: '12/28' } }), null, 2)), true;
+    if (p === '/api/paycheck/coupon-make' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, paymentCheck.actions.coupon_make(body)), true; }
+    if (p === '/api/paycheck/coupon-make') return send(res, 200, 'application/json', JSON.stringify(paymentCheck.actions.coupon_make({ seed: url.searchParams.get('seed') }), null, 2)), true;
+    if (p === '/api/paycheck/creditor-make' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, paymentCheck.actions.creditor_make(body)), true; }
+    if (p === '/api/paycheck/creditor-make') return send(res, 200, 'application/json', JSON.stringify(paymentCheck.actions.creditor_make({ seed: url.searchParams.get('seed') }), null, 2)), true;
+
+    // ---- Startintro im Browser ----
+    if (p === '/api/intro/flash/status') return send(res, 200, 'application/json', JSON.stringify(flashIntro.status(), null, 2)), true;
+    if (p === '/api/intro/flash/palettes') return send(res, 200, 'application/json', JSON.stringify(flashIntro.actions.palettes(), null, 2)), true;
+    if (p === '/api/intro/flash/played') return send(res, 200, 'application/json', JSON.stringify(flashIntro.actions.played(), null, 2)), true;
+    if (p === '/api/intro/flash/start') { const pg = flashIntro.page({}); return send(res, 200, 'text/html; charset=utf-8', pg.html), true; }
+    if (p === '/api/intro/flash' && req.method === 'POST') { if (r5Guard(req, ctx, res)) return true; const body = await r5Body(req); return r5Send(res, flashIntro.build(body)), true; }
+    if (p === '/api/intro/flash') return send(res, 200, 'application/json', JSON.stringify(flashIntro.build({ seconds: Number(url.searchParams.get('seconds')) || 10, palette: url.searchParams.get('palette') || 'creed', skippable: url.searchParams.get('skippable') !== '0' }), null, 2)), true;
+  }
+
+  // ---------- Vierte Ausbaustufe (Runde 6): Stilkatalog · Verteiler mit Original-Adressen · Podcast/Hörbuch/Audiobibel · Duett · Kamera-Regie · Effekte · Rohrleitungen · Sicherheit ----------
+  {
+    const r6Body = async (req) => { try { return JSON.parse((await readBody(req, 2e6)) || '{}'); } catch { return {}; } };
+    const r6Send = (res, out) => { const st = out && typeof out.code === 'number' ? out.code : (out && out.ok === false ? 400 : 200); return send(res, st, 'application/json', JSON.stringify(out, null, 2)); };
+    const r6Guard = (req, ctx, res) => { if (adminSoft(req, ctx)) return false; send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig.' })); return true; };
+    const r6Info = (path, does, body) => ({ ok: true, path, method: 'POST mit JSON-Body (Admin-Token im Header x-aura-token)', does, body_example: body || null });
+    const q = (k, d) => url.searchParams.get(k) || d;
+
+    // ---- Intro nach Vorlage: Hirn-Hub in der Mitte, Strahlen zu fünf Feldern, in jedem Feld ein
+    //      laufender Workflow, unten das Fundament. Vorschau als Einzelbilder, Video über ffmpeg. ----
+    if (p === '/api/intro/agentic/status') return send(res, 200, 'application/json', JSON.stringify(agenticIntro.status(), null, 2)), true;
+    if (p === '/api/intro/agentic/workflows') return send(res, 200, 'application/json', JSON.stringify(agenticIntro.actions.workflows(), null, 2)), true;
+    if (p === '/api/intro/agentic/list') return send(res, 200, 'application/json', JSON.stringify(agenticIntro.list(), null, 2)), true;
+    if (p === '/api/intro/agentic/build') return send(res, 200, 'application/json', JSON.stringify(agenticIntro.actions.build({ seconds: Number(q('seconds', 12)) }), null, 2)), true;
+    if (p === '/api/intro/agentic/frame.png') {
+      const r = agenticIntro.picture({ seconds: Number(q('seconds', 6)), width: Number(q('width', 1280)), height: Number(q('height', 720)) });
+      return send(res, 200, 'image/png', r.png, { 'Cache-Control': 'no-store' }), true;
+    }
+    if (p === '/api/intro/agentic/frame') return send(res, 200, 'application/json', JSON.stringify(agenticIntro.actions.frame({ seconds: Number(q('seconds', 6)), width: Number(q('width', 1280)), height: Number(q('height', 720)) }), null, 2)), true;
+    if (p === '/api/intro/agentic/start') { const pg = agenticIntro.page({ seconds: Number(q('seconds', 12)) }); return send(res, 200, 'text/html; charset=utf-8', pg.html), true; }
+    if (p === '/api/intro/agentic' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, await agenticIntro.render(body)), true; }
+    if (p === '/api/intro/agentic') return send(res, 200, 'application/json', JSON.stringify(r6Info('/api/intro/agentic', 'Intro „Agentic AI" rendern: Hirn-Hub, fünf Felder mit laufendem Workflow, Fundament. Ton aus dem eigenen Musik-Renderer, ffmpeg kodiert zu MP4.', { seconds: 12, fps: 25, width: 1280, height: 720, out_width: 1920, out_height: 1080, music_style: 'cinematic' }), null, 2)), true;
+
+    // ---- Meilensteine: wer Zeit, Sessions, Tage, Werke und Klicks sammelt, bekommt Stufen verliehen ----
+    if (p === '/api/milestones/kurz') return send(res, 200, 'application/json', JSON.stringify(milestones.kurz(q('user', 'gast')))), true;
+    if (p === '/api/milestones/katalog') return send(res, 200, 'application/json', JSON.stringify(milestones.katalog(), null, 2)), true;
+    if (p === '/api/milestones/status') return send(res, 200, 'application/json', JSON.stringify(milestones.status(q('user', 'gast')), null, 2)), true;
+    if (p === '/api/milestones/track' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return send(res, 200, 'application/json', JSON.stringify(milestones.track(body.user || 'gast', body.event, body.wert, body), null, 2)), true; }
+    if (p === '/api/milestones/track') return send(res, 200, 'application/json', JSON.stringify(r6Info('/api/milestones/track', 'Ereignis melden: zeit (Minuten), session, tag, inhalt, klick. Antwort trägt aktuelle Werte und neu verliehene Meilensteine.', { user: 'gast', event: 'zeit', wert: 1, session: 's1' }), null, 2)), true;
+    if (p === '/api/milestones/check' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return send(res, 200, 'application/json', JSON.stringify({ ok: true, neu: milestones.pruefen(body.user || 'gast') }, null, 2)), true; }
+    if (p === '/meilensteine' || p === '/api/milestones/page') return send(res, 200, 'text/html; charset=utf-8', milestones.page(q('user', 'gast'))), true;
+
+    // ---- Install-Stand als Download: damit ein fremder Rechner den Stand in EINER Zeile holen kann ----
+    if (p === '/api/stand/patch') {
+      const f = require('path').join(__dirname, '..', '..', '..', 'ARBEITSSTAND.patch');
+      if (fs.existsSync(f)) {
+        const st = fs.statSync(f);
+        res.writeHead(200, { 'content-type': 'application/octet-stream', 'content-disposition': 'attachment; filename="ARBEITSSTAND.patch"', 'content-length': st.size, 'x-aura-security': 'headers-on' });
+        fs.createReadStream(f).pipe(res);
+        return true;
+      }
+      return send(res, 404, 'application/json', JSON.stringify({ error: 'Patch-Datei nicht gefunden — in der Session neu bauen mit: git format-patch 2e407b0..HEAD --stdout > ARBEITSSTAND.patch' })), true;
+    }
+    if (p === '/api/stand/tar.gz') {
+      const f = require('path').join(__dirname, '..', '..', '..', 'dist-stand', 'aura-stand.tar.gz');
+      if (fs.existsSync(f)) {
+        const st = fs.statSync(f);
+        res.writeHead(200, { 'content-type': 'application/gzip', 'content-disposition': 'attachment; filename="aura-stand.tar.gz"', 'content-length': st.size, 'x-aura-security': 'headers-on' });
+        fs.createReadStream(f).pipe(res);
+        return true;
+      }
+      return send(res, 404, 'application/json', JSON.stringify({ error: 'Stand-Datei nicht gefunden' })), true;
+    }
+
+    // ---- Install-Skript als Ein-Zeiler: keine && oder ; beim Kopieren nötig ----
+    if (p === '/api/stand/install.sh') {
+      const script = [
+        '#!/usr/bin/env bash',
+        '# AURA Ein-Zeilen-Install: Stand holen, neuer Ordnerzweig, Installer. Ziel/Port per Umgebungsvariable.',
+        'set -euo pipefail',
+        'H="' + String(req.headers.host || '127.0.0.1:8080') + '"',
+        'QUELLE="${AURA_QUELLE:-}"',
+        'if [ -z "$QUELLE" ]; then QUELLE="https://$H"; fi',
+        'hole() { curl -fsSL "$QUELLE/api/stand/tar.gz" || curl -fsSL "http://$H/api/stand/tar.gz"; }',
+        'D="${AURA_DIR:-$HOME/aura-zweig-1}"',
+        'P="${PORT:-8090}"',
+        'echo ">> hole Stand von $QUELLE nach $D (Port $P)"',
+        'mkdir -p "$D"',
+        'hole | tar xz -C "$D"',
+        'cd "$D"',
+        'AURA_DIR="$D" PORT="$P" RUN_VALIDATE=1 bash deploy/master-install.sh',
+        ''
+      ].join('\n');
+      return send(res, 200, 'text/plain; charset=utf-8', script), true;
+    }
+
+    // ---- Verbund: Concat-Repos, Cross-Chain über alle Abteilungen, Montage offen, n8n-Katalog ----
+    if (p === '/api/verbund') return send(res, 200, 'application/json', JSON.stringify(verbundLib.status(), null, 2)), true;
+    if (p === '/api/verbund/kette') return send(res, 200, 'application/json', JSON.stringify(verbundLib.kette(), null, 2)), true;
+    if (p === '/api/n8n/workflows') return send(res, 200, 'application/json', JSON.stringify(verbundLib.n8nWorkflows(), null, 2)), true;
+    if (p === '/api/montage/status') return send(res, 200, 'application/json', JSON.stringify(verbundLib.montage(), null, 2)), true;
+    if (p === '/montage') return send(res, 200, 'text/html; charset=utf-8', verbundLib.pageMontage()), true;
+
+    // ---- Stilkatalog: jeder gängige Stil mit Tempo, Takt, Instrumenten und Renderer-Zuordnung ----
+    if (p === '/api/styles/status') return send(res, 200, 'application/json', JSON.stringify(styles.status(), null, 2)), true;
+    if (p === '/api/styles/list') return send(res, 200, 'application/json', JSON.stringify(styles.actions.list({ family: q('family', undefined), full: url.searchParams.get('full') === '1' }), null, 2)), true;
+    if (p === '/api/styles/families') return send(res, 200, 'application/json', JSON.stringify(styles.actions.families(), null, 2)), true;
+    if (p === '/api/styles/get') return send(res, 200, 'application/json', JSON.stringify(styles.actions.get({ id: q('id', '') }), null, 2)), true;
+    if (p === '/api/styles/match') return send(res, 200, 'application/json', JSON.stringify(styles.read(q('text', '')) || { ok: false, error: 'Kein Stil im Text erkannt' }, null, 2)), true;
+    if (p === '/api/styles/render-plan') return send(res, 200, 'application/json', JSON.stringify(styles.toRender(q('id', q('text', 'pop')), { bars: Number(q('bars', '8')) }), null, 2)), true;
+
+    // ---- Verteiler: Original-Adressen, gerade Wege, Kennungen ----
+    if (p === '/api/dist/status') return send(res, 200, 'application/json', JSON.stringify(distributors.status(), null, 2)), true;
+    if (p === '/api/dist/list') return send(res, 200, 'application/json', JSON.stringify(distributors.list({ kind: q('kind', undefined), full: url.searchParams.get('full') === '1' }), null, 2)), true;
+    if (p === '/api/dist/links') return send(res, 200, 'application/json', JSON.stringify(distributors.links({ kind: q('kind', undefined) }), null, 2)), true;
+    if (p === '/api/dist/get') return send(res, 200, 'application/json', JSON.stringify(distributors.actions.get({ id: q('id', '') }), null, 2)), true;
+    if (p === '/api/dist/straight') return send(res, 200, 'application/json', JSON.stringify(distributors.straightLine(q('kind', 'podcast')), null, 2)), true;
+    if (p === '/api/dist/straight-lines') return send(res, 200, 'application/json', JSON.stringify(distributors.actions.straight_lines(), null, 2)), true;
+    if (p === '/api/dist/kinds') return send(res, 200, 'application/json', JSON.stringify(distributors.actions.kinds(), null, 2)), true;
+    if (p === '/api/dist/ean') return send(res, 200, 'application/json', JSON.stringify(distributors.ean13(q('prefix', '426'), q('number', '000000001')), null, 2)), true;
+    if (p === '/api/dist/isrc') return send(res, 200, 'application/json', JSON.stringify(distributors.isrc({ country: q('country', 'DE'), registrant: q('registrant', 'CSX'), year: q('year', '26'), number: q('number', '1') }), null, 2)), true;
+
+    // ---- Gesprochenes Wort: Podcast · Hörbuch · Audiobibel ----
+    if (p === '/api/spoken/status') return send(res, 200, 'application/json', JSON.stringify(spoken.status(), null, 2)), true;
+    if (p === '/api/spoken/formats') return send(res, 200, 'application/json', JSON.stringify(spoken.actions.formats(), null, 2)), true;
+    if (p === '/api/spoken/bible') return send(res, 200, 'application/json', JSON.stringify(spoken.bibleBooks({ testament: q('testament', undefined) }), null, 2)), true;
+    if (p === '/api/spoken/productions') return send(res, 200, 'application/json', JSON.stringify(spoken.actions.productions(), null, 2)), true;
+    if (p === '/api/spoken/feeds') return send(res, 200, 'application/json', JSON.stringify(spoken.actions.feeds(), null, 2)), true;
+    if (p === '/api/spoken/readings') return send(res, 200, 'application/json', JSON.stringify(spoken.actions.readings(), null, 2)), true;
+    if (p === '/api/spoken/reading-time' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, spoken.readingTime(body.text, body)), true; }
+    if (p === '/api/spoken/reading-time') return send(res, 200, 'application/json', JSON.stringify(spoken.readingTime(q('text', 'Ein Satz zum Messen.'), { chapters: Number(q('chapters', '0')) }), null, 2)), true;
+    if (p === '/api/spoken/outline' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, spoken.outline(body)), true; }
+    if (p === '/api/spoken/podcast' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, spoken.podcastEpisode(body)), true; }
+    if (p === '/api/spoken/podcast') return send(res, 200, 'application/json', JSON.stringify(r6Info('/api/spoken/podcast', 'Podcast-Folge planen: Abschnitte, Kapitelmarken in Sekunden, Stimmen, Bett aus dem Stilkatalog.', { title: 'Folge 1: Der erste Ton', format: 'interview', minutes: 30, voices: ['moderator', 'gast'] }), null, 2)), true;
+    if (p === '/api/spoken/feed' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, spoken.podcastFeed(body)), true; }
+    if (p === '/api/spoken/feed') return send(res, 200, 'application/json', JSON.stringify(spoken.podcastFeed({ title: q('title', 'Creed Street Podcast'), base_url: q('base', 'https://example.invalid') }), null, 2)), true;
+    if (p === '/api/spoken/feed.xml') { const f = spoken.podcastFeed({ title: q('title', 'Creed Street Podcast'), base_url: q('base', 'https://example.invalid') }); return send(res, 200, 'application/rss+xml; charset=utf-8', f.xml), true; }
+    if (p === '/api/spoken/audiobook' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, spoken.audiobook(body)), true; }
+    if (p === '/api/spoken/audiobook') return send(res, 200, 'application/json', JSON.stringify(r6Info('/api/spoken/audiobook', 'Hörbuch aus Text: Teile, Kapitel, Lesezeit je Kapitel, Aufnahmeplan, UPC, Lautheitsziel.', { title: 'Beispielhörbuch', author: 'Creed Street', text: 'Kapitel 1\n\nText …' }), null, 2)), true;
+    if (p === '/api/spoken/bible-plan' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, spoken.biblePlan(body)), true; }
+    if (p === '/api/spoken/bible-plan') return send(res, 200, 'application/json', JSON.stringify(spoken.biblePlan({ days: Number(q('days', '365')), from: q('from', 'Genesis') }), null, 2)), true;
+    if (p === '/api/spoken/bible-progress' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, spoken.actions.bible_progress(body)), true; }
+    if (p === '/api/spoken/measure' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, spoken.measure(body.file), true); }
+    if (p === '/api/spoken/measure') return send(res, 200, 'application/json', JSON.stringify(spoken.measure(q('file', '')), null, 2)), true;
+
+    // ---- Duett: zu zweit singen ----
+    if (p === '/api/duet/status') return send(res, 200, 'application/json', JSON.stringify(duet.status(), null, 2)), true;
+    if (p === '/api/duet/styles') return send(res, 200, 'application/json', JSON.stringify(duet.actions.styles(), null, 2)), true;
+    if (p === '/api/duet/sessions') return send(res, 200, 'application/json', JSON.stringify(duet.actions.sessions(), null, 2)), true;
+    if (p === '/api/duet/renders') return send(res, 200, 'application/json', JSON.stringify(duet.actions.renders(), null, 2)), true;
+    if (p === '/api/duet/analyze') return send(res, 200, 'application/json', JSON.stringify(duet.actions.analyze({ file: q('file', '') }), null, 2)), true;
+    if (p === '/api/duet/pitch-profile') return send(res, 200, 'application/json', JSON.stringify(duet.actions.pitch_profile({ file: q('file', ''), segments: Number(q('segments', '8')) }), null, 2)), true;
+    if (p === '/api/duet/notes') return send(res, 200, 'application/json', JSON.stringify(duet.actions.notes({ hz: q('hz', '') }), null, 2)), true;
+    if (p === '/api/duet/session' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, duet.session(body)), true; }
+    if (p === '/api/duet/session') return send(res, 200, 'application/json', JSON.stringify(r6Info('/api/duet/session', 'Duett-Sitzung anlegen. Ohne Einverständnis der zweiten Person (consent: true) wird nichts gerechnet.', { partner: 'Freundin', style: 'terz', song: 'Zweite Stimme', consent: true }), null, 2)), true;
+    if (p === '/api/duet/take' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, duet.take(body)), true; }
+    if (p === '/api/duet/take') return send(res, 200, 'application/json', JSON.stringify(r6Info('/api/duet/take', 'Aufnahme an eine Sitzung hängen (WAV-Datei auf diesem Rechner).', { id: 'du-xxxxxx', who: 'ich', file: '/pfad/aufnahme.wav' }), null, 2)), true;
+    if (p === '/api/duet/mix' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, duet.duet(body)), true; }
+    if (p === '/api/duet/mix') return send(res, 200, 'application/json', JSON.stringify(r6Info('/api/duet/mix', 'Ausrichten, Stimmen ziehen, Harmonie, Dopplung, Mischen, Messen. Höchstens zwei Halbtöne Korrektur je Stimme.', { id: 'du-xxxxxx', style: 'terz', key: 'A', mode: 'moll' }), null, 2)), true;
+
+    // ---- Kamera-Regie ----
+    if (p === '/api/cam/status') return send(res, 200, 'application/json', JSON.stringify(camera.status(), null, 2)), true;
+    if (p === '/api/cam/catalog') return send(res, 200, 'application/json', JSON.stringify(camera.actions.catalog(), null, 2)), true;
+    if (p === '/api/cam/storyboards') return send(res, 200, 'application/json', JSON.stringify(camera.actions.storyboards(), null, 2)), true;
+    if (p === '/api/cam/optics') return send(res, 200, 'application/json', JSON.stringify(camera.optics({ sensor: q('sensor', 'vollformat'), focal: Number(q('focal', '50')), distance_m: Number(q('distance', '3')) || undefined, aperture: Number(q('aperture', '2.8')) }), null, 2)), true;
+    if (p === '/api/cam/motion') return send(res, 200, 'application/json', JSON.stringify(camera.motion({ movement: q('movement', 'schwenk'), degrees: Number(q('degrees', '45')), speed_deg_s: Number(q('speed', '8')) || undefined, seconds: Number(q('seconds', '6')) || undefined }), null, 2)), true;
+    if (p === '/api/cam/cutting') return send(res, 200, 'application/json', JSON.stringify(camera.cutting({ minutes: Number(q('minutes', '5')), avg_shot_seconds: Number(q('avg', '6')) }), null, 2)), true;
+    if (p === '/api/cam/axis') return send(res, 200, 'application/json', JSON.stringify(camera.axisCheck({ positions_m: { a_cam_x: Number(q('a_x', '2')), b_cam_x: Number(q('b_x', '-3')), person_x: Number(q('person_x', '0')) } }), null, 2)), true;
+    if (p === '/api/cam/format') return send(res, 200, 'application/json', JSON.stringify(camera.formatPlan({ ratio: q('ratio', '16:9'), height: Number(q('height', '1080')), fps: Number(q('fps', '25')), seconds: Number(q('seconds', '600')) }), null, 2)), true;
+    if (p === '/api/cam/maximize') return send(res, 200, 'application/json', JSON.stringify(camera.maximize({ minutes: Number(q('minutes', '10')), existing_shots: Number(q('shots', '20')) }), null, 2)), true;
+    if (p === '/api/cam/storyboard' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, camera.storyboard(body)), true; }
+    if (p === '/api/cam/storyboard') return send(res, 200, 'application/json', JSON.stringify(r6Info('/api/cam/storyboard', 'Einstellungsliste aus Szenen bauen: Größe, Bewegung, Licht, Kadrierung, Prüfliste.', { scenes: [{ name: 'Ankunft', minutes: 2 }, { name: 'Gespräch', minutes: 4 }], style: 'mittel' }), null, 2)), true;
+    if (p === '/api/cam/day' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, camera.shootDay(body)), true; }
+    if (p === '/api/cam/day') return send(res, 200, 'application/json', JSON.stringify(r6Info('/api/cam/day', 'Drehtag mit Zeitfenstern, Puffern und Reihenfolge.', { start: '09:00', scenes: [{ name: 'Außen', minutes: 60 }, { name: 'Interview', minutes: 90 }] }), null, 2)), true;
+
+    // ---- Effekte und Specials ----
+    if (p === '/api/fx/status') return send(res, 200, 'application/json', JSON.stringify(effects.status(), null, 2)), true;
+    if (p === '/api/fx/list') return send(res, 200, 'application/json', JSON.stringify(effects.search({ q: q('q', undefined), family: q('family', undefined) }), null, 2)), true;
+    if (p === '/api/fx/families') return send(res, 200, 'application/json', JSON.stringify(effects.actions.families(), null, 2)), true;
+    if (p === '/api/fx/presets') return send(res, 200, 'application/json', JSON.stringify(effects.actions.presets(), null, 2)), true;
+    if (p === '/api/fx/get') return send(res, 200, 'application/json', JSON.stringify(effects.actions.get({ id: q('id', '') }), null, 2)), true;
+    if (p === '/api/fx/check') return send(res, 200, 'application/json', JSON.stringify(effects.checkFilter(q('filter', 'gblur=sigma=6')), null, 2)), true;
+    if (p === '/api/fx/chain' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, effects.chain(body)), true; }
+    if (p === '/api/fx/chain') return send(res, 200, 'application/json', JSON.stringify(effects.chain({ effects: (q('effects', 'farbe-grundlook,stoerung-filmkorn,schnitt-blende')).split(',') }), null, 2)), true;
+    if (p === '/api/fx/preset') return send(res, 200, 'application/json', JSON.stringify(effects.applyPreset({ preset: q('preset', 'musikvideo-nacht') }), null, 2)), true;
+
+    // ---- Rohrleitungen (alle Straßen des Hauses) ----
+    if (p === '/api/pipes/status') return send(res, 200, 'application/json', JSON.stringify(pipes.status(), null, 2)), true;
+    if (p === '/api/pipes/list') return send(res, 200, 'application/json', JSON.stringify(pipes.list({ area: q('area', undefined) }), null, 2)), true;
+    if (p === '/api/pipes/get') return send(res, 200, 'application/json', JSON.stringify(pipes.actions.get({ id: q('id', '') }), null, 2)), true;
+    if (p === '/api/pipes/coverage') return send(res, 200, 'application/json', JSON.stringify(pipes.coverage(), null, 2)), true;
+    if (p === '/api/pipes/runs') return send(res, 200, 'application/json', JSON.stringify(pipes.actions.runs(), null, 2)), true;
+    if (p === '/api/pipes/run' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, pipes.run(body)), true; }
+    if (p === '/api/pipes/run') return send(res, 200, 'application/json', JSON.stringify(pipes.run({ pipe: q('pipe', 'podcast'), input: { title: q('title', 'Folge 1'), minutes: Number(q('minutes', '25')) } }), null, 2)), true;
+
+    // ---- Sicherheit ----
+    if (p === '/api/sec/status') return send(res, 200, 'application/json', JSON.stringify(security.status(), null, 2)), true;
+    if (p === '/api/sec/roles') return send(res, 200, 'application/json', JSON.stringify(security.roleMatrix(), null, 2)), true;
+    if (p === '/api/sec/inputs') return send(res, 200, 'application/json', JSON.stringify(security.scanInputs(), null, 2)), true;
+    if (p === '/api/sec/store') return send(res, 200, 'application/json', JSON.stringify(security.scanStore({}), null, 2)), true;
+    if (p === '/api/sec/incidents') return send(res, 200, 'application/json', JSON.stringify(security.actions.incidents(), null, 2)), true;
+    if (p === '/api/sec/sweeps') return send(res, 200, 'application/json', JSON.stringify(security.actions.sweeps(), null, 2)), true;
+    if (p === '/api/sec/kopfzeilen') return send(res, 200, 'application/json', JSON.stringify({ ok: true, headers: securityHeadersForInfo }), true);
+    if (p === '/api/sec/secrets') return send(res, 200, 'application/json', JSON.stringify(security.scanSecrets({ limit: Number(q('limit', '600')) }), null, 2)), true;
+    if (p === '/api/sec/kind') return send(res, 200, 'application/json', JSON.stringify(security.kindOf(q('file', '')), null, 2)), true;
+    if (p === '/api/sec/sweep' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, await security.sweep(body)), true; }
+    if (p === '/api/sec/sweep') return send(res, 200, 'application/json', JSON.stringify(await security.sweep({ limit: Number(q('limit', '800')), online: url.searchParams.get('online') !== '0' }), null, 2)), true;
+    if (p === '/api/sec/upload' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, security.scanUpload(body), true); }
+    if (p === '/api/sec/incident' && req.method === 'POST') { if (r6Guard(req, ctx, res)) return true; const body = await r6Body(req); return r6Send(res, security.incident(body)), true; }
+    if (p === '/api/sec/incident') return send(res, 200, 'application/json', JSON.stringify(r6Info('/api/sec/incident', 'Vorfall führen: detect (erfassen) → isolate (sperren, Belege sichern) → decide (Mensch entscheidet).', { action: 'detect', what: 'Auffällige Anmeldungen', severity: 'MITTEL' }), null, 2)), true;
+
+    // ---- Seiten: Stile als Knöpfe (Studio) und Werkstatt-Übersicht ----
+    if (p === '/stile' || p === '/api/styles/page') {
+      const st = styles.status();
+      const fam = styles.FAMILIES.map((f) => ({
+        id: f.id, name: f.name, count: f.styles.length,
+        rows: f.styles.map((x) => ({ id: x.id, name: x.name, bpm: x.bpm[0], meter: x.meter, mood: x.mood, g: x.render.g, inst: x.instruments.slice(0, 3).join(', ') })),
+      }));
+      const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stile · Creed Street Studios</title>
+<style>body{background:#0d0f14;color:#e9edf5;font:15px/1.5 system-ui,sans-serif;margin:0;padding:24px}h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:26px 0 8px;color:#ffd200}.sub{color:#9aa4b8;margin-bottom:18px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}.card{background:#151922;border:1px solid #222836;border-radius:10px;padding:12px}.card b{display:block}.card small{color:#9aa4b8}.tags{color:#7fd1a0;font-size:12px;margin-top:6px}.btn{display:inline-block;margin-top:8px;padding:6px 10px;border-radius:8px;background:#ffd200;color:#111;text-decoration:none;font-weight:600;font-size:12px}a.plain{color:#8ab4ff;font-size:12px}</style></head><body>
+<h1>Stilkatalog</h1><div class="sub">${st.families} Familien · ${st.styles} Stile · jeder Stil nennt Tempo, Takt, Instrumente, Stimmung, Herkunft und das Renderer-Gerüst. Knopf = fertiger Render-Plan.</div>
+${fam.map((f) => `<h2>${f.name} <small>(${f.count})</small></h2><div class="grid">${f.rows.map((x) => `<div class="card"><b>${x.name}</b><small>${x.bpm} bpm · ${x.meter} · Gerüst ${x.g}</small><div class="tags">${x.mood}<br>${x.inst}</div><a class="btn" href="/api/styles/render-plan?id=${x.id}&amp;bars=8">Render-Plan</a> <a class="plain" href="/api/styles/get?id=${x.id}">Daten</a></div>`).join('')}</div>`).join('')}
+</body></html>`;
+      return send(res, 200, 'text/html; charset=utf-8', html), true;
+    }
+    if (p === '/werkstatt' || p === '/api/runde6/page') {
+      const blocks = [
+        { t: 'Meilensteine', s: milestones.statusRoute(), go: '/meilensteine' },
+        { t: 'Podcast', s: spoken.status(), go: '/api/spoken/status' },
+        { t: 'Hörbuch & Audiobibel', s: spoken.status(), go: '/api/spoken/bible-plan?days=365' },
+        { t: 'Duett', s: duet.status(), go: '/api/duet/status' },
+        { t: 'Kamera-Regie', s: camera.status(), go: '/api/cam/status' },
+        { t: 'Effekte & Specials', s: effects.status(), go: '/api/fx/status' },
+        { t: 'Verteiler', s: distributors.status(), go: '/api/dist/status' },
+        { t: 'Rohrleitungen', s: pipes.status(), go: '/api/pipes/status' },
+        { t: 'Sicherheit', s: security.status(), go: '/api/sec/status' },
+      ];
+      const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Werkstatt · Creed Street Studios</title>
+<style>body{background:#0d0f14;color:#e9edf5;font:15px/1.5 system-ui,sans-serif;margin:0;padding:24px}h1{font-size:22px;margin:0 0 4px}.sub{color:#9aa4b8;margin-bottom:18px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}.card{background:#151922;border:1px solid #222836;border-radius:12px;padding:14px}.card b{color:#ffd200;font-size:15px}ul{margin:8px 0 0;padding-left:18px;color:#b9c2d4;font-size:13px}a{color:#8ab4ff}</style></head><body>
+<h1>Werkstatt</h1><div class="sub">Runde 6: Podcast · Hörbücher · Audiobibeln · Verteiler mit Original-Adressen · Duett · Kamera · Effekte · alle Rohrleitungen · Sicherheit. <a href="/stile">Stilkatalog</a></div>
+<div class="grid">${blocks.map((b) => `<div class="card"><b>${b.t}</b><ul>${Object.entries(b.s).slice(0, 5).map(([k, v]) => `<li>${k}: ${typeof v === 'object' ? JSON.stringify(v).slice(0, 60) : String(v).slice(0, 70)}</li>`).join('')}</ul><a href="${b.go}">Rohdaten</a></div>`).join('')}</div>
+</body></html>`;
+      return send(res, 200, 'text/html; charset=utf-8', html), true;
+    }
+
+    // ---- Übersicht der neuen Bereiche (eine Seite, die alles auflistet) ----
+    if (p === '/api/runde6/status') return send(res, 200, 'application/json', JSON.stringify({
+      ok: true, area: 'ROUND6', state: 'live',
+      bereiche: [
+        { id: 'styles', path: '/api/styles/status', was: 'Jeder gängige Stil, auch fürs Studio und für die Rohrleitungen' },
+        { id: 'dist', path: '/api/dist/status', was: 'Verteiler mit originalen Adressen und geraden Wegen' },
+        { id: 'spoken', path: '/api/spoken/status', was: 'Podcast, Hörbuch, Audiobibel (Plan, Kapitel, Feed, Tonmessung)' },
+        { id: 'duet', path: '/api/duet/status', was: 'Duett: ausrichten, stimmen, Harmonie, Dopplung, mischen' },
+        { id: 'cam', path: '/api/cam/status', was: 'Kamera-Regie: Optik, Bewegung, Schnitt, Licht, Drehplan' },
+        { id: 'fx', path: '/api/fx/status', was: 'Effekte und Specials mit geprüften Filterketten' },
+        { id: 'pipes', path: '/api/pipes/status', was: 'Alle Rohrleitungen des Hauses' },
+        { id: 'sec', path: '/api/sec/status', was: 'Sicherheit: prüfen, isolieren, entscheiden' },
+        { id: 'intro2', path: '/api/intro/agentic/status', was: 'Intro nach Vorlage: Hirn-Hub, fünf Workflow-Felder, Fundament (Vorschau und Video)' },
+      ],
+      seiten: [
+        { id: 'stile', path: '/stile', was: 'Stilkatalog als Seite mit Knöpfen (Render-Plan je Stil)' },
+        { id: 'werkstatt', path: '/werkstatt', was: 'Werkstatt-Übersicht aller neuen Bereiche' },
+        { id: 'intro', path: '/api/intro/agentic/start', was: 'Intro „Agentic AI" als laufende Vorschau (Hirn-Hub, fünf Felder, Fundament)' },
+      ],
+      counts: { styles: styles.status().styles, verteiler: distributors.status().total, rohre: pipes.status().pipes, effekte: effects.status().effects, stufen: pipes.status().stages },
+      human_rule: 'Jede Rohrleitung endet bei einem Menschen. Kein Ausschluss, keine Veröffentlichung, keine Zahlung ohne Freigabe.',
+    }, null, 2)), true;
+  }
 
   // ---------- Area 75: Routine & Link Control ----------
   if (p === '/api/control') return send(res, 200, 'application/json', JSON.stringify(routineControl.status(), null, 2)), true;
@@ -826,17 +2188,17 @@ async function handle(ctx) {
     try { return send(res, 200, 'application/json', JSON.stringify(await testLab.runOne(body), null, 2)), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
-  if (p === '/api/testlab/suite' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(await testLab.suite(), null, 2)), true;
+  if (p === '/api/testlab/suite' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; return send(res, 200, 'application/json', JSON.stringify(await testLab.suite(), null, 2)), true; }
 
   // ---------- Area 78: Telegram Agent ----------
   if (p === '/api/telegram/status') return send(res, 200, 'application/json', JSON.stringify(await telegramAgent.status(), null, 2)), true;
-  if (p === '/api/telegram/probe' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(await telegramAgent.probe(), null, 2)), true;
+  if (p === '/api/telegram/probe' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; return send(res, 200, 'application/json', JSON.stringify(await telegramAgent.probe(), null, 2)), true; }
   if (p === '/api/telegram/start' && req.method === 'POST') {
     if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' })), true;
     try { return send(res, 200, 'application/json', JSON.stringify(await telegramAgent.startPoller(), null, 2)), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
-  if (p === '/api/telegram/stop' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(telegramAgent.stopPoller(), null, 2)), true;
+  if (p === '/api/telegram/stop' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; return send(res, 200, 'application/json', JSON.stringify(telegramAgent.stopPoller(), null, 2)), true; }
 
   // ---------- Hot-CRUD: departments/skills ohne Neustart & ohne Crash ----------
   if (p === '/api/depts/add' && req.method === 'POST') {
@@ -891,7 +2253,7 @@ async function handle(ctx) {
   if (p === '/api/ollama/status') return send(res, 200, 'application/json', JSON.stringify(await ollamaManager.status(), null, 2)), true;
   if (p === '/api/ollama/server-profiles') return send(res, 200, 'application/json', JSON.stringify(await ollamaManager.serverProfiles(), null, 2)), true;
   if (p === '/api/ollama/catalog') return send(res, 200, 'application/json', JSON.stringify({ excluded_note: ollamaManager.EXCLUDED_NOTE, catalog: ollamaManager.catalog() }, null, 2)), true;
-  if (p === '/api/ollama/probe' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(await ollamaManager.probe(), null, 2)), true;
+  if (p === '/api/ollama/probe' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; return send(res, 200, 'application/json', JSON.stringify(await ollamaManager.probe(), null, 2)), true; }
   if (p === '/api/ollama/pull' && req.method === 'POST') {
     if (ops.isKilled()) return send(res, 423, 'application/json', JSON.stringify({ error: 'KILL SWITCH ENGAGED' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
@@ -968,7 +2330,7 @@ async function handle(ctx) {
     try { return send(res, 200, 'application/json', JSON.stringify(yellowPages.addCategory(body), null, 2)), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
-  if (p === '/api/yp/categories/delete' && req.method === 'POST') {
+  if (p === '/api/yp/categories/delete' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
     return send(res, 200, 'application/json', JSON.stringify(yellowPages.deleteCategory(String(body.id || '')), null, 2)), true;
   }
@@ -993,7 +2355,7 @@ async function handle(ctx) {
     try { return send(res, 200, 'application/json', JSON.stringify(yellowPages.restoreEntry(String(body.id || '')), null, 2)), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
-  if (p === '/api/yp/ingest' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(yellowPages.ingestFromCatalog(), null, 2)), true;
+  if (p === '/api/yp/ingest' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; try { return send(res, 200, 'application/json', JSON.stringify(yellowPages.ingestFromCatalog(), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
   if (p === '/api/yp/feed' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify({ feed: yellowPages.brainFeed() }, null, 2)), true;
   if (p === '/api/yp/feed' && req.method === 'POST') {
     let body; try { body = JSON.parse(await readBody(req, 3e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
@@ -1005,7 +2367,7 @@ async function handle(ctx) {
     try { return send(res, 200, 'application/json', JSON.stringify(yellowPages.toggleFeed(String(body.id || '')), null, 2)), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
-  if (p === '/api/yp/feed/delete' && req.method === 'POST') {
+  if (p === '/api/yp/feed/delete' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
     return send(res, 200, 'application/json', JSON.stringify(yellowPages.deleteFeed(String(body.id || '')), null, 2)), true;
   }
@@ -1027,7 +2389,7 @@ async function handle(ctx) {
     try { return send(res, 200, 'application/json', JSON.stringify(ollamaManager.addCustom(body), null, 2)), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
-  if (p === '/api/ollama/custom/remove' && req.method === 'POST') {
+  if (p === '/api/ollama/custom/remove' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
     return send(res, 200, 'application/json', JSON.stringify(ollamaManager.removeCustom(String(body.name || '')), null, 2)), true;
   }
@@ -1042,7 +2404,7 @@ async function handle(ctx) {
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
   if (p === '/api/ollama/keys' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify({ ok: true, keys: ollamaManager.keysMasked() }, null, 2)), true;
-  if (p === '/api/ollama/keys' && req.method === 'POST') {
+  if (p === '/api/ollama/keys' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
     try { return send(res, 200, 'application/json', JSON.stringify(ollamaManager.setKeys(body), null, 2)), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
@@ -1051,7 +2413,7 @@ async function handle(ctx) {
   // ---------- Areas 09–15,18,26–31,34/35,37/38,40: neue Live-Module ----------
   if (p === '/api/media/status') return send(res, 200, 'application/json', JSON.stringify(mediaPipeline.status(), null, 2)), true;
   if (p === '/api/media/plan' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 2e5) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(mediaPipeline.plan(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
-  if (p === '/api/media/render' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } return send(res, 200, 'application/json', JSON.stringify(await mediaPipeline.render(b), null, 2)), true; }
+  if (p === '/api/media/render' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(await mediaPipeline.render(b), null, 2)), true; } catch (e) { return send(res, e.code || 400, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
 
   if (p === '/api/incubator/status') return send(res, 200, 'application/json', JSON.stringify(contentIncubator.status(), null, 2)), true;
   if (p === '/api/incubator/submit' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 2e5) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(contentIncubator.submit(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
@@ -1069,7 +2431,7 @@ async function handle(ctx) {
 
   if (p === '/api/dispatch/status') return send(res, 200, 'application/json', JSON.stringify(dispatcher.status(), null, 2)), true;
   if (p === '/api/dispatch/enqueue' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 2e5) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(dispatcher.enqueue(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
-  if (p === '/api/dispatch/flush' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(await dispatcher.flush(), null, 2)), true;
+  if (p === '/api/dispatch/flush' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; return send(res, 200, 'application/json', JSON.stringify(await dispatcher.flush(), null, 2)), true; }
   if (p === '/api/dispatch/list') return send(res, 200, 'application/json', JSON.stringify(dispatcher.list(), null, 2)), true;
 
   if (p === '/api/wordpress/status') return send(res, 200, 'application/json', JSON.stringify(wordpressBridge.status(), null, 2)), true;
@@ -1081,7 +2443,7 @@ async function handle(ctx) {
 
   if (p === '/api/ksync/status') return send(res, 200, 'application/json', JSON.stringify(knowledgeSync.status(), null, 2)), true;
   if (p === '/api/ksync/repo' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(knowledgeSync.addRepo(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
-  if (p === '/api/ksync/sync' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } return send(res, 200, 'application/json', JSON.stringify(await knowledgeSync.syncRepo(String(b.owner || ''), String(b.repo || '')), null, 2)), true; }
+  if (p === '/api/ksync/sync' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(await knowledgeSync.syncRepo(String(b.owner || ''), String(b.repo || '')), null, 2)), true; } catch (e) { return send(res, e.code || 400, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
 
   if (p === '/api/hardware/status') return send(res, 200, 'application/json', JSON.stringify(hardwareRouter.status(), null, 2)), true;
   if (p === '/api/hardware/device' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(hardwareRouter.addDevice(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
@@ -1089,7 +2451,7 @@ async function handle(ctx) {
 
   if (p === '/api/compute/status') return send(res, 200, 'application/json', JSON.stringify(computeRouter.status(), null, 2)), true;
   if (p === '/api/compute/node' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(computeRouter.registerNode(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
-  if (p === '/api/compute/submit' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(computeRouter.submitJob(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
+  if (p === '/api/compute/submit' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(computeRouter.submitJob(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
 
   if (p === '/api/cloud/status') return send(res, 200, 'application/json', JSON.stringify(cloudConnector.status(), null, 2)), true;
   if (p === '/api/cloud/optin' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(cloudConnector.setOptIn(String(b.provider || ''), !!b.on), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
@@ -1108,14 +2470,14 @@ async function handle(ctx) {
 
   if (p === '/api/finance/status') return send(res, 200, 'application/json', JSON.stringify(financeEngine.status(), null, 2)), true;
   if (p === '/api/finance/budget' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(financeEngine.setBudget(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
-  if (p === '/api/finance/usage' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(financeEngine.recordUsage(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
+  if (p === '/api/finance/usage' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(financeEngine.recordUsage(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
 
   if (p === '/api/gateway/status') return send(res, 200, 'application/json', JSON.stringify(gatewayHealth.status(), null, 2)), true;
-  if (p === '/api/gateway/check' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(await gatewayHealth.checkAll(), null, 2)), true;
+  if (p === '/api/gateway/check' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; return send(res, 200, 'application/json', JSON.stringify(await gatewayHealth.checkAll(), null, 2)), true; }
   if (p === '/api/gateway/report') return send(res, 200, 'application/json', JSON.stringify(gatewayHealth.report(), null, 2)), true;
 
   if (p === '/api/delivery/status') return send(res, 200, 'application/json', JSON.stringify(deliveryMonitor.status(), null, 2)), true;
-  if (p === '/api/delivery/ingest' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(deliveryMonitor.ingestFromDispatcher(), null, 2)), true;
+  if (p === '/api/delivery/ingest' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; return send(res, 200, 'application/json', JSON.stringify(deliveryMonitor.ingestFromDispatcher(), null, 2)), true; }
   if (p === '/api/delivery/quota') return send(res, 200, 'application/json', JSON.stringify(deliveryMonitor.quota(), null, 2)), true;
 
   if (p === '/api/vision/status') return send(res, 200, 'application/json', JSON.stringify(visionBridge.status(), null, 2)), true;
@@ -1124,7 +2486,7 @@ async function handle(ctx) {
   if (p === '/api/vault/status') return send(res, 200, 'application/json', JSON.stringify(vault.status(), null, 2)), true;
   if (p === '/api/vault/add' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } try { return send(res, 200, 'application/json', JSON.stringify(vault.addSecret(b), null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
   if (p === '/api/vault/list') return send(res, 200, 'application/json', JSON.stringify(vault.listSecrets(), null, 2)), true;
-  if (p === '/api/vault/remove' && req.method === 'POST') { let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } return send(res, 200, 'application/json', JSON.stringify(vault.removeSecret(String(b.name || '')), null, 2)), true; }
+  if (p === '/api/vault/remove' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; let b; try { b = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; } return send(res, 200, 'application/json', JSON.stringify(vault.removeSecret(String(b.name || '')), null, 2)), true; }
 
   // ---------- Area 85: Harness-Kit (Claude Code / Cursor / OpenClaw) ----------
   if (p === '/api/harness/status') return send(res, 200, 'application/json', JSON.stringify(harnessKit.status(), null, 2)), true;
@@ -1138,12 +2500,12 @@ async function handle(ctx) {
   if (p === '/api/sentinel/status') return send(res, 200, 'application/json', JSON.stringify(sentinelWatch.status(), null, 2)), true;
   if (p === '/api/sentinel/scan') return send(res, 200, 'application/json', JSON.stringify(sentinelWatch.scan(), null, 2)), true;
   if (p === '/api/sentinel/events') return send(res, 200, 'application/json', JSON.stringify(sentinelWatch.events(), null, 2)), true;
-  if (p === '/api/sentinel/block' && req.method === 'POST') {
+  if (p === '/api/sentinel/block' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
     try { return send(res, 200, 'application/json', JSON.stringify(sentinelWatch.block(String(body.ip || ''), body.reason), null, 2)), true; }
     catch (e) { return send(res, e.code || 400, 'application/json', JSON.stringify({ error: String(e.message || e) })), true; }
   }
-  if (p === '/api/sentinel/unblock' && req.method === 'POST') {
+  if (p === '/api/sentinel/unblock' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
     return send(res, 200, 'application/json', JSON.stringify(sentinelWatch.unblock(String(body.ip || '')), null, 2)), true;
   }
@@ -1156,7 +2518,7 @@ async function handle(ctx) {
     skills: [{ id: 'aura-ask', name: 'aura-ask', description: 'Frage das ULTRA MASTER BRAIN — antwortet aus Live-Systemdaten.' }],
     security: 'REGEL 1: nur mit Autorisierung des Administrators; keine autonomen Fremdaktionen.',
   }, null, 2)), true;
-  if (p === '/api/a2a' && req.method === 'POST') {
+  if (p === '/api/a2a' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
     const msg = body.params && body.params.message && Array.isArray(body.params.message.parts) ? body.params.message.parts.map((x) => x.text || '').join(' ') : String(body.msg || '');
     let answer = 'REGEL 1: keine Nachricht übergeben.';
@@ -1178,12 +2540,12 @@ async function handle(ctx) {
     try { return send(res, 200, 'application/json', JSON.stringify(await agentIntercom.speak(body), null, 2)), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
-  if (p === '/api/intercom/meeting' && req.method === 'POST') {
+  if (p === '/api/intercom/meeting' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 2e5) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
     try { return send(res, 200, 'application/json', JSON.stringify(await agentIntercom.meeting(body), null, 2)), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
-  if (p === '/api/intercom/clear' && req.method === 'POST') {
+  if (p === '/api/intercom/clear' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 1e4) || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON body' })), true; }
     return send(res, 200, 'application/json', JSON.stringify(agentIntercom.clear(body.channel), null, 2)), true;
   }
@@ -1280,7 +2642,7 @@ async function handle(ctx) {
   if (p.startsWith('/api/builder/workflows/') && req.method === 'DELETE') {
     return send(res, 200, 'application/json', JSON.stringify(wfBuilder.remove(decodeURIComponent(p.split('/').pop())))), true;
   }
-  if (p === '/api/builder/simulate' && req.method === 'POST') {
+  if (p === '/api/builder/simulate' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true;
     let body; try { body = JSON.parse(await readBody(req, 2e5)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; }
     return send(res, 200, 'application/json', JSON.stringify(wfBuilder.simulate(body.id), null, 2)), true;
   }
@@ -1330,9 +2692,11 @@ async function handle(ctx) {
 
   // ---- Area 64: backup vault (verified snapshots + restore) ----
   if (p === '/api/backups' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(watcher.backups(), null, 2)), true;
-  if (p === '/api/backups/restore' && req.method === 'POST') {
+  if (p === '/api/backups/restore' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 2e4)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; }
-    return send(res, 200, 'application/json', JSON.stringify(watcher.restore(body.file))), true;
+    if (!body || typeof body.file !== 'string' || !body.file.trim()) return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'file fehlt: Name der Backup-Datei aus GET /api/backups nötig.' })), true;
+    try { return send(res, 200, 'application/json', JSON.stringify(watcher.restore(body.file.trim()))), true; }
+    catch (e) { return send(res, e.code || 400, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
 
   // ---- Area 65: honest traffic telemetry ----
@@ -1345,12 +2709,12 @@ async function handle(ctx) {
     return send(res, 200, 'application/json', JSON.stringify({ mode: 'LIVE', level: level || 'ALL', lines: selfRepair.tail(n, level || undefined) }, null, 2)), true;
   }
   if (p === '/api/selfrepair' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(selfRepair.report(), null, 2)), true;
-  if (p === '/api/selfrepair/run' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(selfRepair.runChecks(), null, 2)), true;
-  if (p === '/api/selfrepair/drill' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(selfRepair.actions.simulate_error(), null, 2)), true;
+  if (p === '/api/selfrepair/run' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true; return send(res, 200, 'application/json', JSON.stringify(selfRepair.runChecks(), null, 2)), true; }
+  if (p === '/api/selfrepair/drill' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true; return send(res, 200, 'application/json', JSON.stringify(selfRepair.actions.simulate_error(), null, 2)), true; }
 
   // ---- Area 67: module containers (crash isolation) ----
   if (p === '/api/containers' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(containers.status(), null, 2)), true;
-  if (p === '/api/containers/drill' && req.method === 'POST') {
+  if (p === '/api/containers/drill' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true;
     let body; try { body = JSON.parse(await readBody(req, 2e4)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; }
     return send(res, 200, 'application/json', JSON.stringify(containers.drill(String(body.area || '16'), body), null, 2)), true;
   }
@@ -1358,7 +2722,7 @@ async function handle(ctx) {
   // ---- Area 70: central module system (manifest loader + lifecycle) ----
   if (p === '/api/modulehub' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(moduleSystem.status(), null, 2)), true;
   if (p === '/api/modulehub/catalog' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(moduleSystem.actions.catalog(), null, 2)), true;
-  if (p === '/api/modulehub/scan' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(moduleSystem.scan(), null, 2)), true;
+  if (p === '/api/modulehub/scan' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; return send(res, 200, 'application/json', JSON.stringify(moduleSystem.scan(), null, 2)), true; }
   const mh = p.match(/^\/api\/modulehub\/([a-z0-9_-]+)\/(approve|enable|disable|health)$/i);
   if (mh) {
     const id = mh[1].toLowerCase(), op = mh[2].toLowerCase();
@@ -1385,12 +2749,12 @@ async function handle(ctx) {
   // ---- Area 68: global config ----
   if (p === '/api/config/schema') return send(res, 200, 'application/json', JSON.stringify(config.schema(), null, 2)), true;
   if (p === '/api/config' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify({ file: config.file, config: config.current() }, null, 2)), true;
-  if (p === '/api/config' && req.method === 'POST') {
+  if (p === '/api/config' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     let body; try { body = JSON.parse(await readBody(req, 2e4)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, errors: ['invalid JSON'] })), true; }
     const r = config.set(body);
     return send(res, r.ok ? 200 : 400, 'application/json', JSON.stringify(r, null, 2)), true;
   }
-  if (p === '/api/config/reset' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(config.reset(), null, 2)), true;
+  if (p === '/api/config/reset' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true; return send(res, 200, 'application/json', JSON.stringify(config.reset(), null, 2)), true; }
 
   // ---- AURA Infrastructure Control Room: local inventory, never remote execution ----
   if (p === '/api/cluster/status') return send(res, 200, 'application/json', JSON.stringify(clusterControl.status(), null, 2)), true;
@@ -1439,8 +2803,8 @@ async function handle(ctx) {
 
   // ---- Area 69: recursive learning core (max 1 failure per fingerprint) ----
   if (p === '/api/learning' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(learningCore.curve(), null, 2)), true;
-  if (p === '/api/learning/simulate' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(learningCore.actions.simulate(), null, 2)), true;
-  if (p === '/api/learning/outcome' && req.method === 'POST') {
+  if (p === '/api/learning/simulate' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true; return send(res, 200, 'application/json', JSON.stringify(learningCore.actions.simulate(), null, 2)), true; }
+  if (p === '/api/learning/outcome' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true;
     let body; try { body = JSON.parse(await readBody(req, 2e4)); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; }
     return send(res, 200, 'application/json', JSON.stringify(learningCore.reportOutcome(String(body.fingerprint || ''), body.ok !== false), null, 2)), true;
   }
@@ -1471,10 +2835,10 @@ async function handle(ctx) {
 
   // ---------- ops: kill switch, scheduler, telegram, mail ----------
   if (p === '/api/ops') return send(res, 200, 'application/json', JSON.stringify(ops.status(), null, 2)), true;
-  if (p === '/api/ops/super' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(ops.runSuper() || { ok: true })), true;
-  if (p === '/api/ops/others' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(ops.runOthers() || { ok: true })), true;
-  if (p === '/api/ops/sync' && req.method === 'POST') return send(res, 200, 'application/json', JSON.stringify(ops.runFullSync() || { ok: true })), true;
-  if (p === '/api/kill' && req.method === 'POST') {
+  if (p === '/api/ops/super' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true; return send(res, 200, 'application/json', JSON.stringify(ops.runSuper() || { ok: true })), true; }
+  if (p === '/api/ops/others' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true; return send(res, 200, 'application/json', JSON.stringify(ops.runOthers() || { ok: true })), true; }
+  if (p === '/api/ops/sync' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true; return send(res, 200, 'application/json', JSON.stringify(ops.runFullSync() || { ok: true })), true; }
+  if (p === '/api/kill' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true;
     const raw = await readBody(req); let body; try { body = JSON.parse(raw || '{}'); } catch { body = {}; }
     return send(res, 200, 'application/json', JSON.stringify(body.arm ? ops.kill(body.reason) : ops.revive(body.reason))), true;
   }
@@ -1535,12 +2899,12 @@ async function handle(ctx) {
 
   // ---------- schedule + watcher + ignition ----------
   if (p === '/api/schedule') return send(res, 200, 'application/json', JSON.stringify(registry.get('60').mod.list(), null, 2)), true;
-  if (p === '/api/schedule/add' && req.method === 'POST') {
+  if (p === '/api/schedule/add' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true;
     const raw = await readBody(req); let body; try { body = JSON.parse(raw || '{}'); } catch { syntaxFail(); return send(res, 400, 'application/json', JSON.stringify({ error: 'invalid JSON' })), true; }
     try { return send(res, 200, 'application/json', JSON.stringify(registry.get('60').mod.add(body))), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ error: e.message })), true; }
   }
-  if (p === '/api/schedule/remove' && req.method === 'POST') {
+  if (p === '/api/schedule/remove' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht (oder als Besitzer anmelden).' })), true;
     const raw = await readBody(req); let body; try { body = JSON.parse(raw || '{}'); } catch { body = {}; }
     return send(res, 200, 'application/json', JSON.stringify(registry.get('60').mod.remove(String(body.id)))), true;
   }

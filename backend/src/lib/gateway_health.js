@@ -45,7 +45,9 @@ async function checkAll() {
   const results = [];
   for (const ep of db.endpoints) results.push(await probeEndpoint(ep));
   // lokale Selbstprüfung ist immer möglich:
-  results.push(await probeEndpoint({ id: 'self', url: 'http://127.0.0.1:8080/api/health' }));
+  // Eigener Port statt hart 8080: sonst meldet sich ein Server auf 8090 selbst als DOWN,
+  // nur weil er auf einen fremden Port schaut.
+  results.push(await probeEndpoint({ id: 'self', url: 'http://127.0.0.1:' + (process.env.PORT || 8080) + '/api/health' }));
   db.checks.push({ at: new Date().toISOString(), results: results.map((r) => ({ id: r.id, state: r.state, latency_ms: r.latency_ms, http: r.http })) });
   if (db.checks.length > 200) db.checks = db.checks.slice(-200);
   save(db);

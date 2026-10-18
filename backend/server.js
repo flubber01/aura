@@ -63,7 +63,7 @@ function serveStatic(req, res) {
   if (!file.startsWith(PUBLIC_DIR)) return send(res, 403, 'text/plain', 'Forbidden');
   fs.readFile(file, (err, buf) => {
     if (err) return send(res, 404, 'text/plain', 'Not found: ' + p);
-    res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });
+    res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream', ...SECURITY_HEADERS });
     res.end(buf);
   });
 }
@@ -72,10 +72,24 @@ function readBody(req, cap = 5e6) {
   return new Promise((r) => { let d = ''; req.on('data', (c) => { d += c; if (d.length > cap) req.destroy(); }); req.on('end', () => r(d)); });
 }
 
+// Schutz-Kopfzeilen (Bereich SEC): Typ nicht raten, Herkunft begrenzen, nicht in fremde Seiten
+// einbetten — **außer** in unsere eigene Vorschau. Die Vorschau läuft in einem Rahmen auf anderer
+// Adresse; deshalb steht sie ausdrücklich in frame-ancestors. Ohne diese Zeile bricht die Vorschau,
+// mit einer pauschalen Sperre ebenso. Über AURA_FRAME_ANCESTORS anpassbar.
+const FRAME_ANCESTORS = process.env.AURA_FRAME_ANCESTORS || "'self' https:";
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Content-Security-Policy': `default-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors ${FRAME_ANCESTORS}; base-uri 'self'; form-action 'self'`,
+  'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+  'Cross-Origin-Resource-Policy': 'same-site',
+  'X-AURA-Security': 'headers-on',
+};
+
 function send(res, code, type, body, extra = {}) {
   // Browser-facing AURA uses same-origin relative APIs. Do not advertise a
   // wildcard CORS policy for privileged local admin surfaces.
-  res.writeHead(code, { 'Content-Type': type, ...extra });
+  res.writeHead(code, { 'Content-Type': type, ...SECURITY_HEADERS, ...extra });
   res.end(body);
 }
 
@@ -114,6 +128,14 @@ const server = http.createServer(async (req, res) => {
   try {
     const ctx = { req, res, url, p, method: req.method, send, readBody, syntaxFail, ROOT, PUBLIC_DIR, actor: authGate.actor || null, auth_mode: authGate.mode };
     const handled = await dispatcher.dispatch(ctx);
+    // Cross-Chain: jede erfolgreiche Aktion bucht den Meilenstein der Abteilung (Verbund → Kette).
+    // Ereignis je Pfad aus dem Verbund-Katalog; Erzeuger-Routen buchen Inhalt, alles andere Aktion.
+    if (handled && req.method === 'POST' && res.statusCode === 200) {
+      try {
+        const verbund = require('./src/lib/verbund');
+        require('./src/lib/milestones').track('gast', verbund.crosschain(p, req.method) || 'klick', 1);
+      } catch (e) { /* Meilensteine dürfen den Betrieb nie stören */ }
+    }
     if (!handled) {
       if (p.startsWith('/api/')) return send(res, 404, 'application/json', JSON.stringify({ error: 'Unknown endpoint' }));
       return serveStatic(req, res);
@@ -129,16 +151,37 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  require('./src/lib/autonomy_loop').start(); // self-healing loop + swarm strategy + learning curve
-  ops.startScheduler(); // 12h super-brain autosave · 4h others · 24h full sync
-  watcher.start(config.get('watcher.interval_ms', 1500)); // hot-reload data files w/ rollback on syntax error
-  selfRepair.start(config.get('self_repair.interval_ms', 20000)); // area 66: massive logging + self-repair daemon
+  // Watchdog: die Dienste laufen unter Aufsicht (3-Strike-Regel, Sleep-Mode, Live-Uebersicht).
+  // Er startet nur neu — er erzeugt keinen Traffic und kein Engagement.
+  const watchdog = require('./src/lib/watchdog');
+  const control = require('./src/lib/routine_control');
+  const daemons = [
+    { name: 'autonomy-loop', description: 'Selbstheilung + Lernkurve', job: () => require('./src/lib/autonomy_loop'), start: (m) => m.start(), stop: (m) => m.stop && m.stop() },
+    { name: 'ops-scheduler', description: 'Autosave 12h/4h/24h', job: () => ops, start: (m) => m.startScheduler(), stop: (m) => m.stopScheduler() },
+    { name: 'file-watcher', description: 'Datei-Hotreload mit Rollback', job: () => watcher, start: (m) => m.start(config.get('watcher.interval_ms', 1500)), stop: (m) => m.stop && m.stop() },
+    { name: 'self-repair', description: 'Logging + Selbstreparatur', job: () => selfRepair, start: (m) => m.start(config.get('self_repair.interval_ms', 20000)), stop: (m) => m.stop && m.stop() },
+    { name: 'report-daemon', description: 'Report-Tick (Area 17)', job: () => require('./src/lib/report_daemon'), start: () => control.toggle('report-daemon', true), stop: () => control.toggle('report-daemon', false) },
+    { name: 'forge-tick', description: 'Content-Forge-Tick (Area 73)', job: () => require('./src/lib/content_forge'), start: () => control.toggle('forge-tick', true), stop: () => control.toggle('forge-tick', false) },
+  ];
+  for (const d of daemons) {
+    try { watchdog.register({ name: d.name, description: d.description, start: () => d.start(d.job()), stop: () => d.stop(d.job()) }); }
+    catch (e) { selfRepair.log('ERROR', 'WATCHDOG', 'register ' + d.name, { error: String(e.message || e) }); }
+  }
+  for (const d of daemons) {
+    try { const r = watchdog.startService(d.name); if (!r.ok && r.code !== 423) selfRepair.log('ERROR', 'WATCHDOG', 'start ' + d.name, r); }
+    catch (e) { selfRepair.log('ERROR', 'WATCHDOG', 'start ' + d.name, { error: String(e.message || e) }); }
+  }
   setInterval(() => { // areas 17+73 daemons, gated by Area 74 modes + Area 75 toggles
     try {
-      const control = require('./src/lib/routine_control');
       const fabric = require('./src/lib/service_fabric');
-      if (control.isEnabled('report-daemon')) require('./src/lib/report_daemon').tick();
-      if (control.isEnabled('forge-tick') && !fabric.mode('safe') && !fabric.mode('quiet')) require('./src/lib/content_forge').tick();
+      if (control.isEnabled('report-daemon') && watchdog.status().services.find((s) => s.name === 'report-daemon' && s.status === 'RUNNING')) {
+        try { require('./src/lib/report_daemon').tick(); watchdog.beat('report-daemon'); }
+        catch (e) { const c = watchdog.crash('report-daemon', e); if (c.status === 'DOWN_PERMANENT') { control.toggle('report-daemon', false); selfRepair.log('ERROR', 'WATCHDOG', 'report-daemon bleibt unten', c); } }
+      }
+      if (control.isEnabled('forge-tick') && !fabric.mode('safe') && !fabric.mode('quiet') && watchdog.status().services.find((s) => s.name === 'forge-tick' && s.status === 'RUNNING')) {
+        try { require('./src/lib/content_forge').tick(); watchdog.beat('forge-tick'); }
+        catch (e) { const c = watchdog.crash('forge-tick', e); if (c.status === 'DOWN_PERMANENT') { control.toggle('forge-tick', false); selfRepair.log('ERROR', 'WATCHDOG', 'forge-tick bleibt unten', c); } }
+      }
     } catch {}
   }, 30000);
   console.log(`AURA backend listening on http://${HOST}:${PORT} (dispatcher: ${dispatcher.modules.join(' → ')})`);

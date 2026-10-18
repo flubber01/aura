@@ -22,3 +22,8 @@ extracted/AURA-Web-Deploy/public/dl/
 
 # Arena/Connector downloads — never commit rescue archives
 google_drive/
+_uploads/
+
+# Installationsprotokoll des Startskripts (deploy/master-install.sh)
+aura-backend.log
+/aura-backend.log

@@ -69,9 +69,23 @@ bash deploy/start_swarm.sh up     # docker compose web+backend
 | [`docs/AURA_CONTINUITY_ASSET_REACTOR.md`](docs/AURA_CONTINUITY_ASSET_REACTOR.md) | Area 97: time-off creator coverage, avatar/voice rights gates, owner review and product image → multi-format render briefs |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) · [`docs/SETUP.md`](docs/SETUP.md) · [`docs/DATABASE.md`](docs/DATABASE.md) · [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md) | Architektur, Setup, Datenmodell, Integrationen |
 
-Eine Zeile, ohne Schnickschnack:
+Eine Zeile, ohne Schnickschnack (öffentliches Repo):
 ```bash
-curl -fsSL https://raw.githubusercontent.com/flubber01/aura/arena/0ee9c54c-aura/deploy/master-install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/flubber01/aura/main/deploy/master-install.sh | bash
+```
+
+**Privates Repo (aktueller Zustand):** ohne Token liefert `raw.githubusercontent.com` **404** und es passiert nichts.
+Fein granulierten Token (nur `Contents: Read`) anlegen und mitgeben:
+```bash
+TOKEN=<github_pat_...>
+curl -fsSL -H "Authorization: Bearer $TOKEN" \
+  https://raw.githubusercontent.com/flubber01/aura/main/deploy/master-install.sh \
+  | AURA_TOKEN="$TOKEN" bash
+```
+Alternativ direkt klonen:
+```bash
+git clone https://x-access-token:$TOKEN@github.com/flubber01/aura.git aura && cd aura
+AURA_DIR="$PWD" bash deploy/master-install.sh
 ```
 
 ## Safety (hard lines, enforced in code)
