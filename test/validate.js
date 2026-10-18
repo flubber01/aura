@@ -5,6 +5,9 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const net = require('net');
+const os = require('os');
+const { spawn, spawnSync } = require('child_process');
 
 const BASE = process.env.AURA_URL || 'http://127.0.0.1:8080';
 const results = { pass: 0, fail: 0, items: [] };
@@ -73,6 +76,18 @@ async function checkPage(p) {
     const copyReady = /Kopieren/.test(r.body) && /navigator\.clipboard/.test(r.body);
     ok = ok && copyReady;
     detail += copyReady ? ' · Befehle kopierbar' : ' · Kopierfunktion fehlt';
+  }
+  if (p === '/selfwork') {
+    const ready = /Nichts wird gepusht oder automatisch neu gestartet/.test(r.body) && /id="diffView"/.test(r.body)
+      && /id="checkList"/.test(r.body) && /\/api\/selfwork\/apply/.test(r.body) && /\/api\/selfwork\/revert/.test(r.body)
+      && /selfwork-local/.test(r.body) && /gh pr create/.test(r.body);
+    ok = ok && ready;
+    detail += ready ? ' · Diff-Ansicht, Prüfliste und Klick-Buttons' : ' · Diff-Ansicht/Buttons fehlen';
+  }
+  if (p === '/containers') {
+    const ready = /Dritt-Modul importieren/.test(r.body) && /\/api\/modulehub\/import/.test(r.body) && /id="impQueue"/.test(r.body);
+    ok = ok && ready;
+    detail += ready ? ' · Import-Schleuse sichtbar' : ' · Import-Schleuse fehlt';
   }
   results.items.push({ kind: 'page', path: p, ok, detail });
 }
@@ -143,7 +158,7 @@ async function main() {
   const pages = ['/hub', '/brain', '/master', '/console', '/skills', '/downloads',
     '/pipelines', '/yellowpages', '/deploy', '/cluster', '/hierarchy', '/ops', '/terminal',
     '/minibot', '/ignition', '/arcade', '/schedule', '/builder', '/research', '/seo',
-    '/logs', '/config', '/containers', '/login', '/jarvis', '/admin', '/intelligence', '/workflows', '/repair', '/content-command', '/aura-heart', '/creator-desk', '/label-desk', '/media-newsroom', '/social-control', '/growth-nexus', '/capability-radar', '/aura-os', '/aura-os/launchpad', '/creator-continuity', '/remote-approval', '/creator-collaboration', '/creator-revenue', '/creator-passport', '/today', '/studio-command'];
+    '/logs', '/config', '/containers', '/login', '/jarvis', '/admin', '/intelligence', '/workflows', '/repair', '/content-command', '/aura-heart', '/creator-desk', '/label-desk', '/media-newsroom', '/social-control', '/growth-nexus', '/capability-radar', '/aura-os', '/aura-os/launchpad', '/creator-continuity', '/remote-approval', '/creator-collaboration', '/creator-revenue', '/creator-passport', '/today', '/studio-command', '/selfwork'];
   for (const p of pages) await checkPage(p);
   // root must redirect to the multi-screen hub (Gehirn 2.0 reachable from there)
   const rootRes = await get('/');
@@ -370,6 +385,244 @@ async function main() {
 
     const surv = jp(await post('/api/modulehub/hello-tool/execute', { action: 'greet', input: { name: 'Survival' } }));
     results.items.push({ kind: 'module', path: 'backward compat: system intact after all module drills', ok: surv.ok === true, detail: 'server + modules alive' });
+  }
+
+  // ---------- Runde 10 · E: Dritt-Connector mit Fehlerfrei-Schleuse (Area 70) ----------
+  {
+    const jp = (r) => { try { return JSON.parse(r.body); } catch { return {}; } };
+    const { pack } = require(path.join(__dirname, '..', 'backend', 'src', 'lib', 'zip_stored'));
+    const MODS = path.join(__dirname, '..', 'backend', 'modules');
+    const MH_STATE = path.join(__dirname, '..', 'backend', 'src', 'data', 'module_system.json');
+    const b64 = (s) => Buffer.from(s).toString('base64');
+    const zipVon = (dateien) => pack(dateien.map((d) => ({ name: d.rel, data: Buffer.from(d.inhalt) })), { compress: true }).toString('base64');
+    const manifest = (id) => JSON.stringify({
+      id, name: 'Sweep-Import ' + id, version: '1.0.0', description: 'temporäres Import-Paket für den Validierungslauf',
+      author: 'validate.js', type: 'module', entry: 'index.js', permissions: [], routes: [],
+      selftest: { entry: 'selftest.js' }, capabilities: [{ action: 'ping', description: 'test', input: {} }],
+    });
+    const zielOrdner = path.join(MODS, 'zz-sweep-import');
+    const sauber = () => {
+      try { fs.rmSync(zielOrdner, { recursive: true, force: true }); } catch {}
+      try {
+        const st = JSON.parse(fs.readFileSync(MH_STATE, 'utf8'));
+        for (const bereich of ['approved', 'enabled', 'config']) delete (st[bereich] || {})['zz-sweep-import'];
+        fs.writeFileSync(MH_STATE, JSON.stringify(st, null, 2));
+      } catch {}
+    };
+    sauber();
+
+    // 1) absichtlich kaputtes Beispielmodul → ok:false, mit Gründen
+    const kaputt = jp(await post('/api/modulehub/import', {
+      files: [
+        { path: 'aura.module.json', content: b64(JSON.stringify({ id: 'zz-sweep-broken', name: 'kaputt', version: '1.0', description: 'd', author: 'a', type: 'module', entry: 'index.js', permissions: ['secrets:read'], routes: [], selftest: { entry: 'selftest.js' } })), encoding: 'base64' },
+        { path: 'index.js', content: b64("const cp = require('child_process'); module.exports = { execute: () => ({ ok: true }) };"), encoding: 'base64' },
+        { path: 'selftest.js', content: b64('process.exit(0);'), encoding: 'base64' },
+      ],
+    }));
+    const kaputtRot = (kaputt.checks || []).filter((c) => c.status === 'fail').map((c) => c.id);
+    results.items.push({ kind: 'import', path: 'kaputtes Dritt-Modul: ok:false mit Gründen (422)', ok: kaputt.ok === false && kaputt.status === 'abgelehnt' && kaputtRot.includes('manifest') && kaputtRot.includes('verbote') && String(kaputt.reason || '').length > 20, detail: 'rot: ' + kaputtRot.join(', ') + ' · ' + String(kaputt.reason || '').slice(0, 90) });
+
+    // 2) mitgeliefertes Beispielmodul als ZIP → ok:true, Status pending_approval
+    const beispielOrdner = path.join(MODS, 'example-hello');
+    const beispielDateien = fs.readdirSync(beispielOrdner).filter((f) => f.endsWith('.js') || f === 'aura.module.json')
+      .map((name) => ({ rel: name, inhalt: fs.readFileSync(path.join(beispielOrdner, name)) }));
+    const gut = jp(await post('/api/modulehub/import', { name: 'example-hello', data: zipVon(beispielDateien) }));
+    const gutChecks = (gut.checks || []).map((c) => c.id + ':' + c.status);
+    results.items.push({ kind: 'import', path: 'example-hello als ZIP: ok:true · Status pending_approval', ok: gut.ok === true && gut.status === 'pending_approval' && (gut.checks || []).length >= 7 && (gut.checks || []).every((c) => c.status !== 'fail'), detail: gutChecks.join(' ') });
+    results.items.push({ kind: 'import', path: 'Import-Schleuse: Prüfprotokoll ist vollständig benannt', ok: ['paket', 'manifest', 'einstieg', 'quarantaene', 'syntax', 'verbote', 'konflikt', 'selftest'].every((id) => (gut.checks || []).some((c) => c.id === id)), detail: (gut.checks || []).length + ' Prüfungen' });
+
+    // 3) frisches Modul: importieren → wartet → erst Freigabe macht den Registry-Eintrag
+    const paket = [
+      { rel: 'aura.module.json', inhalt: manifest('zz-sweep-import') },
+      { rel: 'index.js', inhalt: "module.exports = { initialize() {}, execute: (a) => ({ ok: true, pong: a }), healthCheck: () => ({ ok: true }), shutdown() {} };" },
+      { rel: 'selftest.js', inhalt: "const m = require('./index.js'); const r = m.execute('ping'); console.log(JSON.stringify({ ok: r.ok })); process.exit(r.ok ? 0 : 1);" },
+    ];
+    const frisch = jp(await post('/api/modulehub/import', { name: 'zz-sweep-import', data: zipVon(paket) }));
+    results.items.push({ kind: 'import', path: 'frisches Dritt-Modul: ok:true · pending_approval', ok: frisch.ok === true && frisch.status === 'pending_approval', detail: String(frisch.status) + ' · ' + (frisch.checks || []).map((c) => c.id + ':' + c.status).join(' ') });
+
+    await post('/api/modulehub/scan', {});
+    const vorFreigabe = jp(await get('/api/modulehub'));
+    results.items.push({ kind: 'import', path: 'keine Auto-Freigabe: wartendes Modul ist nicht geladen', ok: !(vorFreigabe.modules || []).some((m) => m.id === 'zz-sweep-import' && ['ready', 'disabled'].includes(m.status)) && !fs.existsSync(zielOrdner), detail: 'Ordner vorhanden: ' + fs.existsSync(zielOrdner) });
+    const warteschlange = jp(await get('/api/modulehub/imports'));
+    results.items.push({ kind: 'import', path: 'Warteschlange zeigt pending_approval mit Protokoll', ok: (warteschlange.imports || []).some((i) => i.id === 'zz-sweep-import' && i.status === 'pending_approval' && (i.checks || []).length >= 7), detail: (warteschlange.imports || []).length + ' Einträge' });
+
+    // 4) Freigabe ausschließlich durch das bestehende Approve-Gate — erst danach Registry-Eintrag
+    const freigabe = jp(await post('/api/modulehub/zz-sweep-import/approve', { on: true }));
+    results.items.push({ kind: 'import', path: 'Approve-Gate installiert aus der Quarantäne und gibt frei', ok: freigabe.ok === true && freigabe.approved === true && fs.existsSync(zielOrdner), detail: 'status ' + freigabe.status + ' · Ordner: ' + fs.existsSync(zielOrdner) });
+    const nachFreigabe = jp(await get('/api/modulehub'));
+    const installiert = (nachFreigabe.modules || []).find((m) => m.id === 'zz-sweep-import');
+    const liveNach = jp(await get('/api/modules/live'));
+    results.items.push({ kind: 'import', path: 'erst nach der Freigabe: Registry-Eintrag (pkg) vorhanden', ok: (liveNach.modules || []).some((m) => m.mode === 'pkg' && m.area === 'pkg:zz-sweep-import') && !!installiert && installiert.status === 'ready', detail: installiert ? installiert.status : 'fehlt' });
+    const ausgefuehrt = jp(await post('/api/modulehub/zz-sweep-import/execute', { action: 'ping' }));
+    results.items.push({ kind: 'import', path: 'freigegebenes Import-Modul läuft (execute)', ok: ausgefuehrt.ok === true && ausgefuehrt.result && ausgefuehrt.result.pong === 'ping', detail: ausgefuehrt.ok ? 'pong' : String(ausgefuehrt.error || '') });
+
+    // Aufräumen: Import verwerfen, Ordner entfernen, Zustand säubern, neu einlesen
+    await post('/api/modulehub/imports/discard', { id: 'zz-sweep-import' });
+    await post('/api/modulehub/imports/discard', { id: 'example-hello' });
+    sauber();
+    await post('/api/modulehub/scan', {});
+    const danach = jp(await get('/api/modulehub'));
+    results.items.push({ kind: 'import', path: 'Aufgeräumt: Sweep-Modul restlos entfernt', ok: !(danach.modules || []).some((m) => m.id === 'zz-sweep-import') && !fs.existsSync(zielOrdner), detail: 'Module: ' + (danach.modules || []).length });
+  }
+
+  // ---------- Runde 10 · F: Selbstbearbeitungs-Werkbank (Area 103) ----------
+  {
+    const jp = (r) => { try { return JSON.parse(r.body); } catch { return {}; } };
+    const freierPort = () => new Promise((res, rej) => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => res(p)); }); s.on('error', rej); });
+    const schlaf = (ms) => new Promise((r) => setTimeout(r, ms));
+    const MINI_DIFF = [
+      'diff --git a/backend/src/lib/zz_sweep_probe.js b/backend/src/lib/zz_sweep_probe.js',
+      'new file mode 100644',
+      '--- /dev/null',
+      '+++ b/backend/src/lib/zz_sweep_probe.js',
+      '@@ -0,0 +1,2 @@',
+      "+'use strict';",
+      '+module.exports = { sweep_probe: true };',
+      '',
+    ].join('\n');
+    const BOESE_DIFF = [
+      'diff --git a/deploy/zz_sweep_boese.sh b/deploy/zz_sweep_boese.sh',
+      'new file mode 100644',
+      '--- /dev/null',
+      '+++ b/deploy/zz_sweep_boese.sh',
+      '@@ -0,0 +1,2 @@',
+      '#!/bin/sh',
+      '+echo boese',
+      '',
+    ].join('\n');
+
+    // Fake-Ollama: antwortet lokal, ohne jedes Netz. Liefert einen Mini-Diff.
+    function fakeOllama(port) {
+      const server = http.createServer((req, res) => {
+        let data = '';
+        req.on('data', (c) => { data += c; });
+        req.on('end', () => {
+          res.setHeader('content-type', 'application/json');
+          if (req.url === '/api/tags') return res.end(JSON.stringify({ models: [{ name: 'zz-sweep-fake:1b' }, { name: 'qwen2.5-coder:14b' }] }));
+          const boese = /VERBOTENER-PFAD-TEST/.test(data);
+          res.end(JSON.stringify({ model: 'zz-sweep-fake:1b', message: { role: 'assistant', content: boese ? BOESE_DIFF : MINI_DIFF }, done: true }));
+        });
+      });
+      return new Promise((r) => server.listen(port, '127.0.0.1', () => r(server)));
+    }
+
+    // Kopie des Projekts: Apply/Revert/Commit laufen dort, nie im echten Repository.
+    function kopie() {
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'aura-selfwork-sweep-'));
+      const dir = path.join(tmp, 'repo');
+      fs.mkdirSync(dir);
+      const SKIP = new Set(['.git', 'node_modules', '_uploads', 'google_drive']);
+      for (const entry of fs.readdirSync(path.join(__dirname, '..'), { withFileTypes: true })) {
+        if (SKIP.has(entry.name)) continue;
+        if (entry.isFile() && /\.zip$/i.test(entry.name)) continue;
+        fs.cpSync(path.join(__dirname, '..', entry.name), path.join(dir, entry.name), { recursive: true, filter: (src) => !src.includes(`${path.sep}node_modules`) });
+      }
+      const g = (args) => spawnSync('git', args, { cwd: dir, encoding: 'utf8', env: Object.assign({}, process.env, { GIT_AUTHOR_NAME: 'validate', GIT_AUTHOR_EMAIL: 'validate@aura.local', GIT_COMMITTER_NAME: 'validate', GIT_COMMITTER_EMAIL: 'validate@aura.local' }) });
+      g(['init', '-q']);
+      g(['add', '-A']);
+      g(['commit', '-q', '-m', 'sweep-baseline']);
+      return dir;
+    }
+
+    async function serverStarten(dir, envZusatz) {
+      const port = await freierPort();
+      const child = spawn(process.execPath, ['backend/server.js'], {
+        cwd: dir,
+        env: Object.assign({}, process.env, { PORT: String(port), AURA_ADMIN_TOKEN: 'sweep-selfwork', AURA_ULTRA_SCOUT: '0' }, envZusatz),
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      let log = '';
+      child.stdout.on('data', (d) => { log += d; });
+      child.stderr.on('data', (d) => { log += d; });
+      const basis = 'http://127.0.0.1:' + port;
+      let oben = false;
+      for (let i = 0; i < 80 && !oben; i++) { try { const r = await fetch(basis + '/api/health'); oben = r.status < 500; } catch { await schlaf(250); } }
+      return { child, basis, log, oben };
+    }
+    const httpPost = async (basis, p, body) => {
+      const r = await fetch(basis + p, { method: 'POST', headers: { 'content-type': 'application/json', 'x-aura-token': 'sweep-selfwork' }, body: JSON.stringify(body || {}) });
+      return { status: r.status, body: await r.json().catch(() => ({})) };
+    };
+    const httpGet = async (basis, p) => {
+      const r = await fetch(basis + p);
+      return { status: r.status, body: await r.text() };
+    };
+
+    // --- Pfad 1: MIT lokalem Modell (Fake-Ollama) ---
+    const dir = kopie();
+    const fakePort = await freierPort();
+    const fake = await fakeOllama(fakePort);
+    const instanz = await serverStarten(dir, { OLLAMA_URL: 'http://127.0.0.1:' + fakePort, OLLAMA_MODEL: 'zz-sweep-fake:1b' });
+    try {
+      if (!instanz.oben) throw new Error('Server startet nicht: ' + instanz.log.slice(-400));
+      const status = JSON.parse((await httpGet(instanz.basis, '/api/selfwork/status')).body);
+      results.items.push({ kind: 'selfwork', path: 'Status: Modus, Erlaubnisliste, Modelle, Grenzen', ok: status.mode === 'LOCAL_SELF_EDIT_WORKBENCH' && status.repo && status.repo.is_repo === true && Array.isArray(status.allowlist.erlaubt) && status.allowlist.erlaubt.length === 4 && status.modelle.reachable === true && status.grenzen.kein_push === true && status.grenzen.kein_neustart === true, detail: 'Modelle: ' + (status.modelle.models || []).length + ' · Dateien: ' + status.files });
+
+      const seite = await httpGet(instanz.basis, '/selfwork');
+      results.items.push({ kind: 'selfwork', path: '/selfwork antwortet 200 mit Diff-Ansicht und Klick-Buttons', ok: seite.status === 200 && /id="diffView"/.test(seite.body) && /id="applyButton"/.test(seite.body) && /id="revertButton"/.test(seite.body) && /Nichts wird gepusht oder automatisch neu gestartet/.test(seite.body), detail: seite.status + ' · ' + seite.body.length + 'B' });
+
+      const vorschlag = await httpPost(instanz.basis, '/api/selfwork/propose', { auftrag: 'Lege eine winzige Probe-Datei in backend/src/lib an, damit die Prüfkette messbar ist.' });
+      const v = vorschlag.body;
+      results.items.push({ kind: 'selfwork', path: 'propose: Prüfungen laufen gegen den Vorschlag', ok: vorschlag.status === 200 && v.ok === true && (v.checks || []).length >= 5 && (v.checks || []).every((c) => c.status !== 'fail') && v.llm && v.llm.used === true, detail: (v.checks || []).map((c) => c.id + ':' + c.status).join(' ') });
+      results.items.push({ kind: 'selfwork', path: 'propose: git apply --check + node --check im temporären Worktree', ok: (v.checks || []).some((c) => c.id === 'git_apply_check' && c.status === 'ok') && (v.checks || []).some((c) => c.id === 'node_check' && c.status === 'ok'), detail: 'Diff: ' + String(v.diff || '').split('\n').length + ' Zeilen' });
+      results.items.push({ kind: 'selfwork', path: 'propose: nur Pfade aus der Erlaubnisliste im Diff', ok: (v.dateien || []).length > 0 && v.dateien.every((f) => /^(backend\/pages|backend\/src\/lib|backend\/src\/routes|test)\//.test(f)), detail: (v.dateien || []).join(', ') });
+
+      const vorher = spawnSync('git', ['status', '--porcelain'], { cwd: dir, encoding: 'utf8' }).stdout.trim();
+      results.items.push({ kind: 'selfwork', path: 'keine Auto-Aktion: propose verändert den Arbeitsbaum nicht', ok: vorher === '', detail: vorher === '' ? 'Arbeitsbaum sauber' : vorher });
+
+      const anwendung = await httpPost(instanz.basis, '/api/selfwork/apply', { id: v.id });
+      const nachher = spawnSync('git', ['status', '--porcelain'], { cwd: dir, encoding: 'utf8' }).stdout.trim();
+      const commitDateien = spawnSync('git', ['show', '--name-only', '--pretty=format:', 'refs/heads/selfwork-local'], { cwd: dir, encoding: 'utf8' }).stdout.trim().split('\n').filter(Boolean);
+      const zweig = spawnSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: dir, encoding: 'utf8' }).stdout.trim();
+      results.items.push({ kind: 'selfwork', path: 'apply erst nach explizitem Aufruf · Commit auf selfwork-local', ok: anwendung.status === 200 && anwendung.body.ok === true && !!anwendung.body.commit && nachher !== '' && zweig !== 'selfwork-local', detail: 'Commit ' + String(anwendung.body.commit || '').slice(0, 10) + ' · Arbeitszweig ' + zweig });
+      results.items.push({ kind: 'selfwork', path: 'apply ändert nachweislich nur erlaubte Pfade', ok: commitDateien.length > 0 && commitDateien.every((f) => /^(backend\/pages|backend\/src\/lib|backend\/src\/routes|test)\//.test(f)) && !commitDateien.some((f) => f.startsWith('backend/src/data/') || f.startsWith('deploy/')), detail: commitDateien.join(', ') });
+      results.items.push({ kind: 'selfwork', path: 'kein Push und kein Neustart: branch bleibt lokal, Arbeitsbaum bleibt Hauptzweig', ok: spawnSync('git', ['ls-remote', '--exit-code', 'origin', 'refs/heads/selfwork-local'], { cwd: dir, encoding: 'utf8' }).status !== 0 || !spawnSync('git', ['remote'], { cwd: dir, encoding: 'utf8' }).stdout.trim(), detail: 'kein Remote-Zweig angelegt' });
+
+      const ruecknahme = await httpPost(instanz.basis, '/api/selfwork/revert', { id: v.id });
+      const danach = spawnSync('git', ['status', '--porcelain'], { cwd: dir, encoding: 'utf8' }).stdout.trim();
+      results.items.push({ kind: 'selfwork', path: 'revert nimmt den Vorschlag zurück', ok: ruecknahme.status === 200 && ruecknahme.body.ok === true && danach === '', detail: danach === '' ? 'Arbeitsbaum wieder sauber' : danach });
+
+      // harte Grenze: verbotener Pfad im Vorschlag → rot, apply verweigert
+      const boese = await httpPost(instanz.basis, '/api/selfwork/propose', { auftrag: 'VERBOTENER-PFAD-TEST: schreibe nach deploy/zz_sweep_boese.sh' });
+      results.items.push({ kind: 'selfwork', path: 'Grenze: Vorschlag mit verbotenem Pfad ist rot', ok: boese.status === 422 && boese.body.ok === false && (boese.body.checks || []).some((c) => c.id === 'pfade' && c.status === 'fail'), detail: (boese.body.checks || []).map((c) => c.id + ':' + c.status).join(' ') });
+      const boeseApply = await httpPost(instanz.basis, '/api/selfwork/apply', { id: boese.body.id });
+      results.items.push({ kind: 'selfwork', path: 'Grenze: roter Vorschlag lässt sich nicht anwenden', ok: boeseApply.status === 400 && boeseApply.body.ok === false, detail: String(boeseApply.body.error || '').slice(0, 80) });
+
+      const liste = JSON.parse((await httpGet(instanz.basis, '/api/selfwork/proposals')).body);
+      results.items.push({ kind: 'selfwork', path: 'proposals listet Vorschläge mit Protokoll', ok: Array.isArray(liste) && liste.length >= 2 && liste.every((p) => Array.isArray(p.checks) && typeof p.diff === 'string'), detail: liste.length + ' Vorschläge' });
+    } catch (e) {
+      results.items.push({ kind: 'selfwork', path: 'Selbstbearbeitung mit lokalem Modell (Fake-Ollama)', ok: false, detail: String(e.message || e).slice(0, 160) });
+    } finally {
+      instanz.child.kill('SIGTERM');
+      fake.close();
+      await schlaf(300);
+      try { fs.rmSync(path.dirname(dir), { recursive: true, force: true }); } catch {}
+    }
+
+    // --- Pfad 2: OHNE lokales Modell (OLLAMA_URL nicht gesetzt) → ehrliche Absage ---
+    const dir2 = kopie();
+    const instanz2 = await serverStarten(dir2, { OLLAMA_URL: '', OLLAMA_MODEL: '' });
+    try {
+      if (!instanz2.oben) throw new Error('Server startet nicht: ' + instanz2.log.slice(-400));
+      const status2 = JSON.parse((await httpGet(instanz2.basis, '/api/selfwork/status')).body);
+      results.items.push({ kind: 'selfwork', path: 'ohne lokales Modell: Status meldet das ehrlich', ok: status2.modelle.configured === false && status2.modelle.reachable === false, detail: String(status2.grenzen && status2.grenzen.hinweis || '').slice(0, 90) });
+      const v2 = await httpPost(instanz2.basis, '/api/selfwork/propose', { auftrag: 'ohne Modell kann nichts entstehen' });
+      results.items.push({ kind: 'selfwork', path: 'ohne lokales Modell: propose bleibt ehrlich rot (kein erfundener Diff)', ok: v2.status === 422 && v2.body.ok === false && v2.body.llm && v2.body.llm.used === false && v2.body.diff === '', detail: String((v2.body.llm || {}).reason || '').slice(0, 80) });
+      const apply2 = await httpPost(instanz2.basis, '/api/selfwork/apply', { id: v2.body.id });
+      results.items.push({ kind: 'selfwork', path: 'ohne lokales Modell: apply wird verweigert', ok: apply2.status === 400 && apply2.body.ok === false, detail: String(apply2.body.error || '').slice(0, 80) });
+      const arbeitsbaum = spawnSync('git', ['status', '--porcelain'], { cwd: dir2, encoding: 'utf8' }).stdout.trim();
+      results.items.push({ kind: 'selfwork', path: 'ohne lokales Modell: der Arbeitsbaum bleibt unberührt', ok: arbeitsbaum === '', detail: arbeitsbaum === '' ? 'sauber' : arbeitsbaum });
+    } catch (e) {
+      results.items.push({ kind: 'selfwork', path: 'Selbstbearbeitung ohne lokales Modell', ok: false, detail: String(e.message || e).slice(0, 160) });
+    } finally {
+      instanz2.child.kill('SIGTERM');
+      await schlaf(300);
+      try { fs.rmSync(path.dirname(dir2), { recursive: true, force: true }); } catch {}
+    }
+
+    // Die Werkbank am laufenden Server: Status und Vorschlagsliste müssen antworten.
+    await checkApi('/api/selfwork/status', j((d) => (d.mode === 'LOCAL_SELF_EDIT_WORKBENCH' && Array.isArray(d.allowlist.erlaubt) && Array.isArray(d.runbook) && d.runbook.length >= 2 ? true : 'selfwork status unvollständig')));
+    await checkApi('/api/selfwork/proposals', j((d) => (Array.isArray(d) ? true : 'proposals ist keine Liste')));
   }
 
   // ---------- Area 71: Image Generation Gateway (ComfyUI + WebUI) ----------
