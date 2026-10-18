@@ -2,11 +2,13 @@
   "id": "example-hello",
   "name": "Beispiel: Hallo-Modul",
   "version": "1.0.0",
-  "description": "Minimales Beispielmodul für die Modul-Schnittstelle. Zeigt Manifest, Konfiguration, Aktion, Rechte und Health-Check.",
+  "description": "Minimales Beispielmodul für die Modul-Schnittstelle. Zeigt Manifest, Konfiguration, Aktion, Rechte, Routen, Selbsttest und Health-Check.",
   "author": "AURA",
   "type": "module",
   "entry": "index.js",
   "permissions": ["registry:read", "audit:write"],
+  "routes": [],
+  "selftest": { "entry": "selftest.js", "timeout_ms": 5000 },
   "configSchema": {
     "greeting": { "type": "string", "default": "Hallo", "description": "Begrüßungstext" },
     "shout": { "type": "boolean", "default": false, "description": "In Großbuchstaben ausgeben" }
