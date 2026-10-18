@@ -82,6 +82,8 @@ const jarvis = require('../lib/jarvis');
 const repair = require('../lib/repair');
 const learningCore = require('../lib/learning_core');
 const moduleSystem = require('../lib/module_system');
+const moduleImport = require('../lib/module_import'); // Dritt-Connector: Import + Fehlerfrei-Schleuse (Approve bleibt beim Menschen)
+const selfwork = require('../lib/selfwork'); // Selbstbearbeitungs-Werkbank: Vorschlag → Prüfung → dein Klick
 const imageGen = require('../lib/image_gen');
 const mcpManager = require('../lib/mcp_manager');
 const contentForge = require('../lib/content_forge');
@@ -2724,12 +2726,26 @@ ${fam.map((f) => `<h2>${f.name} <small>(${f.count})</small></h2><div class="grid
   if (p === '/api/modulehub' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(moduleSystem.status(), null, 2)), true;
   if (p === '/api/modulehub/catalog' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(moduleSystem.actions.catalog(), null, 2)), true;
   if (p === '/api/modulehub/scan' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; return send(res, 200, 'application/json', JSON.stringify(moduleSystem.scan(), null, 2)), true; }
+  // ---- Area 70: Dritt-Connector mit Fehlerfrei-Schleuse (Import prüft, der Mensch gibt frei) ----
+  if (p === '/api/modulehub/import' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify(moduleImport.status(), null, 2)), true;
+  if (p === '/api/modulehub/import' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; let body; try { body = JSON.parse(await readBody(req, 8e6) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; } try { const out = await moduleImport.importPackage(body); return send(res, out.ok ? 200 : 422, 'application/json', JSON.stringify(out, null, 2)), true; } catch (e) { return send(res, 500, 'application/json', JSON.stringify({ ok: false, error: String(e && e.message || e) })), true; } }
+  if (p === '/api/modulehub/imports' && req.method === 'GET') return send(res, 200, 'application/json', JSON.stringify({ mode: 'IMPORT_QUEUE', spec_version: moduleImport.status().spec_version, imports: moduleImport.list() }, null, 2)), true;
+  if (p === '/api/modulehub/imports/discard' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; let body; try { body = JSON.parse(await readBody(req, 2e4) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; } const out = moduleImport.discard(String(body.id || '')); return send(res, out.ok ? 200 : 404, 'application/json', JSON.stringify(out, null, 2)), true; }
   const mh = p.match(/^\/api\/modulehub\/([a-z0-9_-]+)\/(approve|enable|disable|health)$/i);
   if (mh) {
     const id = mh[1].toLowerCase(), op = mh[2].toLowerCase();
     let body = {};
     if (req.method === 'POST') { try { body = JSON.parse(await readBody(req, 2e4) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; } }
-    if (op === 'approve') return send(res, 200, 'application/json', JSON.stringify(moduleSystem.approve(id, body.on), null, 2)), true;
+    if (op === 'approve') {
+      // Das bestehende Approve-Gate bleibt das EINZIGE Tor: wartet ein geprüfter Import,
+      // wird er hier aus der Quarantäne installiert und danach wie jedes Modul freigegeben.
+      if (body.on !== false) {
+        const staged = moduleImport.installIfStaged(id);
+        if (staged.installed) moduleSystem.scan();
+        else if (staged.result && staged.result.ok === false) return send(res, 400, 'application/json', JSON.stringify(staged.result, null, 2)), true;
+      }
+      return send(res, 200, 'application/json', JSON.stringify(moduleSystem.approve(id, body.on), null, 2)), true;
+    }
     if (op === 'enable') return send(res, 200, 'application/json', JSON.stringify(moduleSystem.enable(id), null, 2)), true;
     if (op === 'disable') return send(res, 200, 'application/json', JSON.stringify(moduleSystem.disable(id), null, 2)), true;
     return send(res, 200, 'application/json', JSON.stringify(moduleSystem.health(id), null, 2)), true;
@@ -2746,6 +2762,13 @@ ${fam.map((f) => `<h2>${f.name} <small>(${f.count})</small></h2><div class="grid
     const r = await moduleSystem.execute(id, String(body.action || 'status'), body.input || {});
     return send(res, r.ok ? 200 : (r.fails >= 3 ? 429 : 500), 'application/json', JSON.stringify(r, null, 2)), true;
   }
+
+  // ---- Area 103: Selbstbearbeitungs-Werkbank (lokales Modell schreibt, Mensch entscheidet) ----
+  if (p === '/api/selfwork/status' && req.method === 'GET') { try { return send(res, 200, 'application/json', JSON.stringify(await selfwork.status(), null, 2)), true; } catch (e) { return send(res, 500, 'application/json', JSON.stringify({ ok: false, error: String(e && e.message || e) })), true; } }
+  if (p === '/api/selfwork/proposals' && req.method === 'GET') { try { return send(res, 200, 'application/json', JSON.stringify(selfwork.list(), null, 2)), true; } catch (e) { return send(res, 500, 'application/json', JSON.stringify({ ok: false, error: String(e && e.message || e) })), true; } }
+  if (p === '/api/selfwork/propose' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; let body; try { body = JSON.parse(await readBody(req, 2e5) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; } try { const out = await selfwork.propose(body); return send(res, out.ok ? 200 : 422, 'application/json', JSON.stringify(out, null, 2)), true; } catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; } }
+  if (p === '/api/selfwork/apply' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; let body; try { body = JSON.parse(await readBody(req, 2e4) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; } try { const out = selfwork.apply(String(body.id || '')); return send(res, out.ok ? 200 : 400, 'application/json', JSON.stringify(out, null, 2)), true; } catch (e) { return send(res, 500, 'application/json', JSON.stringify({ ok: false, error: String(e && e.message || e) })), true; } }
+  if (p === '/api/selfwork/revert' && req.method === 'POST') { if (!adminSoft(req, ctx)) return send(res, 401, 'application/json', JSON.stringify({ ok: false, error: 'Admin-Token noetig: AURA_ADMIN_TOKEN ist gesetzt, Header x-aura-token fehlt oder stimmt nicht.' })), true; let body; try { body = JSON.parse(await readBody(req, 2e4) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; } try { const out = selfwork.revert(String(body.id || '')); return send(res, out.ok ? 200 : 400, 'application/json', JSON.stringify(out, null, 2)), true; } catch (e) { return send(res, 500, 'application/json', JSON.stringify({ ok: false, error: String(e && e.message || e) })), true; } }
 
   // ---- Area 68: global config ----
   if (p === '/api/config/schema') return send(res, 200, 'application/json', JSON.stringify(config.schema(), null, 2)), true;
