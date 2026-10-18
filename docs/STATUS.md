@@ -1,6 +1,6 @@
 # AURA — Status aller Bereiche (gemessen, nicht geschätzt)
 
-Stand: 2026-10-16 · Branch `arena/c13026d1-aura` · Messmethode: Code-Inspektion + Live-Aufrufe gegen den laufenden Server.
+Stand: 2026-10-18 · Branch `arena/3f656e82-aura` (auf main `6267206`, PR #5 gemergt) · Messmethode: Code-Inspektion + Live-Aufrufe gegen den laufenden Server.
 
 Legende:
 **LIVE** = funktioniert im Betrieb · **VERWALTUNG** = Datenhaltung/Planung ohne externen Aufruf ·
@@ -686,7 +686,7 @@ ragflow and voicestudio noosmedia … cli-anything … add concat repro … open
 
 **Push/GitHub zuerst ehrlich:** diese Session ist abgeschlossen (PR gemergt/geclosed) — Push, PR
 und `gh`-Aufriffe sind hier technisch zu und werden nicht versucht. Commits liegen im Branch
-`arena/c13026d1-aura`; ein Push passiert erst in einer neuen Session. Ebenso ehrlich: aus dieser
+`arena/3f656e82-aura`; ein Push passiert erst in einer neuen Session. Ebenso ehrlich: aus dieser
 Sandbox sind outbound nur die Paketregistries (npm/pypi) erreichbar — externe Dienste werden
 deshalb als **Steckplätze mit ehrlichem Status** geführt, nichts wird live behauptet.
 
@@ -780,11 +780,72 @@ alle 35 Suiten exit 0 · route_smoke 851/0/0 · validate 335/0 · alle 8 NAV-Lin
 `/api/milestones/kurz` → `{"stufe":"BRONZE","verliehen":1,"naechster":{"prozent":29,…}}` ·
 Stand-Tarball neu: 1.925.873 B.
 
-## Push-Vorbereitung (18.10.2026)
+## Push-Vorbereitung (18.10.2026, mit der Hygiene-Runde überholt)
 
-`deploy/push.sh` — läuft in der NEUEN Session (mit GitHub-Zugriff): Zustand prüfen,
-Runtime-Daten auf main-Stand, Syntax-Check, `git push origin arena/c13026d1-aura`,
+`deploy/push.sh` läuft in jeder Session mit GitHub-Zugriff: Zustand prüfen,
+Runtime-Daten auf main-Stand, Syntax-Check, `git push origin <HEAD-Branch>`,
 PR anlegen (base main) mit Messwerten im Text. `CHECK_ONLY=1` prüft nur.
-Save-Dateien für den Übergang (untracked, zum Herunterladen): `ARBEITSSTAND.patch`
-(git format-patch 2e407b0..HEAD — beide Commits, per `git am` auf frischen main-Klon)
-und `dist-stand/aura-stand.tar.gz` (kompletter Stand ohne .git/Runtime/Medien).
+**Seit der Hygiene-Runde (unten) ist der Branch nicht mehr verdrahtet** — er wird
+aus `git rev-parse --abbrev-ref HEAD` gelesen; es gibt keinen Branch-Namen
+mehr, der veralten könnte. Save-Dateien für den Übergang (untracked):
+`dist-stand/aura-stand.tar.gz` (kompletter Stand ohne .git/Runtime/Medien).
+
+---
+
+## Hygiene-Runde auf reinem main-Stand — 18.10.2026
+
+Ausgangspunkt: `main` bei `6267206` (PR #5 gemergt), Arbeitsbaum sauber,
+`deploy/resume.sh` und `test/round8_suite.test.js` vorhanden ✔.
+Ziel: nichts Neues bauen, nur messen, belegen und die Push-Kette reparieren.
+
+### Messwerte (alle lokal, gegen diesen Stand)
+
+| Prüfung | Ergebnis |
+|---|---|
+| Test-Suiten (`test/*.test.js`, 35 Dateien) | **35/35 exit 0** — u. a. round8 32/0 · round6 65/0 · intro_agentic 27/0 · milestones 12/0 · verbund 10/0 |
+| Routen-Smoke (in den Suiten) | **852 PASS / 0 FAIL / 0 WARN** (Runde 8 meldete 851 — eine Route mehr auf main, kein Rückschritt) |
+| `deploy/resume.sh` (kompletter Lauf) | exit 0 — ffmpeg ✔ · Stand-Tarball 1.650.231 B gebaut · Server live :8080 · **validate 335 pass / 0 fail** |
+| `GET /api/health` | 200 · 912 B |
+| `GET /api/milestones/kurz` | 200 · 189 B · `{"stufe":"BRONZE","verliehen":1,"katalog":14,"naechster":{"name":"MACHER","prozent":29,…}}` — deckt sich mit dem Runde-8-Beleg |
+| `GET /meilensteine` | 200 · 17.075 B · nutzt `ui_kit.shell()` (Badge + NAV im HTML) |
+| `GET /montage` | 200 · 18.592 B · nutzt `ui_kit.shell()` |
+
+### Zwei echte Fehler auf reinem main gefunden und behoben (beide in `deploy/resume.sh`)
+
+1. **`npm install` ließ das ganze Skript sterben:** Es gibt kein `package.json`
+   (reines Node-Stdlib-Projekt) → npm brach mit `ENOENT` ab, `set -e` beendete
+   `resume.sh` mit Exit 254, bevor der Server startete. Jetzt: ohne
+   `package.json` wird der Schritt ehrlich übersprungen („reines
+   Node-Stdlib-Projekt"), mit `package.json` läuft `npm install` wie bisher.
+2. **`validate` stürzte mit `ERR_INVALID_URL` ab:** `resume.sh` setzte
+   `AURA_URL="127.0.0.1:$PORT"` ohne Schema, `test/validate.js` baut daraus
+   `127.0.0.1:8080/hub` → `new URL` wirft. Jetzt `AURA_URL="http://127.0.0.1:$PORT"`
+   — der Prüf-Sweep läuft im Resume-Lauf wieder ehrlich durch (335/0, siehe oben).
+
+### `deploy/push.sh` repariert
+
+- Fest verdrahtetes `BRANCH="arena/…"` ersetzt durch
+  `BRANCH="$(git rev-parse --abbrev-ref HEAD)"` (nach `cd "$ROOT"`), plus
+  Detached-HEAD-Schutz (Abbruch statt Push auf `HEAD`).
+- Veraltete Branch-Namen in `push.sh` (Kommentar + Variable) und in dieser
+  Datei (Kopfzeile, Push-Abschnitte) auf den aktuellen Stand korrigiert —
+  in `STATUS.md` steht der Branch jetzt nur noch als Ist-Stand, nicht als Rezept.
+- PR-Titel/-Text in `push.sh` auf diese Hygiene-Runde aktualisiert (die alten
+  Messwerte der Runden 4–8 stimmten für diesen Push nicht mehr).
+
+### Runde 9 — Ausgangslage (Inventur, noch nicht umgestellt)
+
+- `backend/pages/` enthält **59 Dateien: 58 `.js`-Seiten + 1 HTML-Fragment**
+  (`ext_modules.fragment.html`); dazu kommen Seiten aus `backend/src/lib/`
+  (u. a. `/meilensteine`, `/montage`, `/design`, `/start` — die letzten beiden
+  Runden haben diese vier bereits auf `ui_kit.shell()` gehoben).
+- Von den 58 JS-Seiten nutzt **noch keine einzige** `ui_kit` — alle liefern
+  eigenes `<!doctype html>` mit eigenem CSS/NAV aus. Einzelne Dateien sind
+  keine eigenständigen Seiten, sondern Bausteine/Snippets (z. B. `brain3d.js`
+  wird von `hub.js` eingebunden) — die brauchen keine Shell, sondern bleiben
+  Fragmente; das wird je Datei entschieden, nicht pauschal.
+- Vorgehen schrittweise (je Block: umstellen → Suiten + Smoke + Live-Check →
+  Messwerte hier nachtragen → eigener Commit): zuerst einfache, statische
+  Seiten als Pilot, dann formular-/datenlastige, zuletzt die animierten
+  Sonder-Seiten (Hub/Brain/Intro-Umfeld) — dort muss geprüft werden, ob die
+  Shell das eigene Vollbild-Layout überhaupt verträgt.
