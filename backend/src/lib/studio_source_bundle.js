@@ -54,37 +54,9 @@ const BLOCKED_PREFIXES = ['.git/', '.cache/', 'node_modules/', 'uploads/', 'back
 const BLOCKED_SEGMENTS = new Set(['artifacts', 'secrets', 'cache']);
 const BLOCKED_FILES = new Set(['backend/data/sentinel.json', 'deploy/.env']);
 
-let crcTable;
-function crc32(data) {
-  if (!crcTable) {
-    crcTable = Array.from({ length: 256 }, (_, n) => {
-      let c = n;
-      for (let i = 0; i < 8; i++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
-      return c >>> 0;
-    });
-  }
-  let c = 0xffffffff;
-  for (const byte of data) c = crcTable[(c ^ byte) & 0xff] ^ (c >>> 8);
-  return (c ^ 0xffffffff) >>> 0;
-}
-function dosTime(date) { return ((date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2)) & 0xffff; }
-function dosDate(date) { return (((date.getFullYear() - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate()) & 0xffff; }
-function u16(n) { const b = Buffer.alloc(2); b.writeUInt16LE(n & 0xffff); return b; }
-function u32(n) { const b = Buffer.alloc(4); b.writeUInt32LE(n >>> 0); return b; }
-function zipStored(entries) {
-  const local = [], central = [];
-  let offset = 0;
-  const now = new Date(); const tm = dosTime(now); const dt = dosDate(now);
-  for (const entry of entries) {
-    const name = Buffer.from(entry.name, 'utf8'); const data = entry.data; const crc = crc32(data);
-    const head = Buffer.concat([u32(0x04034b50), u16(20), u16(0x0800), u16(0), u16(tm), u16(dt), u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0), name]);
-    local.push(head, data);
-    central.push(Buffer.concat([u32(0x02014b50), u16(0x031e), u16(20), u16(0x0800), u16(0), u16(tm), u16(dt), u32(crc), u32(data.length), u32(data.length), u16(name.length), u16(0), u16(0), u16(0), u16(0), u32(0), u32(offset), name]));
-    offset += head.length + data.length;
-  }
-  const directory = Buffer.concat(central);
-  return Buffer.concat([...local, directory, u32(0x06054b50), u16(0), u16(0), u16(entries.length), u16(entries.length), u32(directory.length), u32(offset), u16(0)]);
-}
+// ZIP-Werkzeug kommt aus src/lib/zip_stored.js — dieselbe Implementierung nutzt auch
+// der Modul-Import (Area 70). Zweimal dasselbe Rad wäre hier nur doppelte Fehlerfläche.
+const { pack } = require('./zip_stored');
 function toRelative(absolute) { return path.relative(ROOT, absolute).split(path.sep).join('/'); }
 function isSafeFullFile(relative) {
   const base = path.posix.basename(relative);
@@ -131,7 +103,7 @@ function buildBundle({ files, prefix, packageName, filename, scope }) {
   };
   const entries = source.map((x) => ({ name: prefix + x.relative, data: x.data }));
   entries.push({ name: prefix + 'BUNDLE_MANIFEST.json', data: Buffer.from(JSON.stringify(manifest, null, 2) + '\n') });
-  return { body: zipStored(entries), manifest, filename };
+  return { body: pack(entries), manifest, filename };
 }
 function buildStudioSourceBundle() {
   return buildBundle({

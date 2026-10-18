@@ -37,6 +37,7 @@ const PERMISSION_CATALOG = {
   'skills:read':  { grants: 'context.skills — list wired skills/roles' },
   'schedule:read':{ grants: 'context.schedule — read scheduling data' },
   'ai:route':     { grants: 'context.routing — model routing info/status (never API keys)' },
+  'registry:read':{ grants: 'context.services.registry.counts() — module counts (read-only)' },
 };
 
 const STATES = ['discovered', 'invalid', 'needs_approval', 'needs_config', 'initializing', 'ready', 'error', 'disabled', 'absent'];
@@ -46,6 +47,19 @@ const LIMITS = { initMs: 5000, execMs: 10000, healthMs: 5000 };
 // ---------------------------------------------------------------------------
 // manifest validation
 // ---------------------------------------------------------------------------
+
+// Spec v1 nennt die angebotenen Aktionen capabilities[].name, der Area-70-Vertrag
+// capabilities[].action. Beides meint dasselbe — hier wird normalisiert, damit EIN
+// Vertrag gilt und die Beispielmodule beider Fassungen laufen.
+function normalizeManifest(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return raw;
+  if (Array.isArray(raw.capabilities)) {
+    for (const cap of raw.capabilities) {
+      if (cap && typeof cap === 'object' && !cap.action && typeof cap.name === 'string') cap.action = cap.name;
+    }
+  }
+  return raw;
+}
 
 function validateManifest(m, seenIds) {
   const errs = [];
@@ -148,8 +162,8 @@ function discover() {
     let raw = null;
     try { raw = JSON.parse(fs.readFileSync(mfile, 'utf8')); }
     catch (e) { rec.errors = ['aura.module.json missing or invalid JSON: ' + e.message]; found.push(rec); continue; }
-    rec.manifest = raw;
-    rec.errors = validateManifest(raw, seenIds);
+    rec.manifest = normalizeManifest(raw);
+    rec.errors = validateManifest(rec.manifest, seenIds);
     if (!rec.errors.length) {
       seenIds.add(raw.id);
       // duplicate id on disk: second directory with same id is kept invalid
@@ -180,6 +194,7 @@ function buildContext(manifest, values) {
   if (has('skills:read')) ctx.skills = () => { try { return require('./skills_registry').skills(); } catch { return []; } };
   if (has('schedule:read')) ctx.schedule = () => { try { return require('./schedule').status(); } catch { return null; } };
   if (has('ai:route')) ctx.routing = () => { try { const o = require('./omniroute'); return o.status ? o.status() : o; } catch { return null; } };
+  if (has('registry:read')) ctx.services = Object.assign(ctx.services || {}, { registry: { counts: () => { try { return require('./registry').counts(); } catch { return { total: 0 }; } } } });
   if (has('storage:kv')) {
     const bucket = () => { if (!kv.has(manifest.id)) kv.set(manifest.id, Object.assign({}, (state.config['__kv__'] || {})[manifest.id])); return kv.get(manifest.id); };
     ctx.store = {
@@ -189,7 +204,7 @@ function buildContext(manifest, values) {
   }
   // resolved module config (defaults + stored)
   const schema = manifest.configSchema || {};
-  for (const [k, f] of Object.entries(schema)) ctx.config[k] = f.def;
+  for (const [k, f] of Object.entries(schema)) ctx.config[k] = f.def !== undefined ? f.def : f.default;
   Object.assign(ctx.config, values || {});
   return ctx;
 }
@@ -287,9 +302,12 @@ function initializeModule(id) {
     }
     // dependency check (other package modules must be ready or not required-hard)
     for (const dep of m.dependencies || []) {
-      if (dep.startsWith('aura-core')) continue; // host requirement, always satisfied here
-      const dr = runtime.get(dep);
-      if (!dr || !['ready'].includes(dr.status)) { r.status = 'error'; r.lastError = `dependency "${dep}" not ready`; return; }
+      // Spec v1 kennt {service:'registry'|'audit'|'mcp'|'llm'} — die Wirtsanforderungen gelten hier als erfüllt.
+      if (typeof dep === 'object' && dep !== null) { if (dep.service) continue; }
+      const depId = typeof dep === 'string' ? dep : String((dep && dep.id) || '');
+      if (!depId || depId.startsWith('aura-core') || depId.startsWith('service:')) continue;
+      const dr = runtime.get(depId);
+      if (!dr || !['ready'].includes(dr.status)) { r.status = 'error'; r.lastError = `dependency "${depId}" not ready`; return; }
     }
     r.status = 'initializing';
     const entry = resolveEntry(m, dirPath);
@@ -507,7 +525,7 @@ function actionsMeta() {
 module.exports = {
   meta: { area: '70', id: 'module_system', name: 'Central Module System (manifest loader + lifecycle + permissions)', state: 'live' },
   MODULES_DIR, STATE_FILE, TYPES, PERMISSION_CATALOG, STATES,
-  validateManifest, validateConfig, discover, scan, approve, enable, disable, configure, execute, health,
+  validateManifest, normalizeManifest, validateConfig, discover, scan, approve, enable, disable, configure, execute, health,
   status, moduleStatus, registryEntries, integrationStatus, bus,
   actions: Object.assign(actionsMeta(), {
     catalog: () => ({ permissions: PERMISSION_CATALOG, types: TYPES, states: STATES, lifecycle: status().lifecycle, contract: status().contract }),

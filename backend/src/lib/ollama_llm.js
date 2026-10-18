@@ -75,6 +75,41 @@ async function phrase({ question, facts }) {
   }
 }
 
+// Freie Anfrage an das lokale Modell — für Aufgaben, die mehr als einen Satz brauchen
+// (z. B. einen Unified Diff schreiben). Gleicher Host, gleiche Grenzen: kein fremder Dienst.
+async function chat({ model, system, prompt, options }) {
+  const c = cfg();
+  if (!c.configured) return { used: false, reason: 'OLLAMA_URL nicht gesetzt' };
+  const timeoutMs = Math.max(c.timeoutMs, Number(process.env.AURA_LLM_LONG_TIMEOUT_MS) || 180000);
+  try {
+    const r = await request(c.base, '/api/chat', {
+      model: model || c.model,
+      stream: false,
+      messages: [{ role: 'system', content: String(system || '') }, { role: 'user', content: String(prompt || '') }],
+      options: Object.assign({ temperature: 0.2, num_predict: 1600 }, options || {}),
+    }, timeoutMs);
+    const text = r && r.message && typeof r.message.content === 'string' ? r.message.content : '';
+    if (!text.trim()) return { used: false, reason: 'leere Antwort' };
+    return { used: true, text, model: model || c.model };
+  } catch (e) {
+    return { used: false, reason: e.message };
+  }
+}
+
+// Installierte Modelle für Auswahllisten (Dropdown in Oberflächen).
+async function models() {
+  const c = cfg();
+  const probe = await status();
+  return {
+    configured: c.configured,
+    reachable: probe.reachable === true,
+    endpoint: c.base,
+    default: c.model,
+    models: Array.isArray(probe.models) ? probe.models.slice() : [],
+    model_present: probe.model_present === true,
+  };
+}
+
 async function status() {
   const c = cfg();
   if (!c.configured) {
@@ -90,4 +125,4 @@ async function status() {
   }
 }
 
-module.exports = { phrase, status, cfg };
+module.exports = { phrase, chat, models, status, cfg };
