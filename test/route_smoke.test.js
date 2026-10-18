@@ -13,6 +13,7 @@ const net = require('net');
 
 const ROOT = path.resolve(__dirname, '..');
 const BACKEND = path.join(ROOT, 'backend');
+const NAV_PATHS = require(path.join(BACKEND, 'src', 'lib', 'nav')).hrefs();
 // Routen liegen seit dem Dispatcher-Umbau nicht mehr nur in server.js, sondern in src/routes/*.js.
 // Deshalb wird der komplette Quelltext der Routendateien gescannt (sonst findet der Test 0 Routen
 // und prüft still nichts — genau das war der Fall).
@@ -37,7 +38,7 @@ const KNOWN_OPEN = new Set([]);
 const PUBLIC_WRITES = new Set(['/api/auth/logout', '/api/jarvis', '/api/jarvis/llm', '/api/yellowpages/suggest', '/api/yellowpages/help', '/api/studio/groove', '/api/studio/orchestrate', '/api/terminal', '/api/ultra/chat', '/api/video/preview',
   // Reine Rechenpfade: prüfen/ausrechnen, speichern nichts (kein Zustand, keine Freigabe nötig).
   '/api/audio/license', '/api/plugins/audio/validate', '/api/plugins/audio/build', '/api/speech/plan', '/api/speech/podcast', '/api/media/preview',
-  '/api/human/guard', '/api/avatar/check', '/api/ads/check']);
+  '/api/human/guard', '/api/avatar/check', '/api/ads/check', '/api/repair/advise']);
 // /api/video/preview rechnet nur die ffmpeg-Filterkette aus und speichert nichts — reiner Lesepfad.
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'aura-smoke-'));
@@ -79,6 +80,8 @@ async function main() {
   let pass = 0, fail = 0, warn = 0;
   const failures = [];
   const warnings = [];
+  let navPass = 0, navFail = 0;
+  const navFailures = [];
   try {
     if (!up) throw new Error('Server startet nicht: ' + log.slice(-400));
     for (const r of ROUTES) {
@@ -99,15 +102,25 @@ async function main() {
       else if (gOk && KNOWN_OPEN.has(r) && pStatus >= 200 && pStatus < 300) { warn++; warnings.push(`${r}: POST ohne Token erlaubt (bekannt offen)`); }
       else { fail++; failures.push(`${r}: GET ${g.status}${g.err ? ' ' + g.err : ''} · POST ${pStatus}`); }
     }
+    for (const href of NAV_PATHS) {
+      try {
+        const response = await fetch(base + href, { signal: AbortSignal.timeout(8000) });
+        await response.text();
+        if (response.status === 200) navPass++;
+        else { navFail++; navFailures.push(`${href}: GET ${response.status}`); }
+      } catch (e) { navFail++; navFailures.push(`${href}: GET failed (${e.message})`); }
+    }
   } finally {
     child.kill('SIGTERM');
     await sleep(200);
     try { fs.rmSync(tmp, { recursive: true, force: true }); } catch {}
   }
   console.log(`route_smoke: ${pass} PASS / ${fail} FAIL / ${warn} WARN (${ROUTES.length} Routen)`);
+  console.log(`route_smoke NAV: ${navPass} PASS / ${navFail} FAIL (${NAV_PATHS.length} hrefs)`);
   for (const f of failures) console.log('  FAIL ' + f);
+  for (const f of navFailures) console.log('  FAIL NAV ' + f);
   for (const w of warnings) console.log('  WARN ' + w);
-  process.exitCode = fail ? 1 : 0;
+  process.exitCode = fail || navFail ? 1 : 0;
 }
 
 main().catch((e) => { console.error('route_smoke FEHLER:', e.message); process.exitCode = 1; });

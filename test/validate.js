@@ -62,8 +62,19 @@ function zipStoredEntryNames(buf) { // inspect AURA's intentionally stored (unco
 
 async function checkPage(p) {
   const r = await get(p);
-  const ok = r.status === 200 && /<html/i.test(r.body) && r.body.length > 500;
-  results.items.push({ kind: 'page', path: p, ok, detail: r.status + ' · ' + r.body.length + 'B' });
+  let ok = r.status === 200 && /<html/i.test(r.body) && r.body.length > 500;
+  let detail = r.status + ' · ' + r.body.length + 'B';
+  if (p === '/hub' || p === '/aura-os') {
+    const hasMore = /<summary[^>]*>Mehr/.test(r.body);
+    ok = ok && hasMore;
+    detail += hasMore ? ' · Mehr-Menü sichtbar' : ' · Mehr-Menü fehlt';
+  }
+  if (p === '/repair') {
+    const copyReady = /Kopieren/.test(r.body) && /navigator\.clipboard/.test(r.body);
+    ok = ok && copyReady;
+    detail += copyReady ? ' · Befehle kopierbar' : ' · Kopierfunktion fehlt';
+  }
+  results.items.push({ kind: 'page', path: p, ok, detail });
 }
 
 async function checkApi(p, validate) {
@@ -93,8 +104,8 @@ function post(p, body, timeout = 20000) {
   });
 }
 
-async function checkPost(p, body, validate) {
-  const r = await post(p, body);
+async function checkPost(p, body, validate, timeout = 20000) {
+  const r = await post(p, body, timeout);
   let ok = r.status === 200 || r.status === 201;
   let detail = r.status + '';
   if (ok && /json/.test(r.type)) {
@@ -132,7 +143,7 @@ async function main() {
   const pages = ['/hub', '/brain', '/master', '/console', '/skills', '/downloads',
     '/pipelines', '/yellowpages', '/deploy', '/cluster', '/hierarchy', '/ops', '/terminal',
     '/minibot', '/ignition', '/arcade', '/schedule', '/builder', '/research', '/seo',
-    '/logs', '/config', '/containers', '/login', '/jarvis', '/admin', '/intelligence', '/workflows', '/content-command', '/aura-heart', '/creator-desk', '/label-desk', '/media-newsroom', '/social-control', '/growth-nexus', '/capability-radar', '/aura-os', '/aura-os/launchpad', '/creator-continuity', '/remote-approval', '/creator-collaboration', '/creator-revenue', '/creator-passport', '/today', '/studio-command'];
+    '/logs', '/config', '/containers', '/login', '/jarvis', '/admin', '/intelligence', '/workflows', '/repair', '/content-command', '/aura-heart', '/creator-desk', '/label-desk', '/media-newsroom', '/social-control', '/growth-nexus', '/capability-radar', '/aura-os', '/aura-os/launchpad', '/creator-continuity', '/remote-approval', '/creator-collaboration', '/creator-revenue', '/creator-passport', '/today', '/studio-command'];
   for (const p of pages) await checkPage(p);
   // root must redirect to the multi-screen hub (Gehirn 2.0 reachable from there)
   const rootRes = await get('/');
@@ -227,7 +238,9 @@ async function main() {
   await checkApi('/api/admin-copilot/status', j((d) => d.local_only === true && typeof d.model === 'string' && Array.isArray(d.shortcuts) && d.shortcuts.some((x) => x.href === '/today') && Array.isArray(d.recommended_models) ? true : 'admin copilot local status missing'));
   await checkApi('/api/cluster/status', j((d) => d.mode === 'LOCAL_INFRASTRUCTURE_INVENTORY' && d.main_core && d.main_core.protected === true && d.arms && typeof d.declared_capacity?.cores === 'number' && Array.isArray(d.interfaces) ? true : 'infrastructure control room status missing'));
   await checkApi('/api/cluster/preflight', j((d) => d.mode === 'LOCAL_PREFLIGHT_ONLY' && Array.isArray(d.checks) && d.checks.some((x) => x.id === 'remote_boundary' && x.pass === true) ? true : 'infrastructure preflight boundary missing'));
-  await checkPost('/api/jarvis', { msg: 'status' },  j((d) => (d.reply && d.mode === 'LIVE' && d.intent === 'status' && d.deterministic === true && Array.isArray(d.signals) && d.signals.length >= 4 && Array.isArray(d.next) && /Read-only local briefing/.test(d.boundary || '')) ? true : 'structured status briefing missing'));
+  await checkApi('/api/repair/status', j((d) => d.mode === 'READ_ONLY_LOCAL_REPAIR_STATUS' && d.log && Array.isArray(d.log.lines) && d.validate && d.incidents && d.ollama && Array.isArray(d.ollama.models) && d.configuration?.ollama_url && d.configuration?.ollama_model && Array.isArray(d.runbooks) ? true : 'repair status fields missing'));
+  await checkPost('/api/repair/advise', { fehler: 'JARVIS meldet: Modell nicht gefunden; Ollama läuft.' }, j((d) => Array.isArray(d.runbooks) && d.runbooks.length > 0 && Array.isArray(d.steps) && d.steps.length >= 3 && d.boundary === 'Nichts wurde ausgeführt — der Mensch führt jeden Schritt selbst aus.' ? true : 'repair advice steps or human boundary missing'), 70000);
+  await checkPost('/api/jarvis', { msg: 'status' },  j((d) => (d.reply && (d.mode === 'LIVE' || String(d.mode || '').indexOf('LOCAL-LLM') === 0) && d.intent === 'status' && d.deterministic === true && Array.isArray(d.signals) && d.signals.length >= 4 && Array.isArray(d.next) && /Read-only local briefing/.test(d.boundary || '')) ? true : 'structured status briefing missing'));
   await checkPost('/api/jarvis', { msg: 'learning' }, j((d) => /generation/i.test(d.reply || '') && d.intent === 'learning' && Array.isArray(d.signals) ? true : 'learning briefing missing'));
   await checkPost('/api/jarvis', { msg: 'studio workflow' }, j((d) => d.intent === 'studio' && d.workflow && Array.isArray(d.workflow.steps) && d.workflow.steps.length >= 6 && d.signals.some((x) => x.label === 'External renders' && x.value === '0') ? true : 'studio workflow / no-render boundary missing'));
   await checkPost('/api/jarvis', { msg: 'download zip' }, j((d) => d.intent === 'download' && d.next.some((x) => x.href === '/api/download/aura-studio-command-source.zip') ? true : 'download handoff missing'));
@@ -1207,6 +1220,11 @@ async function main() {
     if (it.ok) results.pass++; else results.fail++;
     console.log((it.ok ? 'PASS' : 'FAIL') + ' [' + it.kind + '] ' + it.path + ' — ' + it.detail);
   }
+  try {
+    const resultFile = path.join(__dirname, '..', 'backend', 'src', 'data', 'validate-result.json');
+    fs.mkdirSync(path.dirname(resultFile), { recursive: true });
+    fs.writeFileSync(resultFile, JSON.stringify({ at: new Date().toISOString(), pass: results.pass, fail: results.fail }, null, 2) + String.fromCharCode(10));
+  } catch {}
   console.log('\n=== VALIDATION: ' + results.pass + ' pass / ' + results.fail + ' fail ===');
   process.exit(results.fail ? 1 : 0);
 }

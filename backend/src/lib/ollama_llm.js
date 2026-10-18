@@ -65,7 +65,7 @@ async function phrase({ question, facts }) {
       model: c.model,
       stream: false,
       messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: user }],
-      options: { temperature: 0.3, num_predict: 300 },
+      options: { temperature: 0.3, num_predict: 120 },
     }, c.timeoutMs);
     const text = r && r.message && typeof r.message.content === 'string' ? r.message.content.trim() : '';
     if (!text) return { used: false, reason: 'leere Antwort' };
