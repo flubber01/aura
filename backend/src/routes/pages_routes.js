@@ -10,6 +10,7 @@ const pageConsole = require('../../pages/console');
 const pageBrain = require('../../pages/brain');
 const pageMaster = require('../../pages/master');
 const pageDownloads = require('../../pages/downloads');
+const pageRepair = require('../../pages/repair');
 const pageBuilder = require('../../pages/builder');
 const pageWorkflows = require('../../pages/workflows');
 const pageResearch = require('../../pages/research');
@@ -80,6 +81,7 @@ async function handle(ctx) {
   if (p === '/cluster') return send(res, 200, HTML, pageCluster()), true;
   if (p === '/builder') return send(res, 200, HTML, pageBuilder()), true;
   if (p === '/workflows') return send(res, 200, HTML, pageWorkflows()), true;
+  if (p === '/repair') return send(res, 200, HTML, pageRepair()), true;
   if (p === '/research') return send(res, 200, HTML, pageResearch()), true;
   if (p === '/seo') return send(res, 200, HTML, pageSeo()), true;
   if (p === '/logs') return send(res, 200, HTML, pageLogs()), true;
@@ -123,7 +125,7 @@ async function handle(ctx) {
   if (p === '/remote-approval') return send(res, 200, HTML, pageRemoteApproval()), true;
   if (p === '/creator-collaboration') return send(res, 200, HTML, pageCreatorCollaboration()), true;
   if (p === '/creator-revenue') return send(res, 200, HTML, pageCreatorRevenue()), true;
-  if (p === '/creator-passport' || p === '/today') return send(res, 200, HTML, pageCreatorPassport()), true;
+  if (p === '/creator-passport' || p === '/today') return send(res, 200, HTML, pageCreatorPassport(p)), true;
   if (p === '/studio-command') return send(res, 200, HTML, pageStudioCommand()), true;
   if (p === '/console') return send(res, 200, HTML, pageConsole()), true;
   if (p === '/downloads') return send(res, 200, HTML, pageDownloads()), true;

@@ -1,4 +1,5 @@
 'use strict';
+const nav = require('../src/lib/nav');
 // OPS Control Palette: kill switch, backup schedule, telegram control, mail.
 module.exports = function opsPageHtml() {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">
@@ -27,7 +28,7 @@ pre{background:#12060a;border:1px dashed #5e2330;border-radius:8px;padding:10px;
 .sb b{color:#fda4af;display:block}
 input{background:#12060a;color:#ffe8ec;border:1px solid #5e2330;border-radius:8px;padding:7px;font-size:12px;width:100%;font-family:inherit}
 </style></head><body>
-<nav><a href="/hub">Hub</a><a href="/hierarchy">Brains</a><a href="/deploy">Deploy</a><a href="/cluster">Cluster</a></nav>
+${nav.html('/ops')}
 <header><h1>🚨 OPS CONTROL PALETTE</h1><p class="sub">12h super-brain autosave · 4h others · 24h full sync · telegram command deck · emergency kill switch</p></header>
 <div class="wrap"><div class="grid">
  <div class="panel"><h3>⭘ EMERGENCY KILL SWITCH</h3>

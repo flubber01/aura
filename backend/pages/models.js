@@ -1,4 +1,5 @@
 'use strict';
+const nav = require('../src/lib/nav');
 // Model Bay — offenes Modell-System (Area 79): Suche, eigene Modelle, Test, Keys.
 module.exports = function modelsHtml() {
   return `<!doctype html><html lang="de"><head><meta charset="utf-8">
@@ -33,7 +34,7 @@ button:hover{filter:brightness(1.2)}
 h3{font-size:12px;color:#9fd4ff;letter-spacing:1px;margin:12px 0 6px}
 #spin{display:none;color:var(--cy)}
 </style></head><body>
-<nav><a href="/hub">Hub</a><a href="/tower">Tower</a><a href="/grid">Grid</a><a href="/yellowpages">Yellow Pages</a></nav>
+${nav.html('/models')}
 <header><h1>🧭 MODEL BAY</h1><p class="sub">offenes Modell-System · kuratierter Katalog + EIGENE Modelle + offene Suche + Test-Konsole</p></header>
 <div class="wrap">
 <div id="statusline" class="note" style="text-align:center;margin-bottom:12px">lade Status …</div>

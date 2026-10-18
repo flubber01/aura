@@ -1,15 +1,16 @@
 'use strict';
 // AURA Multi-Screen Hub — 4 animated screens, layered themes, one live core.
 const brain3dSnippet = require('./brain3d');
+const nav = require('../src/lib/nav');
 module.exports = function hubPageHtml() {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>AURA · Multi-Screen Hub</title>
 <style>
 :root{--ink:#e8f4ff}
 *{box-sizing:border-box}body{margin:0;background:#02040a;color:var(--ink);font-family:system-ui,Segoe UI,Roboto,sans-serif;overflow-x:hidden}
-nav{position:sticky;top:0;left:0;right:0;z-index:50;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px;background:rgba(2,4,10,.96);backdrop-filter:blur(6px);border-bottom:1px solid #12233f}
-nav a,nav button{cursor:pointer;background:#0b1526;border:1px solid #1e3a8a;color:#8ab4ff;border-radius:20px;padding:7px 16px;font-size:12px;letter-spacing:1px;font-weight:700;text-decoration:none}
-nav button.on{background:#12355e;color:#fff;box-shadow:0 0 14px rgba(57,215,255,.5)}
+#tabs{position:relative;z-index:50;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px;background:rgba(2,4,10,.96);backdrop-filter:blur(6px);border-bottom:1px solid #12233f}
+#tabs button{cursor:pointer;background:#0b1526;border:1px solid #1e3a8a;color:#8ab4ff;border-radius:20px;padding:7px 16px;font-size:12px;letter-spacing:1px;font-weight:700;text-decoration:none}
+#tabs button.on{background:#12355e;color:#fff;box-shadow:0 0 14px rgba(57,215,255,.5)}
 section{display:none;min-height:100vh;padding-top:64px;position:relative}
 section.on{display:block}
 /* ============ SCREEN 1: BRAIN-3D ============ */
@@ -63,12 +64,12 @@ canvas#rain{position:absolute;inset:0;width:100%;height:100%}
 .legend{font-size:10.5px;color:#7d94ad;padding:7px 16px;display:flex;gap:16px;flex-wrap:wrap;border-bottom:1px solid #12233f;background:rgba(6,10,22,.6)}
 h2.scr{ text-align:center;letter-spacing:4px;font-size:15px;margin:8px 0 4px }
 </style></head><body>
+${nav.html('/hub')}
 <nav id="tabs">
  <button data-s="s-brain" class="on">🧠 BRAIN-3D</button>
  <button data-s="s-matrix"> MATRIX</button>
  <button data-s="s-jarvis">🟨 JARVIS</button>
  <button data-s="s-cmd">🟦 COMMAND</button>
- <a href="/console">CONSOLE</a><a href="/master">HUD</a><a href="/brain">GEHIRN 2.0</a><a href="/index.html">UI</a>
 </nav>
 <div class="legend">STATUS-SEMANTIK: <span class="state live">LIVE</span> echte Daten/Messung · <span class="state sim">SIM</span> Simulation/Demo-Daten, klar markiert · <span class="state off">NOT-CONNECTED</span> Integration wartet auf Freischaltung (z.B. Telegram-Token, Mail-Relay, OpenRouter-Key)</div>
 

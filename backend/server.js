@@ -130,7 +130,7 @@ const server = http.createServer(async (req, res) => {
     const handled = await dispatcher.dispatch(ctx);
     // Cross-Chain: jede erfolgreiche Aktion bucht den Meilenstein der Abteilung (Verbund → Kette).
     // Ereignis je Pfad aus dem Verbund-Katalog; Erzeuger-Routen buchen Inhalt, alles andere Aktion.
-    if (handled && req.method === 'POST' && res.statusCode === 200) {
+    if (handled && req.method === 'POST' && res.statusCode === 200 && p !== '/api/repair/advise') {
       try {
         const verbund = require('./src/lib/verbund');
         require('./src/lib/milestones').track('gast', verbund.crosschain(p, req.method) || 'klick', 1);

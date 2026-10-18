@@ -79,6 +79,7 @@ const selfRepair = require('../lib/self_repair');
 const config = require('../lib/config');
 const containers = require('../lib/module_container');
 const jarvis = require('../lib/jarvis');
+const repair = require('../lib/repair');
 const learningCore = require('../lib/learning_core');
 const moduleSystem = require('../lib/module_system');
 const imageGen = require('../lib/image_gen');
@@ -2791,6 +2792,18 @@ ${fam.map((f) => `<h2>${f.name} <small>(${f.count})</small></h2><div class="grid
   if (p === '/api/admin-copilot/chat' && req.method === 'POST') {
     let body; try { body = JSON.parse(await readBody(req, 1e5) || '{}'); } catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; }
     try { const out = await adminCopilot.chat(body); return send(res, out.ok === false ? 409 : 200, 'application/json', JSON.stringify(out, null, 2)), true; }
+    catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
+  }
+
+  // ---- Provider-independent repair guidance: local reads and human-run commands only ----
+  if (p === '/api/repair/status' && req.method === 'GET') {
+    try { return send(res, 200, 'application/json', JSON.stringify(await repair.status(), null, 2)), true; }
+    catch (e) { return send(res, 500, 'application/json', JSON.stringify({ ok: false, error: String(e && e.message || e) })), true; }
+  }
+  if (p === '/api/repair/advise' && req.method === 'POST') {
+    let body; try { body = JSON.parse(await readBody(req, 2e4) || '{}'); }
+    catch { return send(res, 400, 'application/json', JSON.stringify({ ok: false, error: 'invalid JSON' })), true; }
+    try { return send(res, 200, 'application/json', JSON.stringify(await repair.advise(body), null, 2)), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
 
