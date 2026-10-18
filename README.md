@@ -42,6 +42,9 @@ Everything runs with `node backend/server.js` → http://localhost:8080 (binds 0
 | [`docs/AURA_WORKFLOW_OPERATING_MODEL.md`](docs/AURA_WORKFLOW_OPERATING_MODEL.md) | Governed workflow lifecycle, WF-14…WF-21 pack, audit-chain boundary and Hermes planning contract |
 | [`docs/AURA_CLEAN_REBUILD_AND_CUTOVER.md`](docs/AURA_CLEAN_REBUILD_AND_CUTOVER.md) | Parallel clean rebuild, verification, safe cutover, rollback window and later Hermes isolation plan |
 | [`docs/AURA_PRODUCTION_HARDENING.md`](docs/AURA_PRODUCTION_HARDENING.md) | Owner auth, CORS boundary, non-destructive preflight, isolated restore verification, model capacity and WF-20 release evidence |
+| [`docs/MODULE_SPEC.md`](docs/MODULE_SPEC.md) | **Runde 10 / E**: verbindliche, maschinenlesbare Modul-Schnittstelle v2 (`routes[]`, `permissions[]`, `selftest`), Verbotsliste, Import-Prüfprotokoll |
+| `/selfwork` | **Selbstbearbeitungs-Werkbank (Area 103)** — lokales Modell schreibt einen Unified Diff, AURA prüft im temporären Worktree (`git apply --check`, `node --check`, berührte Tests), du klickst „Anwenden“ → lokaler Commit auf `selfwork-local`; kein Push, kein Neustart |
+| `/containers` | **Module Hub (Area 70)** — Manifest-Module, Lifecycle, Rechte **und** die Import-Schleuse: ZIP/Basis64 → Quarantäne → 8 Prüfungen → deine Freigabe |
 | `/capability-radar` | Source-to-workflow adoption lab: curated original sources → local prototype → integration spec → approval |
 | `/yellowpages` | 57 curated links (free-for.dev, thereisanaiforthat, n8n, Kaggle, Vercel…) |
 | `/deploy` | HF search, 1-click Ollama, repo deploy kits, MCP/notebook Schnittstellen, mail |
@@ -64,6 +67,7 @@ bash deploy/start_swarm.sh up     # docker compose web+backend
 | [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) | **Area 68**: globale Config, Schema, Hot-Reload, alle Parameter |
 | [`docs/RUNBOOK.md`](docs/RUNBOOK.md) | **Ops-Runbook**: Triage, Heilung, Quarantäne, Kill-Switch, Repro-Check |
 | [`docs/MODULES.md`](docs/MODULES.md) | **65 Areas** + Container-Crash-Isolation (generiert aus der Registry) |
+| [`docs/MODULE_SPEC.md`](docs/MODULE_SPEC.md) | **Modul-Schnittstelle**: Teil A v2 (Import/Dritt-Module, maschinenlesbar) · Teil B v1 (eigene Module im Repo) |
 | [`docs/AURA_OS_PRODUCT_BRIEF.md`](docs/AURA_OS_PRODUCT_BRIEF.md) | AURA OS: Product thesis, operating cells, resource strategy, pilot and packaging path |
 | [`docs/AURA_OS_LAUNCHPAD.md`](docs/AURA_OS_LAUNCHPAD.md) | Area 96: local access catalog, pricing, product boundaries, NasihatBeatZ 47 pilot, PWA and launch workflow |
 | [`docs/AURA_CONTINUITY_ASSET_REACTOR.md`](docs/AURA_CONTINUITY_ASSET_REACTOR.md) | Area 97: time-off creator coverage, avatar/voice rights gates, owner review and product image → multi-format render briefs |
@@ -87,6 +91,15 @@ Alternativ direkt klonen:
 git clone https://x-access-token:$TOKEN@github.com/flubber01/aura.git aura && cd aura
 AURA_DIR="$PWD" bash deploy/master-install.sh
 ```
+
+## Runde 10: zwei neue Tore, beide hinter deinem Klick
+| Weg | Was automatisch passiert | Was nur du auslöst |
+|---|---|---|
+| **Dritt-Modul importieren** (`/containers` → Module Hub) | Paket in Quarantäne entpacken, Manifest v2 prüfen, `node --check`, Verbotsliste scannen, Selbsttest als Kindprozess (10 s, ohne Netz) | Freigabe (`POST /api/modulehub/<id>/approve`) → erst dann Installation und Registry-Eintrag |
+| **Selbst bearbeiten** (`/selfwork`) | Kontext bauen, lokales Modell schreibt Diff, Prüfungen im temporären Worktree, Protokoll | „Anwenden“ → lokaler Commit auf `selfwork-local`; Promote nach main bleibt dein PR-Ritual |
+
+Harte Grenzen der Werkbank: nur `backend/pages/**`, `backend/src/lib/**`, `backend/src/routes/**`, `test/**`.
+Tabu: `backend/src/data/**`, `deploy/**`, `.git`, alles mit Geheimnis-Mustern. Kein Code ins Netz.
 
 ## Safety (hard lines, enforced in code)
 No credential harvesting/validation, no SOCKS ban-evasion, no stealth multi-account outreach,
