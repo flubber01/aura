@@ -11,6 +11,7 @@ const pageBrain = require('../../pages/brain');
 const pageMaster = require('../../pages/master');
 const pageDownloads = require('../../pages/downloads');
 const pageRepair = require('../../pages/repair');
+const pageSelfwork = require('../../pages/selfwork');
 const pageBuilder = require('../../pages/builder');
 const pageWorkflows = require('../../pages/workflows');
 const pageResearch = require('../../pages/research');
@@ -82,6 +83,7 @@ async function handle(ctx) {
   if (p === '/builder') return send(res, 200, HTML, pageBuilder()), true;
   if (p === '/workflows') return send(res, 200, HTML, pageWorkflows()), true;
   if (p === '/repair') return send(res, 200, HTML, pageRepair()), true;
+  if (p === '/selfwork') return send(res, 200, HTML, pageSelfwork()), true;
   if (p === '/research') return send(res, 200, HTML, pageResearch()), true;
   if (p === '/seo') return send(res, 200, HTML, pageSeo()), true;
   if (p === '/logs') return send(res, 200, HTML, pageLogs()), true;
