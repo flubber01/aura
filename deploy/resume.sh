@@ -37,9 +37,15 @@ else
 fi
 
 # 2) Abhängigkeiten (node_modules überlebt Resets normalerweise — für den Fall).
+#    Kein package.json = reines Node-Stdlib-Projekt: npm install würde mit
+#    ENOENT abbrechen, also ehrlich überspringen statt zu scheitern.
 if [ ! -d node_modules ]; then
-  say "node_modules fehlt — npm install"
-  [ "$DRY_RUN" != 1 ] && npm install --no-audit --no-fund
+  if [ -f package.json ]; then
+    say "node_modules fehlt — npm install"
+    [ "$DRY_RUN" != 1 ] && npm install --no-audit --no-fund
+  else
+    say "kein package.json — reines Node-Stdlib-Projekt, npm install übersprungen ✔"
+  fi
 fi
 
 # 3) Stand-Tarball für die Install-Routen (liegt IM Repo, überlebt Resets).
@@ -72,7 +78,7 @@ fi
 if [ "$SKIP_VALIDATE" = 1 ]; then
   say "validate übersprungen (SKIP_VALIDATE=1)"
 elif [ "$DRY_RUN" != 1 ]; then
-  AURA_URL="127.0.0.1:$PORT" node test/validate.js | tail -1 || say "validate meldet Fehler — Ausgabe oben prüfen"
+  AURA_URL="http://127.0.0.1:$PORT" node test/validate.js | tail -1 || say "validate meldet Fehler — Ausgabe oben prüfen"
 fi
 
 # 6) Install-Einzeiler (in der Sandbox mit Preview-Link, sonst lokal).
