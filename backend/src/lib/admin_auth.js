@@ -4,14 +4,23 @@
 // access. Without that environment flag, status remains visible but existing local
 // development behavior is retained. Passwords are scrypt hashes; session cookies
 // are signed and runtime-only.
+//
+// Runde 11: Der Owner-Datensatz (E-Mail + Passwort-Hash) lebt in einer
+// Laufzeit-Datei (AURA_AUTH_FILE, Standard backend/src/data/auth_owner.json),
+// die NIEMALS committet wird. Sie wird von backend/src/scripts/create-owner.js
+// geschrieben (einmalig per Terminal). Die Anmeldung auf /login läuft als
+// normales HTML-Formular (POST /api/auth/login-form) — ganz ohne JavaScript.
+// Ein Admin-Gate akzeptiert ab jetzt Sitzungs-Cookie ODER x-aura-token.
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
 const FILE = path.join(__dirname, '..', 'data', 'admin_auth.json');
+// Laufzeit-Datei des Owner-Datensatzes — per Env umlenkbar, nie im Repo.
+const OWNER_FILE = process.env.AURA_AUTH_FILE || path.join(__dirname, '..', 'data', 'auth_owner.json');
 const SESSION_TTL_MS = Math.max(15 * 60 * 1000, Math.min(7 * 24 * 60 * 60 * 1000, Number(process.env.AURA_SESSION_TTL_HOURS || 12) * 60 * 60 * 1000));
 const EPHEMERAL_SECRET = crypto.randomBytes(48).toString('hex');
-const PUBLIC_API = new Set(['/api/health', '/api/auth/status', '/api/auth/bootstrap', '/api/auth/login']);
+const PUBLIC_API = new Set(['/api/health', '/api/auth/status', '/api/auth/bootstrap', '/api/auth/login', '/api/auth/login-form']);
 const PUBLIC_PAGES = new Set(['/login']);
 
 function bool(value) { return /^(1|true|yes|on)$/i.test(String(value || '')); }
@@ -46,6 +55,65 @@ function validPassword(password) {
   const p = String(password || '');
   return p.length >= 14 && p.length <= 256 && /[A-Za-z]/.test(p) && /\d/.test(p);
 }
+function validEmail(email) {
+  const e = String(email || '').trim();
+  return e.length >= 5 && e.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+}
+function safeEqual(a, b) {
+  const ba = Buffer.from(String(a || '')); const bb = Buffer.from(String(b || ''));
+  if (ba.length !== bb.length) return false;
+  return crypto.timingSafeEqual(ba, bb);
+}
+
+// ---------- Owner-Datensatz (Laufzeit-Datei, z. B. backend/src/data/auth_owner.json) ----------
+function ownerFile() { return OWNER_FILE; }
+function loadOwner() {
+  try {
+    const db = JSON.parse(fs.readFileSync(OWNER_FILE, 'utf8'));
+    return db && db.owner && db.owner.password_hash ? db.owner : null;
+  } catch { return null; }
+}
+function ownerConfigured() { return !!loadOwner(); }
+function saveOwnerFile(db) {
+  fs.mkdirSync(path.dirname(OWNER_FILE), { recursive: true });
+  const tmp = OWNER_FILE + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(db, null, 2) + '\n', { mode: 0o600 });
+  fs.chmodSync(tmp, 0o600);
+  fs.renameSync(tmp, OWNER_FILE);
+  try { fs.chmodSync(OWNER_FILE, 0o600); } catch { /* chmod ist best effort, Inhalt zählt */ }
+}
+// Legt den Owner-Datensatz an (genau einmal). Nur --force überschreibt ihn.
+function createOwner({ email, password, force } = {}) {
+  const mail = String(email || '').trim().toLowerCase();
+  const pw = String(password || '');
+  if (!validEmail(mail)) { const e = new Error('E-Mail-Adresse ist ungültig.'); e.code = 400; throw e; }
+  if (!validPassword(pw)) { const e = new Error('Passwort braucht 14–256 Zeichen mit Buchstaben und Ziffern.'); e.code = 400; throw e; }
+  if (loadOwner() && !force) {
+    const e = new Error('Ein Owner ist bereits eingerichtet (' + loadOwner().email + '). Nur mit --force überschreibbar.');
+    e.code = 409; throw e;
+  }
+  const salt = crypto.randomBytes(24).toString('hex');
+  const db = {
+    schema_version: 1,
+    owner: {
+      id: 'owner-' + crypto.randomBytes(6).toString('hex'),
+      email: mail, role: 'owner',
+      password_algo: 'scrypt', password_salt: salt, password_hash: passwordHash(pw, salt),
+      created_at: now(),
+    },
+  };
+  saveOwnerFile(db);
+  return { ok: true, email: db.owner.email, id: db.owner.id, file: OWNER_FILE };
+}
+// Prüft E-Mail + Passwort gegen den Owner-Datensatz (konstantzeit, kein Statusleak).
+function verifyOwner(email, password) {
+  const owner = loadOwner();
+  if (!owner) return false;
+  const mail = String(email || '').trim().toLowerCase();
+  const mailOk = safeEqual(mail, String(owner.email || '').toLowerCase());
+  const pwOk = safeEqual(passwordHash(String(password || ''), owner.password_salt), owner.password_hash);
+  return mailOk && pwOk;
+}
 function cleanup(db) {
   const before = db.sessions.length; const current = Date.now();
   db.sessions = db.sessions.filter((session) => Date.parse(session.expires_at || '') > current);
@@ -73,14 +141,17 @@ function sameOrigin(req) {
 function status(req) {
   const db = load(); const active = db.sessions.filter((session) => Date.parse(session.expires_at || '') > Date.now()).length;
   const currentActor = req ? actor(req) : null;
+  const ownerSet = !!db.owner || ownerConfigured();
   return {
-    mode: required() ? 'AUTH_REQUIRED' : (db.owner ? 'AUTH_READY_NOT_ENFORCED' : 'SETUP_REQUIRED_NOT_ENFORCED'),
-    enforcement: required(), owner_configured: !!db.owner,
-    bootstrap_available: !db.owner && !!process.env.AURA_AUTH_BOOTSTRAP_TOKEN,
-    bootstrap_note: !db.owner && !process.env.AURA_AUTH_BOOTSTRAP_TOKEN ? 'Set AURA_AUTH_BOOTSTRAP_TOKEN outside Git before creating the first owner.' : null,
+    mode: required() ? 'AUTH_REQUIRED' : (ownerSet ? 'AUTH_READY_NOT_ENFORCED' : 'SETUP_REQUIRED_NOT_ENFORCED'),
+    enforcement: required(), owner_configured: ownerSet,
+    owner_setup: 'node backend/src/scripts/create-owner.js',
+    bootstrap_available: !ownerSet && !!process.env.AURA_AUTH_BOOTSTRAP_TOKEN,
+    bootstrap_note: !ownerSet && !process.env.AURA_AUTH_BOOTSTRAP_TOKEN ? 'Owner per Terminal einrichten: node backend/src/scripts/create-owner.js (danach Anmeldung auf /login mit E-Mail + Passwort).' : null,
     session_secret_mode: sessionSecretMode(), session_ttl_hours: Math.round(SESSION_TTL_MS / 3600000), active_sessions: active,
+    sessions_process_local: !process.env.AURA_SESSION_SECRET,
     actor: currentActor ? { id: currentActor.id, name: currentActor.name, role: currentActor.role, expires_at: currentActor.expires_at } : null,
-    production_checklist: ['Set AURA_AUTH_BOOTSTRAP_TOKEN only for initial owner creation, then remove it.', 'Set AURA_SESSION_SECRET to a high-entropy external secret.', 'Set AURA_AUTH_REQUIRED=true only after owner login was verified.', 'Serve through HTTPS and a restrictive reverse proxy.'],
+    production_checklist: ['Owner anlegen: node backend/src/scripts/create-owner.js (Datei wird nie committet).', 'Set AURA_SESSION_SECRET to a high-entropy external secret (sonst gilt die Sitzung nur bis zum Neustart).', 'Set AURA_AUTH_REQUIRED=true only after owner login was verified — erst NACH dem HTTPS-Dach.', 'Serve through HTTPS and a restrictive reverse proxy.'],
   };
 }
 function issueSession(db, user, req) {
@@ -91,7 +162,7 @@ function issueSession(db, user, req) {
   return { session, set_cookie: cookieHeader('aura_admin_session', id + '.' + sign(id), req, SESSION_TTL_MS / 1000) };
 }
 function bootstrap(body, req) {
-  const db = load(); if (db.owner) throw error('An owner is already configured.', 409);
+  const db = load(); if (db.owner || ownerConfigured()) throw error('An owner is already configured.', 409);
   const expected = String(process.env.AURA_AUTH_BOOTSTRAP_TOKEN || '');
   if (!expected) throw error('Bootstrap is disabled until AURA_AUTH_BOOTSTRAP_TOKEN is set outside Git.', 409);
   const received = String((body || {}).bootstrap_token || '');
@@ -105,11 +176,38 @@ function bootstrap(body, req) {
   return { ok: true, owner: { id: db.owner.id, name: db.owner.name, role: db.owner.role }, csrf_token: issued.session.csrf_token, set_cookie: issued.set_cookie, note: 'Owner created. Remove AURA_AUTH_BOOTSTRAP_TOKEN and set AURA_SESSION_SECRET before enabling AURA_AUTH_REQUIRED.' };
 }
 function login(body, req) {
-  const db = load(); if (!db.owner) throw error('No owner is configured. Bootstrap is required first.', 409);
+  const db = load();
+  // Primär: Owner-Datensatz aus create-owner.js (E-Mail + Passwort).
+  if (ownerConfigured()) {
+    const email = String((body || {}).email || ''); const password = String((body || {}).password || '');
+    if (!verifyOwner(email, password)) throw error('Falsche E-Mail oder falsches Passwort.', 401);
+    const owner = loadOwner();
+    const issued = issueSession(db, { id: owner.id, name: owner.email, role: 'owner' }, req);
+    return { ok: true, actor: { id: owner.id, name: owner.email, role: 'owner' }, csrf_token: issued.session.csrf_token, set_cookie: issued.set_cookie };
+  }
+  // Kompatibilität: alter Bootstrap-Owner (nur Passwort).
+  if (!db.owner) throw error('Kein Owner eingerichtet. Erst auf dem Server: node backend/src/scripts/create-owner.js', 409);
   const password = String((body || {}).password || ''); const candidate = passwordHash(password, db.owner.password_salt);
-  if (candidate.length !== db.owner.password_hash.length || !crypto.timingSafeEqual(Buffer.from(candidate), Buffer.from(db.owner.password_hash))) throw error('Invalid credentials.', 401);
+  if (!safeEqual(candidate, db.owner.password_hash)) throw error('Falsche E-Mail oder falsches Passwort.', 401);
   const issued = issueSession(db, db.owner, req);
   return { ok: true, actor: { id: db.owner.id, name: db.owner.name, role: db.owner.role }, csrf_token: issued.session.csrf_token, set_cookie: issued.set_cookie };
+}
+// Formular-Anmeldung (ohne JavaScript): E-Mail + Passwort gegen den Owner-Datensatz.
+// Treffer → bestehender Sitzungs-Cookie (12 h). Fehlschlag → ehrlicher Fehler ohne Cookie.
+function loginForm(body, req) {
+  const db = load();
+  if (!ownerConfigured()) {
+    const e = new Error('Kein Owner eingerichtet — erst auf dem Server: node backend/src/scripts/create-owner.js');
+    e.code = 503; throw e;
+  }
+  const email = String((body || {}).email || ''); const password = String((body || {}).password || '');
+  if (!verifyOwner(email, password)) {
+    const e = new Error('Falsche E-Mail oder falsches Passwort.');
+    e.code = 401; throw e;
+  }
+  const owner = loadOwner();
+  const issued = issueSession(db, { id: owner.id, name: owner.email, role: 'owner' }, req);
+  return { ok: true, actor: { id: owner.id, name: owner.email, role: 'owner' }, csrf_token: issued.session.csrf_token, set_cookie: issued.set_cookie };
 }
 function logout(req) {
   const raw = cookies(req).aura_admin_session || ''; const id = raw.split('.')[0]; const db = load();
@@ -124,4 +222,7 @@ function guard(req, pathname) {
   if (!sameOrigin(req)) return { allow: false, code: 403, error: 'Cross-origin admin request blocked.', actor: null };
   return { allow: true, actor: currentActor, mode: 'AUTHENTICATED' };
 }
-module.exports = { status, bootstrap, login, logout, actor, guard, required, validPassword };
+module.exports = {
+  status, bootstrap, login, loginForm, logout, actor, guard, required, validPassword, validEmail,
+  createOwner, verifyOwner, ownerConfigured, loadOwner, ownerFile,
+};

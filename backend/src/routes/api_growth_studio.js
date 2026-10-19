@@ -36,8 +36,20 @@ const j = (res, code, obj, send) => (send(res, code, 'application/json', JSON.st
 async function handle(ctx) {
   const { req, res, url, p, send, readBody } = ctx;
   const sp = url && url.searchParams ? url.searchParams : new URL(req.url, 'http://x').searchParams;
-  const adminOk = () => { const t = process.env.AURA_ADMIN_TOKEN || ''; return !!t && req.headers['x-aura-token'] === t; };
-  const adminSoft = () => { const t = process.env.AURA_ADMIN_TOKEN || ''; return !t || req.headers['x-aura-token'] === t; };
+  // Admin-Gate (Runde 11): Cookie ODER x-aura-token. Eine gültige /login-Sitzung
+  // hat Admin-Rechte für alle Routen, die heute den Header verlangen — der Token
+  // bleibt intern für validate/CLI (AURA_VALIDATE_TOKEN) und als Notfallweg.
+  const adminOk = () => {
+    const t = process.env.AURA_ADMIN_TOKEN || '';
+    if (ctx && ctx.actor) return true;                                        // gültige Sitzung (Cookie)
+    return !!t && req.headers['x-aura-token'] === t;
+  };
+  const adminSoft = () => {
+    const t = process.env.AURA_ADMIN_TOKEN || '';
+    if (!t) return true;                                                       // kein Token konfiguriert: lokaler Betrieb
+    if (req.headers['x-aura-token'] === t) return true;                        // Header-Token stimmt
+    return !!(ctx && ctx.actor);                                               // oder angemeldeter Besitzer (/login-Session)
+  };
 
   // ---- Seiten: Growth, Upload, Agent Board ----
   if (p === '/growth') return send(res, 200, 'text/html; charset=utf-8', pageGrowth(analyticsHub.PLATFORMS)), true;

@@ -17,6 +17,10 @@ backend/src/data/imagegen/artifacts/
 # runtime secrets — never commit
 backend/src/data/secrets.json
 
+# Owner-Datensatz (E-Mail + Passwort-Hash) aus backend/src/scripts/create-owner.js — never commit
+backend/src/data/auth_owner.json
+backend/src/data/auth_owner.json.tmp
+
 # Download-Exporte (runtime, nicht committen)
 extracted/AURA-Web-Deploy/public/dl/
 

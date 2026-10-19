@@ -4,7 +4,7 @@ const TOP_LINKS = [
   { label: 'Hub', href: '/hub' },
   { label: 'Today', href: '/today' },
   { label: 'Intelligence', href: '/intelligence' },
-  { label: 'Copilot', href: '/jarvis' },
+  { label: 'JARVIS', href: '/jarvis' },
   { label: 'Reparatur', href: '/repair' },
   { label: 'Ops', href: '/ops' },
   { label: 'Models', href: '/models' },

@@ -34,6 +34,28 @@ async function handle(ctx) {
     try { const out = adminAuth.login(body, req); return send(res, 200, 'application/json', JSON.stringify({ ...out, set_cookie: undefined }, null, 2), { 'Set-Cookie': out.set_cookie }), true; }
     catch (e) { return send(res, e.code || 500, 'application/json', JSON.stringify({ ok: false, error: e.message })), true; }
   }
+  // Formular-Anmeldung (Runde 11) — funktioniert vollständig ohne JavaScript:
+  // normales HTML-Formular von /login, Felder E-Mail + Passwort.
+  // Treffer: Sitzungs-Cookie (bestehender Session-Mechanismus) + 302 auf ?next=…
+  // Fehlschlag: serverseitig gerenderte ehrliche Fehlerseite, KEIN Cookie.
+  if (p === '/api/auth/login-form' && req.method === 'POST') {
+    const raw = await readBody(req, 2e4);
+    const type = String((req.headers || {})['content-type'] || '');
+    let body = {};
+    try {
+      if (/application\/json/i.test(type)) body = JSON.parse(raw || '{}');
+      else body = Object.fromEntries(new URLSearchParams(String(raw || '')));
+    } catch { body = {}; }
+    const { loginErrorPageHtml, safeNext } = require('../../pages/login');
+    const next = safeNext(body.next);
+    try {
+      const out = adminAuth.loginForm(body, req);
+      return send(res, 302, 'text/html; charset=utf-8', '<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Anmeldung …</title></head><body><p>Angemeldet. <a href="' + next + '">Weiter</a></p></body></html>', { 'Set-Cookie': out.set_cookie, Location: next }), true;
+    } catch (e) {
+      const code = e.code || 500;
+      return send(res, code, 'text/html; charset=utf-8', loginErrorPageHtml(code === 401 ? 'Falsche E-Mail oder falsches Passwort.' : e.message, next)), true;
+    }
+  }
   if (p === '/api/auth/logout' && req.method === 'POST') {
     const out = adminAuth.logout(req); return send(res, 200, 'application/json', JSON.stringify({ ok: true }, null, 2), { 'Set-Cookie': out.set_cookie }), true;
   }

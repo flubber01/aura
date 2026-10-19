@@ -28,7 +28,7 @@ th{color:#7d94ad;font-weight:600}
 .stat{display:inline-block;margin-right:14px;color:#9cc4ff}.stat b{color:#ffcf7d}
 .note{font-size:11px;color:#5f7186;margin-top:8px}
 </style></head><body><main>
-<nav><a href="/hub">Hub</a><a href="/yellowpages">Yellow Pages</a><a href="/board">Board</a><a href="/ops">Ops</a><a href="/jarvis">J.A.R.V.I.S.</a></nav>
+<nav><a href="/hub">Hub</a><a href="/yellowpages">Yellow Pages</a><a href="/board">Board</a><a href="/ops">Ops</a><a href="/jarvis">JARVIS</a></nav>
 <h1>DATEN-UPLOAD</h1>
 <p class="sub">Link-Listen hochladen. Erst prüfen, dann übernehmen. Ein abgelehnter Eintrag stoppt die ganze Übernahme. Vor jeder Übernahme wird die alte Datei gesichert.</p>
 

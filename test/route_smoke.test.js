@@ -35,7 +35,7 @@ if (ROUTES.length === 0) { console.error('route_smoke FEHLER: 0 Routen gefunden 
 const KNOWN_OPEN = new Set([]);
 // Bewusst öffentliche Lesepfade (kein Schreiben, keine Freigabe nötig)
 // /api/auth/logout muss ohne Token funktionieren (Abmelden darf nie am Token scheitern)
-const PUBLIC_WRITES = new Set(['/api/auth/logout', '/api/jarvis', '/api/jarvis/llm', '/api/yellowpages/suggest', '/api/yellowpages/help', '/api/studio/groove', '/api/studio/orchestrate', '/api/terminal', '/api/ultra/chat', '/api/video/preview',
+const PUBLIC_WRITES = new Set(['/api/auth/logout', '/api/auth/login-form', '/api/jarvis', '/api/jarvis/llm', '/api/yellowpages/suggest', '/api/yellowpages/help', '/api/studio/groove', '/api/studio/orchestrate', '/api/terminal', '/api/ultra/chat', '/api/video/preview',
   // Reine Rechenpfade: prüfen/ausrechnen, speichern nichts (kein Zustand, keine Freigabe nötig).
   '/api/audio/license', '/api/plugins/audio/validate', '/api/plugins/audio/build', '/api/speech/plan', '/api/speech/podcast', '/api/media/preview',
   '/api/human/guard', '/api/avatar/check', '/api/ads/check', '/api/repair/advise']);

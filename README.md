@@ -8,9 +8,9 @@ Everything runs with `node backend/server.js` → http://localhost:8080 (binds 0
 |---|---|
 | `/` | original AURA Command Center UI |
 | `/hub` | multi-screen: blue 3D brain (5D) · Matrix · JARVIS · Command — all animated, live data |
-| `/jarvis` | **AURA Admin Copilot** — owner chat workspace for a selected local loopback Ollama model, bounded system context and real workflow shortcuts; no action tools |
+| `/jarvis` | **JARVIS** — Owner-Chat mit dem lokalen Ollama-Modell, echte Systemkontexte und Workflow-Shortcuts; keine Aktionswerkzeuge. Jedes lokale Modell ist überall auswählbar — keine Filter, keine Qualitäts-Schranken (Embedding-Modelle sichtbar markiert: „Embedding — für Chat ungeeignet"; Standard = `OLLAMA_MODEL`) |
 | `/admin` | **AURA Admin Console** — local-source-of-truth cockpit for server-refreshed Ollama models/profiles, departments/roles, release evidence and safe workflow simulations |
-| `/login` | **Owner Login** — opt-in production bootstrap/login surface; requires external environment secrets before authentication enforcement is enabled |
+| `/login` | **Owner Login** — Anmeldung mit E-Mail + Passwort per reinem HTML-Formular (funktioniert ohne JavaScript, kein Token im Browser). Einmal einrichten mit `node backend/src/scripts/create-owner.js` (Laufzeit-Datei, wird nie committet). Gültige Sitzung = Admin-Rechte (Cookie ODER `x-aura-token`) · Sitzungen sind prozess-lokal (12 h, nach Neustart neu anmelden) |
 | `/aura-os#intelligence` (expanded: `/intelligence`) | **AURA OS Intelligence** — deterministic read-only live briefings for system, Today View, Studio posture, workflow routing and source-bundle handoff |
 | `/console` | **AURA Control Surface** — searchable live module registry with callable-action visibility and policy states |
 | `/downloads` | **Download Vault** — on-demand complete safe source/docs/config archive plus a focused Studio Command + J.A.R.V.I.S. ZIP, alongside generated catalogs |
@@ -55,10 +55,15 @@ Everything runs with `node backend/server.js` → http://localhost:8080 (binds 0
 
 ## Quick start
 ```bash
-node backend/server.js            # everything on :8080
-bash deploy/master-install.sh     # fresh box, 1-click
-bash deploy/start_swarm.sh up     # docker compose web+backend
+bash deploy/master-install.sh                            # 1) Installer (fresh box, 1-click; startet auch zweimal hintereinander sauber)
+node backend/src/scripts/create-owner.js                 # 2) Owner einrichten: E-Mail + Passwort (einmalig, per Terminal)
+# 3) Browser auf /login → mit E-Mail + Passwort anmelden (Knopf ANMELDEN — kein JavaScript, kein Token nötig)
+node backend/server.js                                   # Alternative ohne Installer: alles auf :8080
+bash deploy/start_swarm.sh up                            # Alternative: docker compose web+backend
 ```
+Admin-Schreibaktionen akzeptieren ab jetzt die gültige Sitzung (Cookie) **oder** `x-aura-token` (Notfallweg/CLI, `AURA_VALIDATE_TOKEN`). Sitzungen sind prozess-lokal: nach einem Server-Neustart bitte neu anmelden.
+
+**AURA_AUTH_REQUIRED=true** (Vollsperrung aller Seiten, auch ohne gesetzten Admin-Token) bleibt Standard-**AUS** und wird erst **nach dem HTTPS-Dach** aktiviert — Reihenfolge: erst TLS-Reverse-Proxy, dann Owner-Login prüfen, dann die Vollsperrung setzen.
 ## Docs (every aspect)
 
 | Doc | Inhalt |

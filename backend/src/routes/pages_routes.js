@@ -69,7 +69,7 @@ function withTokenSnippet(html) {
 }
 
 async function handle(ctx) {
-  const { res, p } = ctx;
+  const { res, p, url } = ctx;
   // HTML-Antworten laufen durch den Token-Wrapper, alle anderen unverändert.
   const rawSend = ctx.send;
   const send = (r, code, type, body, extra) => rawSend(r, code, type, type === HTML ? withTokenSnippet(body) : body, extra);
@@ -91,8 +91,14 @@ async function handle(ctx) {
   if (p === '/config') return send(res, 200, HTML, pageConfig()), true;
   // The former J.A.R.V.I.S. briefing surface now lives as AURA OS Intelligence.
   // /jarvis stays as the familiar entry point, but is now the admin's local-model workspace.
-  if (p === '/login') return send(res, 200, HTML, pageLogin()), true;
-  if (p === '/jarvis') return send(res, 200, HTML, pageAdminCopilot()), true;
+  if (p === '/login') return send(res, 200, HTML, pageLogin({ next: url && url.searchParams ? url.searchParams.get('next') : null })), true;
+  if (p === '/jarvis') {
+    // Modellliste serverseitig aus Ollama /api/tags (alle Einträge, Embedding
+    // markiert, Standard = OLLAMA_MODEL) — die Seite bleibt auch ohne JS ehrlich.
+    let jarvisState = null;
+    try { jarvisState = await require('../lib/admin_copilot').status(); } catch { jarvisState = null; }
+    return send(res, 200, HTML, pageAdminCopilot(jarvisState)), true;
+  }
   if (p === '/admin') return send(res, 200, HTML, pageAdminDashboard()), true;
   if (p === '/intelligence') return send(res, 200, HTML, pageJarvis()), true;
   if (p === '/brain') return send(res, 200, HTML, pageBrain()), true;

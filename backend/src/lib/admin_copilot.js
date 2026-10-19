@@ -15,8 +15,12 @@ const FILE = path.join(__dirname, '..', 'data', 'admin_copilot.json');
 const RECOMMENDED = ['qwen2.5:3b', 'phi3:mini', 'llama3.2:3b', 'gemma3:4b', 'tinyllama'];
 const MAX_MESSAGE = 4000;
 
+// Standard = OLLAMA_MODEL (Fallback phi3:mini). Keine stille Vorauswahl einer
+// "weißen Liste": Jedes Modell aus Ollama /api/tags ist auswählbar.
+function standardModel() { return String(process.env.OLLAMA_MODEL || 'phi3:mini').trim() || 'phi3:mini'; }
+
 function safe(fn, fallback) { try { return fn(); } catch { return fallback; } }
-function load() { try { return { model: 'qwen2.5:3b', ...JSON.parse(fs.readFileSync(FILE, 'utf8')) }; } catch { return { model: 'qwen2.5:3b' }; } }
+function load() { try { return { model: standardModel(), ...JSON.parse(fs.readFileSync(FILE, 'utf8')) }; } catch { return { model: standardModel() }; } }
 function save(config) { fs.mkdirSync(path.dirname(FILE), { recursive: true }); fs.writeFileSync(FILE + '.tmp', JSON.stringify(config, null, 2)); fs.renameSync(FILE + '.tmp', FILE); }
 function isLoopback(url) {
   try { const host = new URL(url).hostname.toLowerCase(); return ['localhost', '127.0.0.1', '::1', '[::1]'].includes(host); } catch { return false; }
@@ -57,17 +61,22 @@ function historyText(history) {
 }
 async function status() {
   const config = load(); const probe = await ollama.probe(1200); const local = isLoopback(probe.url || ollama.keysMasked().ollama_url);
+  // ALLE Einträge aus Ollama /api/tags — ohne stille Filter. Embedding-Modelle
+  // bleiben sichtbar und sind nur markiert (für Chat ungeeignet).
   const available = probe.state === 'LIVE' ? (probe.models || []) : [];
   return {
     mode: probe.state === 'LIVE' && local ? 'LOCAL_MODEL_READY' : probe.state === 'LIVE' ? 'NON_LOCAL_ENDPOINT_BLOCKED' : probe.state,
     model: config.model,
+    standard_model: standardModel(),
     endpoint: probe.url || ollama.keysMasked().ollama_url,
     local_only: true,
     endpoint_is_loopback: local,
     available_models: available,
+    embedding_models: available.filter((m) => ollama.isEmbeddingModel(m)),
     recommended_models: RECOMMENDED,
     model_available: available.includes(config.model),
     probe_detail: probe.detail,
+    model_list_note: 'Jedes lokale Modell ist überall auswählbar — keine Filter, keine Qualitäts-Schranken. Embedding-Modelle sind sichtbar markiert: für Chat ungeeignet.',
     boundary: 'The Admin Copilot only calls a loopback Ollama model and has no action tools. Chat history is kept in the browser for the current tab; it is not stored by this module.',
     shortcuts: [
       { label: 'Today', href: '/today', note: 'priorities and project tasks' },
@@ -91,20 +100,31 @@ function setModel(input = {}) {
 async function chat(input = {}) {
   const message = clean(input.message || input.msg || input.text, MAX_MESSAGE);
   if (!message) { const e = new Error('Bitte schreibe eine Frage oder Arbeitsanweisung.'); e.code = 400; throw e; }
-  const config = load(); const probe = await ollama.probe(1800);
-  if (probe.state !== 'LIVE') return { ok: false, mode: probe.state, model: config.model, error: 'Lokales Ollama ist nicht erreichbar. Starte Ollama auf diesem Host und installiere ein kleines Modell, z. B. qwen2.5:3b.', setup: { href: '/models', command: 'ollama pull qwen2.5:3b && ollama serve' } };
-  if (!isLoopback(probe.url)) return { ok: false, mode: 'NON_LOCAL_ENDPOINT_BLOCKED', model: config.model, error: 'Admin Copilot akzeptiert nur ein lokales Loopback-Ollama. Der konfigurierte Endpoint wurde deshalb nicht verwendet.' };
+  // Das im Request gewählte Modell wird WIRKLICH verwendet (Request-Feld model);
+  // ohne Feld gilt die gespeicherte Auswahl, sonst der Standard (OLLAMA_MODEL).
+  const requested = clean(input.model, 120);
+  const config = load();
+  const model = requested || config.model || standardModel();
+  if (ollama.isEmbeddingModel(model)) {
+    return {
+      ok: false, mode: 'EMBEDDING_MODEL_NOT_FOR_CHAT', model,
+      error: `„${model}“ ist ein Embedding-Modell — für Chat ungeeignet. Embedding-Modelle erzeugen Vektoren, keine Gespräche. Wähle ein Chat-Modell aus der Liste (auf /jarvis sichtbar markiert).`,
+    };
+  }
+  const probe = await ollama.probe(1800);
+  if (probe.state !== 'LIVE') return { ok: false, mode: probe.state, model, error: 'Lokales Ollama ist nicht erreichbar. Starte Ollama auf diesem Host und installiere ein kleines Modell, z. B. qwen2.5:3b.', setup: { href: '/models', command: 'ollama pull qwen2.5:3b && ollama serve' } };
+  if (!isLoopback(probe.url)) return { ok: false, mode: 'NON_LOCAL_ENDPOINT_BLOCKED', model, error: 'Admin Copilot akzeptiert nur ein lokales Loopback-Ollama. Der konfigurierte Endpoint wurde deshalb nicht verwendet.' };
   const available = probe.models || [];
-  if (!available.includes(config.model)) return { ok: false, mode: 'MODEL_NOT_INSTALLED', model: config.model, error: `Das ausgewählte Modell „${config.model}“ ist lokal nicht installiert. Verfügbar: ${available.join(', ') || 'keines'}.`, setup: { href: '/models', command: `ollama pull ${config.model}` } };
+  if (!available.includes(model)) return { ok: false, mode: 'MODEL_NOT_INSTALLED', model, error: `Das ausgewählte Modell „${model}“ ist lokal nicht installiert. Verfügbar: ${available.join(', ') || 'keines'}.`, setup: { href: '/models', command: `ollama pull ${model}` } };
   const snapshot = compactSnapshot();
   const conversation = historyText(input.history);
   const prompt = `${systemPrompt(snapshot)}${conversation ? `Vorheriger Gesprächskontext dieser Browser-Sitzung:\n${conversation}\n\n` : ''}ADMIN: ${message}\nASSISTANT:`;
-  const reply = await ollama.testModel({ model: config.model, prompt });
-  if (!reply.ok) return { ok: false, mode: reply.state || 'LOCAL_MODEL_ERROR', model: config.model, error: reply.error || reply.note || 'Lokales Modell konnte nicht antworten.' };
+  const reply = await ollama.testModel({ model, prompt });
+  if (!reply.ok) return { ok: false, mode: reply.state || 'LOCAL_MODEL_ERROR', model, error: reply.error || reply.note || 'Lokales Modell konnte nicht antworten.' };
   return {
-    ok: true, mode: 'LOCAL_MODEL', model: config.model, reply: clean(reply.response, 5000), eval_tokens: reply.eval_tokens || null,
+    ok: true, mode: 'LOCAL_MODEL', model, reply: clean(reply.response, 5000), eval_tokens: reply.eval_tokens || null,
     snapshot, boundary: 'Local language-model response: advisory only. It did not take an action, grant approval or contact an external service.',
   };
 }
 
-module.exports = { status, setModel, chat, compactSnapshot, isLoopback, RECOMMENDED };
+module.exports = { status, setModel, chat, compactSnapshot, isLoopback, standardModel, RECOMMENDED };

@@ -45,6 +45,12 @@ const SERVER_MODEL_PROFILES = [
 const BLOCKED_RE = /uncensor|abliterate[d]?|norestrict|no[-_ ]restrict|refusal[-_ ]free|no[-_ ]refusal/i;
 const EXCLUDED_NOTE = 'Eine schmale Policy-Linie bleibt: Modelle, deren Zweck das Entfernen von Schutzmechanismen ist (uncensored/abliterated/refusal-free), werden abgelehnt. ALLE anderen Modelle kann der Admin frei registrieren, suchen, testen und einbinden.';
 
+// Embedding-Modelle: sichtbar markieren ("Embedding — für Chat ungeeignet"),
+// niemals verstecken. Namensgesetz deckt die gängigen Embedder-Familien ab
+// (nomic-embed, all-minilm, bge, gte, e5, mxbai-embed, jina-embed, …).
+const EMBEDDING_RE = /(^|[-_/:.])(embed|embedding|embeddings)([-_/:.]|$)|nomic-embed|all-minilm|(^|[-_:])bge([-_]|$)|(^|[-_:])gte([-_]|$)|(^|[-_:])e5([-_]|$)|mxbai|snowflake-arctic-embed|jina-(embed|rerank)|text2vec|granite-embedding|qwen3-embedding/i;
+function isEmbeddingModel(name) { return EMBEDDING_RE.test(String(name || '')); }
+
 function load() { try { return JSON.parse(fs.readFileSync(CFG_FILE, 'utf8')); } catch { return { url: 'http://127.0.0.1:11434', installed: [], assigned: {}, custom: [], keys: {}, policy: { auto_pull: false } }; } }
 function save(db) { db.custom = db.custom || []; db.keys = db.keys || {}; fs.mkdirSync(path.dirname(CFG_FILE), { recursive: true }); const t = CFG_FILE + '.tmp'; fs.writeFileSync(t, JSON.stringify(db, null, 2)); fs.renameSync(t, CFG_FILE); }
 
@@ -156,7 +162,10 @@ function probe(timeoutMs = 2500) {
         try {
           const j = JSON.parse(d);
           const names = (j.models || []).map((m) => m.name || m.model);
-          resolve({ state: 'LIVE', detail: 'Ollama antwortet · ' + names.length + ' Modelle lokal', url: base, models: names });
+          resolve({
+            state: 'LIVE', detail: 'Ollama antwortet · ' + names.length + ' Modelle lokal', url: base, models: names,
+            model_info: names.map((n) => ({ name: n, embedding: isEmbeddingModel(n) })),
+          });
         } catch { resolve({ state: 'NOT-CONNECTED', detail: 'Antwort nicht lesbar', url: base }); }
       });
     });
@@ -276,5 +285,5 @@ module.exports = {
   },
   status, catalog, allModels, serverProfiles, known, probe, pull, removeLocal, installScript, load, save,
   addCustom, removeCustom, customModels, search, localSearch, testModel, setKeys, keysMasked,
-  SERVER_MODEL_PROFILES, EXCLUDED_NOTE,
+  isEmbeddingModel, SERVER_MODEL_PROFILES, EXCLUDED_NOTE,
 };

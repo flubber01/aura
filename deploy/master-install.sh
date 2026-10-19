@@ -105,10 +105,53 @@ test -f backend/server.js || die "backend/server.js fehlt — falscher Ordner/Br
 mkdir -p backend/src/data extracted/AURA-Web-Deploy/public 2>/dev/null || true
 
 # ---------- Port prüfen ----------
-if have ss && ss -ltn 2>/dev/null | grep -q ":$PORT "; then
-  warn "Port $PORT ist schon belegt:"
-  ss -ltnp 2>/dev/null | grep ":$PORT " >&2 || true
-  warn "Anderen Dienst stoppen/umstellen oder mit PORT=8090 erneut starten."
+# Läuft auf dem Port schon ein ALTER eigener Prozess ("node backend/server.js"),
+# wird er vor dem Start sauber beendet (pkill, 2 s warten) — damit läuft der
+# Installer zweimal hintereinander durch und beide Läufe enden mit AURA LIVE.
+# Ein FREMDER Prozess auf dem Port wird nie angefasst: ehrliche Fehlermeldung.
+port_busy() {
+  if have ss; then ss -ltn 2>/dev/null | grep -q ":$PORT " && return 0; return 1; fi
+  if have lsof; then lsof -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1 && return 0; return 1; fi
+  (exec 3<>"/dev/tcp/127.0.0.1/$PORT") 2>/dev/null && { exec 3>&- 3<&-; return 0; }
+  return 1
+}
+port_holder_cmds() {
+  # Kommandozeilen aller Prozesse, die auf $PORT lauschen (eine pro Zeile)
+  PIDS=""
+  if have ss; then PIDS="$(ss -ltnpH "sport = :$PORT" 2>/dev/null | grep -oE 'pid=[0-9]+' | cut -d= -f2 | sort -u)"; fi
+  if [ -z "$PIDS" ] && have lsof; then PIDS="$(lsof -t -iTCP:"$PORT" -sTCP:LISTEN 2>/dev/null | sort -u)"; fi
+  for pid in $PIDS; do tr '\0' ' ' <"/proc/$pid/cmdline" 2>/dev/null; echo; done | sed 's/ *$//'
+}
+if port_busy; then
+  HOLDERS="$(port_holder_cmds)"
+  OWN_AURA=0
+  while IFS= read -r line; do
+    case "$line" in *node*backend/server.js*) OWN_AURA=1 ;; esac
+  done <<EOF
+$HOLDERS
+EOF
+  if [ "$OWN_AURA" = "1" ]; then
+    say "alter eigener AURA-Prozess auf Port $PORT gefunden — beende ihn (pkill -f backend/server.js)"
+    printf '%s\n' "$HOLDERS" >&2
+    pkill -f backend/server.js 2>/dev/null || true
+    sleep 2
+    if port_busy; then
+      warn "Port $PORT ist weiterhin belegt:"
+      ss -ltnp 2>/dev/null | grep ":$PORT " >&2 || true
+      die "Alter Prozess ließ sich nicht beenden — manuell prüfen (pkill -f backend/server.js) und erneut starten."
+    fi
+    say "Port $PORT ist wieder frei — starte frisch."
+  elif [ -n "$HOLDERS" ]; then
+    warn "Port $PORT ist schon belegt (fremder Prozess):"
+    ss -ltnp 2>/dev/null | grep ":$PORT " >&2 || true
+    warn "Halter-Kommando(s):"
+    printf '%s\n' "$HOLDERS" >&2
+    die "Fremder Prozess auf Port $PORT — AURA startet nicht, um nichts zu überschreiben. Anderen Dienst stoppen/umstellen oder mit PORT=8090 erneut starten."
+  else
+    warn "Port $PORT ist schon belegt, der Halter ließ sich nicht ermitteln:"
+    ss -ltnp 2>/dev/null | grep ":$PORT " >&2 || true
+    warn "Anderen Dienst stoppen/umstellen oder mit PORT=8090 erneut starten."
+  fi
 fi
 
 # ---------- Ollama-Auto-Fund (lokales LLM für JARVIS) ----------
@@ -156,6 +199,7 @@ if [ "$OK" != "1" ]; then
 fi
 say "AURA LIVE auf :$PORT — /hub · /console · /ops · /login · /downloads"
 say "PID $PID · Log $LOG · Stopp: kill $PID"
+say "Nächster Schritt (einmalig): node backend/src/scripts/create-owner.js — dann /login öffnen und mit E-Mail + Passwort anmelden (kein Token im Browser nötig)."
 
 # ---------- Repro-Sweep ----------
 # Läuft AURA_ADMIN_TOKEN auf diesem Host, bekommt der Sweep ihn als

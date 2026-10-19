@@ -56,7 +56,7 @@ async function loadStatus(){try{const s=await api('/api/selfwork/status');const 
  $('allowlist').textContent=(s.allowlist&&s.allowlist.erlaubt||[]).join('\\n');
  $('forbidden').textContent=(s.allowlist&&s.allowlist.verboten||[]).join('\\n');
  const sel=$('modell');const chosen=sel.value;
- sel.innerHTML='<option value="">Standard ('+esc(m.default||'OLLAMA_MODEL')+')</option>'+(m.models||[]).map(n=>'<option value="'+esc(n)+'">'+esc(n)+'</option>').join('');
+ sel.innerHTML=(mm=>{const emb=new Set(mm.embedding_models||[]),inst=mm.models||[],names=[...new Set([...inst,mm.default].filter(Boolean))];return names.length?names.map(n=>'<option value="'+esc(n)+'">'+esc(n)+(n===mm.default?(inst.includes(n)?' · Standard':' · Standard (nicht installiert)'):'')+(emb.has(n)?' — Embedding — für Chat ungeeignet':'')+'</option>').join(''):'<option value="">Standard (OLLAMA_MODEL) — kein lokales Modell erkannt</option>'})(m);
  sel.value=chosen;
  $('runbook').innerHTML=(s.runbook||[]).map(b=>'<div><b>'+esc(b.label)+'</b>'+(b.commands||[]).map(c=>'<div class="command"><code>'+esc(c)+'</code><button type="button" data-copy>⧉ Kopieren</button></div>').join('')+'</div>').join('');
  $('runbook').querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>copyText(b.parentElement.querySelector('code').textContent,b)));
