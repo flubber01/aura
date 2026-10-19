@@ -53,6 +53,14 @@ async function main() {
   console.log('AURA — Owner einrichten (einmalig, per Terminal)');
   console.log('Datensatz: ' + adminAuth.ownerFile() + ' (chmod 600, wird nie committet)');
   console.log('');
+  // Existiert schon ein Owner → SOFORT abbrechen (ehrliche Meldung), bevor nach
+  // Passwörtern gefragt wird. Überschreiben tut nur --force.
+  if (adminAuth.ownerConfigured() && !FORCE) {
+    console.log('!! Ein Owner ist bereits eingerichtet (' + adminAuth.loadOwner().email + '). Nur mit --force überschreibbar.');
+    console.log('   Bestehenden Owner behalten, oder bewusst mit --force überschreiben.');
+    process.exitCode = 1;
+    return;
+  }
   let email = '';
   for (;;) {
     email = (await ask('E-Mail-Adresse: ')).trim();

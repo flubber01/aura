@@ -557,7 +557,7 @@ async function status() {
       code_verlaesst_die_maschine_nicht: modelle.configured ? /^(https?:\/\/)?(127\.|localhost|\[?::1\]?|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(String(modelle.endpoint || '')) : true,
       hinweis: modelle.configured
         ? 'Der Kontext geht ausschließlich an OLLAMA_URL = ' + modelle.endpoint
-        : 'OLLAMA_URL ist nicht gesetzt — ohne lokales Modell gibt es keinen Vorschlag (ehrlich statt geraten).',
+        : 'OLLAMA_URL ist nicht gesetzt — ohne diesen Schalter wird nichts an ein Modell gesendet und es gibt keinen Vorschlag (ehrlich statt geraten).',
     },
     runbook: runbook(),
     boundary: BOUNDARY,

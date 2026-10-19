@@ -5,14 +5,17 @@
 // Server-side only: the browser never talks to Ollama directly.
 //
 //   OLLAMA_URL=http://<host>:11434   (required to enable)
-//   OLLAMA_MODEL=llama3.2            (default; any model you have pulled)
+//   OLLAMA_MODEL=phi3:mini           (default; any model you have pulled)
 //   OLLAMA_TIMEOUT_MS=20000          (1000–120000)
 const http = require('http');
 const https = require('https');
 
 function cfg() {
   const raw = (process.env.OLLAMA_URL || '').trim();
-  const model = (process.env.OLLAMA_MODEL || 'llama3.2').trim();
+  // Standard = OLLAMA_MODEL (Fallback phi3:mini) — derselbe Standard wie im
+  // JARVIS-Bereich (admin_copilot.standardModel): keine abweichende stille
+  // Vorauswahl (Runde 11 · Modellgesetz).
+  const model = (process.env.OLLAMA_MODEL || 'phi3:mini').trim();
   const timeoutMs = Math.min(Math.max(Number(process.env.OLLAMA_TIMEOUT_MS) || 20000, 1000), 120000);
   let base = null;
   if (raw) {
@@ -104,7 +107,7 @@ async function models() {
   return {
     configured: c.configured,
     reachable: probe.reachable === true,
-    endpoint: c.base,
+    endpoint: probe.endpoint || c.base,
     default: c.model,
     models: Array.isArray(probe.models) ? probe.models.slice() : [],
     embedding_models: Array.isArray(probe.models) ? probe.models.filter((n) => require('./ollama_manager').isEmbeddingModel(n)) : [],
@@ -115,15 +118,30 @@ async function models() {
 async function status() {
   const c = cfg();
   if (!c.configured) {
-    return { configured: false, reachable: false, model: c.model, hint: 'OLLAMA_URL setzen, z. B. http://<dein-host>:11434' };
+    // Runde 11 · Modellgesetz: Die Modellliste im JARVIS-Bereich (/jarvis,
+    // /api/jarvis/*, /selfwork) ist überall dieselbe — ALLE Einträge aus
+    // Ollama /api/tags, ohne stille Filter. Ohne gesetztes OLLAMA_URL füllt
+    // der Auto-Fund des Managers (Standard 127.0.0.1:11434) die LISTE.
+    // configured/reachable bleiben ehrlich false: OHNE OLLAMA_URL wird nichts
+    // erzeugt (Antworten bleiben opt-in) — nur die Auswahlliste ist vollständig.
+    let names = []; let endpoint = null;
+    try {
+      const probe = await require('./ollama_manager').probe(1200);
+      if (probe.state === 'LIVE') { names = Array.isArray(probe.models) ? probe.models.slice() : []; endpoint = probe.url || null; }
+    } catch { /* ohne Auto-Fund bleibt die Liste leer — ehrlich statt geraten */ }
+    return {
+      configured: false, reachable: false, model: c.model, models: names,
+      models_source: endpoint ? 'AUTO_DETECTED' : null, endpoint,
+      hint: 'OLLAMA_URL setzen, z. B. http://<dein-host>:11434',
+    };
   }
   try {
     const t = await request(c.base, '/api/tags', null, 3000);
     const names = (t.models || []).map((m) => m.name);
     const present = names.some((n) => n === c.model || n.startsWith(c.model + ':'));
-    return { configured: true, reachable: true, model: c.model, model_present: present, models: names };
+    return { configured: true, reachable: true, model: c.model, model_present: present, models: names, models_source: 'OLLAMA_URL', endpoint: c.base };
   } catch (e) {
-    return { configured: true, reachable: false, model: c.model, error: e.message };
+    return { configured: true, reachable: false, model: c.model, error: e.message, models: [], models_source: 'OLLAMA_URL', endpoint: c.base };
   }
 }
 
