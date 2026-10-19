@@ -158,10 +158,14 @@ say "AURA LIVE auf :$PORT — /hub · /console · /ops · /login · /downloads"
 say "PID $PID · Log $LOG · Stopp: kill $PID"
 
 # ---------- Repro-Sweep ----------
+# Läuft AURA_ADMIN_TOKEN auf diesem Host, bekommt der Sweep ihn als
+# AURA_VALIDATE_TOKEN — sonst würden alle Admin-POSTs im Sweep mit
+# „401 — Gate greift" bewertet (Validate crasht dabei nicht, aber die
+# Schreibprüfungen können nicht bestanden werden).
 if [ "${RUN_VALIDATE:-1}" = "1" ] && [ -f test/validate.js ]; then
   say "Repro-Sweep (test/validate.js) läuft …"
   OUT="$(mktemp)"
-  if AURA_URL="http://127.0.0.1:$PORT" node test/validate.js >"$OUT" 2>&1; then
+  if AURA_URL="http://127.0.0.1:$PORT" AURA_VALIDATE_TOKEN="${AURA_ADMIN_TOKEN:-}" node test/validate.js >"$OUT" 2>&1; then
     tail -1 "$OUT"; say "Reproduktion bestätigt ✔"
   else
     grep -E "FAIL|===" "$OUT" | tail -n 20

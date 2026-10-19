@@ -5,18 +5,18 @@ const RUNBOOKS = [
   {
     id: 'server-startet-nicht',
     title: 'Server startet nicht',
-    summary: 'Backend-Prozess, Dienststatus, Syntax und Startprotokoll eingrenzen.',
-    keywords: ['server startet nicht', 'backend startet nicht', 'server down', 'startfehler', 'systemd', 'backend down', 'crash beim start', 'startet nicht'],
+    summary: 'Backend-Prozess, Gesundheitsprobe, Syntax und Startprotokoll eingrenzen.',
+    keywords: ['server startet nicht', 'backend startet nicht', 'server down', 'startfehler', 'prozess fehlt', 'backend down', 'crash beim start', 'startet nicht', 'setsid'],
     diagnostics: [
-      { label: 'Dienstzustand', command: 'sudo systemctl status aura --no-pager' },
+      { label: 'Prozess- und Gesundheitszustand', command: 'pgrep -af "node backend/server.js"; curl -fsS http://127.0.0.1:8080/api/health' },
       { label: 'Letzte Backend-Logs', command: 'tail -n 40 "${AURA_LOG:-./aura-backend.log}"' },
       { label: 'JavaScript-Syntax', command: 'node --check backend/server.js' },
     ],
     steps: [
-      { text: 'Prüfe zuerst, ob systemd den Dienst gestartet hat oder einen Fehler meldet.', commands: ['sudo systemctl status aura --no-pager'] },
+      { text: 'Prüfe zuerst, ob der Backend-Prozess läuft und der Health-Endpunkt antwortet (Standard-Start ist setsid, kein Dienstmanager).', commands: ['pgrep -af "node backend/server.js"', 'curl -fsS http://127.0.0.1:8080/api/health'] },
       { text: 'Lies die letzten Backend-Zeilen und suche nach dem ersten Fehler vor dem Abbruch.', commands: ['tail -n 40 "${AURA_LOG:-./aura-backend.log}"'] },
-      { text: 'Prüfe die Serverdatei auf einen Syntaxfehler, ohne den Dienst zu starten.', commands: ['node --check backend/server.js'] },
-      { text: 'Wenn der Dienst fehlt, prüfe den Installationspfad und starte danach den vorgesehenen Dienst bewusst neu.', commands: ['sudo systemctl cat aura'] },
+      { text: 'Prüfe die Serverdatei auf einen Syntaxfehler, ohne sie zu starten.', commands: ['node --check backend/server.js'] },
+      { text: 'Fehlt der Prozess, starte AURA mit dem Standard-Ritual neu: erst beenden, dann den Installer-Einzeiler (er holt den gemergten Stand und startet mit Env).', commands: ['pkill -f backend/server.js || true', 'curl -fsSL https://raw.githubusercontent.com/flubber01/aura/main/deploy/master-install.sh | bash'] },
     ],
   },
   {
@@ -49,7 +49,7 @@ const RUNBOOKS = [
     steps: [
       { text: 'Vergleiche den Namen in OLLAMA_MODEL exakt mit einem Eintrag aus ollama list.', commands: ['ollama list'] },
       { text: 'Prüfe über die lokale API, ob Ollama das Modell wirklich anbietet.', commands: ['curl -fsS http://127.0.0.1:11434/api/tags | python3 -m json.tool'] },
-      { text: 'Trage den vorhandenen Modellnamen samt Tag, zum Beispiel phi3:mini, in die Dienst-Umgebung ein und starte AURA danach neu.', commands: ['sudoedit /opt/aura/deploy/.env'] },
+      { text: 'Setze OLLAMA_MODEL direkt in der Start-Environment (Kopiervorlage — vor dem Starten den gewünschten Namen einsetzen).', commands: ['pkill -f backend/server.js || true', 'setsid nohup env PORT=8080 OLLAMA_URL=http://127.0.0.1:11434 OLLAMA_MODEL=phi3:mini OLLAMA_TIMEOUT_MS=60000 node backend/server.js >>"${AURA_LOG:-./aura-backend.log}" 2>&1 < /dev/null &'] },
       { text: 'Falls das Modell fehlt, lade es bewusst lokal nach und prüfe die Liste erneut.', commands: ['ollama pull phi3:mini', 'ollama list'] },
     ],
   },
@@ -61,13 +61,13 @@ const RUNBOOKS = [
     diagnostics: [
       { label: 'AURA-Ollama-Status', command: 'curl -fsS http://127.0.0.1:8080/api/jarvis/llm | python3 -m json.tool' },
       { label: 'Ollama lokal', command: 'curl -fsS http://127.0.0.1:11434/api/tags | python3 -m json.tool' },
-      { label: 'Nur Ollama-Env-Status aus systemd', command: 'sudo systemctl show aura --property=Environment --value | tr " " "\\n" | sed -E "s/^(OLLAMA_URL|OLLAMA_MODEL|OLLAMA_TIMEOUT_MS)=.*/\\1=<gesetzt>/" | grep -E "^(OLLAMA_URL|OLLAMA_MODEL|OLLAMA_TIMEOUT_MS)="' },
+      { label: 'Ollama-Env-Status des laufenden Prozesses (Schlüssel nur, keine Werte)', command: 'tr "\\0" "\\n" < /proc/$(pgrep -f "node backend/server.js" | head -1)/environ | grep -E "^(OLLAMA_URL|OLLAMA_MODEL|OLLAMA_TIMEOUT_MS)=" | sed -E "s/=(.*)$/=<gesetzt>/"' },
     ],
     steps: [
       { text: 'Prüfe die AURA-Probe: Sie zeigt, ob URL, Verbindung und ausgewähltes Modell stimmen.', commands: ['curl -fsS http://127.0.0.1:8080/api/jarvis/llm | python3 -m json.tool'] },
       { text: 'Frage Ollama direkt auf dem VPS nach seiner lokalen Modellliste.', commands: ['curl -fsS http://127.0.0.1:11434/api/tags | python3 -m json.tool'] },
-      { text: 'Kontrolliere, dass OLLAMA_URL und OLLAMA_MODEL im Dienst gesetzt sind, ohne ihre Werte auszugeben.', commands: ['sudo systemctl show aura --property=Environment --value | tr " " "\\n" | sed -E "s/^(OLLAMA_URL|OLLAMA_MODEL|OLLAMA_TIMEOUT_MS)=.*/\\1=<gesetzt>/" | grep -E "^(OLLAMA_URL|OLLAMA_MODEL|OLLAMA_TIMEOUT_MS)="'] },
-      { text: 'Wenn die Variablen angepasst wurden, starte den Dienst bewusst neu und wiederhole die Probe.', commands: ['sudo systemctl restart aura', 'curl -fsS http://127.0.0.1:8080/api/jarvis/llm | python3 -m json.tool'] },
+      { text: 'Kontrolliere, dass OLLAMA_URL und OLLAMA_MODEL im laufenden Prozess gesetzt sind, ohne ihre Werte auszugeben.', commands: ['tr "\\0" "\\n" < /proc/$(pgrep -f "node backend/server.js" | head -1)/environ | grep -E "^(OLLAMA_URL|OLLAMA_MODEL|OLLAMA_TIMEOUT_MS)=" | sed -E "s/=(.*)$/=<gesetzt>/"'] },
+      { text: 'Wenn die Variablen angepasst wurden, starte AURA mit der neuen Environment bewusst neu (Standard-Ritual) und wiederhole die Probe.', commands: ['pkill -f backend/server.js || true', 'setsid nohup env PORT=8080 OLLAMA_URL=http://127.0.0.1:11434 OLLAMA_MODEL=phi3:mini OLLAMA_TIMEOUT_MS=60000 node backend/server.js >>"${AURA_LOG:-./aura-backend.log}" 2>&1 < /dev/null &', 'curl -fsS http://127.0.0.1:8080/api/jarvis/llm | python3 -m json.tool'] },
     ],
   },
   {
@@ -114,8 +114,8 @@ const RUNBOOKS = [
     ],
     steps: [
       { text: 'Wähle zuerst einen Chat-Modellnamen, der in ollama list bereits erscheint.', commands: ['ollama list'] },
-      { text: 'Setze OLLAMA_MODEL in der Environment-Datei des Dienstes auf den exakten Namen, zum Beispiel phi3:mini.', commands: ['sudoedit /opt/aura/deploy/.env'] },
-      { text: 'Lade die geänderte Dienstkonfiguration durch einen bewussten Neustart neu.', commands: ['sudo systemctl restart aura'] },
+      { text: 'Setze OLLAMA_MODEL direkt in der Start-Environment auf den exakten Namen (Kopiervorlage — Namen vor dem Starten einsetzen).', commands: ['pkill -f backend/server.js || true', 'setsid nohup env PORT=8080 OLLAMA_URL=http://127.0.0.1:11434 OLLAMA_MODEL=phi3:mini OLLAMA_TIMEOUT_MS=60000 node backend/server.js >>"${AURA_LOG:-./aura-backend.log}" 2>&1 < /dev/null &'] },
+      { text: 'Der Neustart ist Teil der Kopiervorlage oben — AURA läuft danach mit dem neuen Modell.', commands: ['pgrep -af "node backend/server.js"'] },
       { text: 'Prüfe anschließend Erreichbarkeit und model_present über die AURA-Probe.', commands: ['curl -fsS http://127.0.0.1:8080/api/jarvis/llm | python3 -m json.tool'] },
     ],
   },
@@ -132,8 +132,8 @@ const RUNBOOKS = [
     steps: [
       { text: 'Prüfe CPU-Kerne und freien RAM, bevor du einen langsameren Modelllauf bewertest.', commands: ['nproc && free -h'] },
       { text: 'Sieh nach, ob Ollama ein Modell geladen hat oder gerade rechnet.', commands: ['ollama ps'] },
-      { text: 'Für CPU-Hardware setze OLLAMA_TIMEOUT_MS im Dienst auf 60000; die Browser-Anfrage wartet höchstens etwa 65 Sekunden.', commands: ['sudoedit /opt/aura/deploy/.env'] },
-      { text: 'Starte AURA nach einer Timeout-Änderung neu und probiere eine kurze Anfrage erneut.', commands: ['sudo systemctl restart aura', 'curl -fsS http://127.0.0.1:8080/api/jarvis/llm | python3 -m json.tool'] },
+      { text: 'Für CPU-Hardware setze OLLAMA_TIMEOUT_MS in der Start-Environment auf 60000 (Kopiervorlage); die Browser-Anfrage wartet höchstens etwa 65 Sekunden.', commands: ['pkill -f backend/server.js || true', 'setsid nohup env PORT=8080 OLLAMA_URL=http://127.0.0.1:11434 OLLAMA_MODEL=phi3:mini OLLAMA_TIMEOUT_MS=60000 node backend/server.js >>"${AURA_LOG:-./aura-backend.log}" 2>&1 < /dev/null &'] },
+      { text: 'Starte AURA nach einer Timeout-Änderung neu (Schritt oben) und probiere eine kurze Anfrage erneut.', commands: ['curl -fsS http://127.0.0.1:8080/api/jarvis/llm | python3 -m json.tool'] },
     ],
   },
   {
@@ -143,13 +143,28 @@ const RUNBOOKS = [
     keywords: ['log lesen', 'logs', 'logdatei', 'log ende', 'fehler im log', 'journalctl', 'protokoll'],
     diagnostics: [
       { label: 'AURA-Log-Ende', command: 'tail -n 40 "${AURA_LOG:-./aura-backend.log}"' },
-      { label: 'systemd-Log-Ende', command: 'sudo journalctl -u aura -n 40 --no-pager' },
+      { label: 'Log-Ende des Installer-Standards', command: 'tail -n 40 /var/log/aura-backend.log' },
     ],
     steps: [
       { text: 'Prüfe zuerst den von AURA verwendeten Logpfad und lies nur die letzten vierzig Zeilen.', commands: ['printf "AURA_LOG=%s\\n" "${AURA_LOG:-./aura-backend.log}"', 'tail -n 40 "${AURA_LOG:-./aura-backend.log}"'] },
-      { text: 'Wenn AURA als systemd-Dienst läuft, lies alternativ das Dienstjournal.', commands: ['sudo journalctl -u aura -n 40 --no-pager'] },
-      { text: 'Suche den frühesten ERROR-Eintrag im Zeitraum und notiere Zeitstempel sowie Route.', commands: ['sudo journalctl -u aura --since "30 minutes ago" --no-pager | grep -iE "error|failed|exception"'] },
+      { text: 'Der Installer-Standard schreibt nach /var/log/aura-backend.log — lies dort alternativ die letzten vierzig Zeilen.', commands: ['tail -n 40 /var/log/aura-backend.log'] },
+      { text: 'Suche den frühesten ERROR-Eintrag im Zeitraum und notiere Zeitstempel sowie Route.', commands: ['grep -iE "error|failed|exception" "${AURA_LOG:-./aura-backend.log}" | tail -n 40'] },
       { text: 'Teile vor einem Support-Bericht keine Zugangsdaten oder vollständigen privaten Logdateien.', commands: [] },
+    ],
+  },
+  {
+    id: 'validate-admin-token',
+    title: 'Validate bei Admin-Token',
+    summary: 'Validate crashes when Admin-Token is set. (Validate crasht bei gesetzem Admin-Token.)',
+    keywords: ['validate crashes', 'validate crasht', 'admin token', 'admin-token', 'aura_admin_token', 'aura_validate_token', 'x-aura-token', 'gate greift', 'gate engages', 'validate fail', 'validate 401', 'typerror'],
+    diagnostics: [
+      { label: 'Validate-Sweep ohne Token', command: 'cd "$HOME/aura" && node test/validate.js' },
+      { label: 'Validate-Sweep mit Token', command: 'cd "$HOME/aura" && AURA_VALIDATE_TOKEN="$AURA_ADMIN_TOKEN" node test/validate.js' },
+    ],
+    steps: [
+      { text: 'Prüfe, ob der Server mit AURA_ADMIN_TOKEN läuft: Ohne den Header x-aura-token verweigern schreibende Routen dann mit 401.', commands: ['curl -fsS http://127.0.0.1:8080/api/auth/status | python3 -m json.tool'] },
+      { text: 'Führe Validate mit dem Token aus — AURA_VALIDATE_TOKEN wird als x-aura-token an alle Admin-POSTs geschickt.', commands: ['cd "$HOME/aura" && AURA_VALIDATE_TOKEN="$AURA_ADMIN_TOKEN" node test/validate.js'] },
+      { text: 'Ohne AURA_VALIDATE_TOKEN bewertet Validate Admin-Schreibprüfungen defensiv als „401 — Gate greift (Gate engages)" und crasht nicht; der Installer übergibt AURA_ADMIN_TOKEN automatisch.', commands: ['cd "$HOME/aura" && node test/validate.js'] },
     ],
   },
 ];

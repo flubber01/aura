@@ -531,8 +531,8 @@ function revert(id) {
 
 function runbook() {
   return [
-    { id: 'restart', label: 'AURA neu starten (nach deiner Freigabe)', commands: ['sudo systemctl restart aura', 'sudo systemctl status aura --no-pager', 'tail -n 40 "${AURA_LOG:-./aura-backend.log}"'] },
-    { id: 'promote', label: 'Weg nach main — dein PR-Ritual', commands: ['git status --porcelain', 'git switch selfwork-local', 'git push -u origin selfwork-local', 'gh pr create --base main --head selfwork-local --title "selfwork: <kurzer Titel>" --body "Prüfprotokoll: node test/validate.js"', 'git switch main', 'git pull --ff-only origin main'] },
+    { id: 'restart', label: 'AURA neu starten (nach deiner Freigabe) — Standard-Start, Kopiervorlage', commands: ['pkill -f backend/server.js || true', 'setsid nohup env PORT="${PORT:-8080}" OLLAMA_URL="${OLLAMA_URL:-}" OLLAMA_MODEL="${OLLAMA_MODEL:-}" OLLAMA_TIMEOUT_MS="${OLLAMA_TIMEOUT_MS:-}" node backend/server.js >>"${AURA_LOG:-./aura-backend.log}" 2>&1 < /dev/null &', 'curl -fsS http://127.0.0.1:8080/api/health', 'tail -n 40 "${AURA_LOG:-./aura-backend.log}"'] },
+    { id: 'promote', label: 'Weg nach main — dein PR-Ritual', commands: ['git status --porcelain', 'git switch selfwork-local', 'git push -u origin selfwork-local', 'gh pr create --base main --head selfwork-local --title "selfwork: <kurzer Titel>" --body "Prüfprotokoll: node test/validate.js"', 'git switch main', 'git pull --ff-only origin main', 'curl -fsSL https://raw.githubusercontent.com/flubber01/aura/main/deploy/master-install.sh | bash'] },
   ];
 }
 
