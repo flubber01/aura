@@ -82,11 +82,11 @@ function html(active) {
 .aura-central-nav .aura-nav-primary{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap}
 .aura-central-nav .aura-nav-primary>a,.aura-central-nav summary{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 10px;border:1px solid transparent;border-radius:8px;background:transparent;color:#bfd0e4;text-decoration:none;font:700 11px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;white-space:nowrap;cursor:pointer}
 .aura-central-nav .aura-nav-primary>a:hover,.aura-central-nav summary:hover,.aura-central-nav .aura-nav-primary>a.active,.aura-central-nav summary.active{border-color:rgba(111,221,255,.32);background:rgba(111,221,255,.12);color:#7ce5ff}
-.aura-central-nav .aura-nav-more{position:relative}
+.aura-central-nav .aura-nav-more{display:contents}
 .aura-central-nav summary{list-style:none}
 .aura-central-nav summary::-webkit-details-marker{display:none}
 .aura-central-nav summary span{margin-left:5px;color:#7ce5ff}
-.aura-central-nav .aura-nav-dropdown{position:absolute;top:calc(100% + 8px);right:0;z-index:1001;display:none;grid-template-columns:repeat(2,minmax(205px,1fr));gap:10px;width:min(760px,94vw);max-height:min(72vh,680px);overflow:auto;padding:14px;border:1px solid rgba(111,221,255,.3);border-radius:12px;background:rgba(5,11,21,.98);box-shadow:0 18px 60px rgba(0,0,0,.55)}
+.aura-central-nav .aura-nav-dropdown{display:none;flex-basis:100%;width:100%;box-sizing:border-box;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-height:min(72vh,680px);overflow:auto;padding:14px;margin-top:6px;border:1px solid rgba(111,221,255,.3);border-radius:12px;background:rgba(5,11,21,.98)}
 .aura-central-nav details[open]>.aura-nav-dropdown{display:grid}
 .aura-central-nav .aura-nav-group{min-width:0;padding:9px;border:1px solid rgba(111,221,255,.13);border-radius:9px;background:rgba(12,24,41,.75)}
 .aura-central-nav .aura-nav-group h2{margin:0 0 7px;color:#7ce5ff;font:800 10px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.1em;text-transform:uppercase}
