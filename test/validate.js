@@ -393,12 +393,22 @@ async function main() {
     const tagsRes = await fetchRaw(tagsUrl, 4000);
     if (tagsRes.status !== 200) {
       results.items.push({ kind: 'jarvis', path: 'JARVIS-Modelliste == Anzahl /api/tags (ohne stille Filter)', ok: null, detail: 'SKIP/NOT-CONNECTED — Ollama nicht erreichbar (' + tagsUrl + ', HTTP ' + tagsRes.status + ')' });
+      results.items.push({ kind: 'jarvis', path: '/api/jarvis/llm Modelliste == Anzahl /api/tags (ohne stille Filter)', ok: null, detail: 'SKIP/NOT-CONNECTED — Ollama nicht erreichbar (' + tagsUrl + ', HTTP ' + tagsRes.status + ')' });
     } else {
       let names = [];
       try { names = (JSON.parse(tagsRes.body.toString('utf8')).models || []).map((m) => m.name || m.model); } catch { names = []; }
       const list = Array.isArray(serverStatus.available_models) ? serverStatus.available_models : [];
       const same = list.length === names.length && names.every((n) => list.includes(n));
       results.items.push({ kind: 'jarvis', path: 'JARVIS-Modelliste == Anzahl /api/tags (ohne stille Filter)', ok: same, detail: 'Liste: ' + list.length + ' · /api/tags: ' + names.length + (same ? ' · alle Einträge auswählbar' : ' · Abweichung!') });
+      // /api/jarvis/* (JARVIS-Bereich): dieselbe Liste, ohne stille Filter.
+      let llmStatus = {};
+      try { llmStatus = JSON.parse((await get('/api/jarvis/llm')).body); } catch { llmStatus = {}; }
+      const llmList = Array.isArray(llmStatus.models) ? llmStatus.models : null;
+      const llmSame = llmList !== null && llmList.length === names.length && names.every((n) => llmList.includes(n));
+      results.items.push({
+        kind: 'jarvis', path: '/api/jarvis/llm Modelliste == Anzahl /api/tags (ohne stille Filter)', ok: llmSame,
+        detail: llmList === null ? 'Abweichung! — /api/jarvis/llm liefert keine Modellliste (models fehlt)' : ('Liste: ' + llmList.length + ' · /api/tags: ' + names.length + (llmSame ? ' · alle Einträge auswählbar' : ' · Abweichung!')),
+      });
     }
   }
 
@@ -626,10 +636,17 @@ async function main() {
       const dir = path.join(tmp, 'repo');
       fs.mkdirSync(dir);
       const SKIP = new Set(['.git', 'node_modules', '_uploads', 'google_drive']);
+      // Laufzeitdaten (backend/src/data, gitignored) werden NICHT mitkopiert: der
+      // laufende Server schreibt dort währenddessen (z. B. Backups) — der Kopier-
+      // Lauf würde sonst zufällig auf gelöschte Dateien treffen (ENOENT-Flake).
+      const DATA_DIR = path.join(__dirname, '..', 'backend', 'src', 'data');
       for (const entry of fs.readdirSync(path.join(__dirname, '..'), { withFileTypes: true })) {
         if (SKIP.has(entry.name)) continue;
         if (entry.isFile() && /\.zip$/i.test(entry.name)) continue;
-        fs.cpSync(path.join(__dirname, '..', entry.name), path.join(dir, entry.name), { recursive: true, filter: (src) => !src.includes(`${path.sep}node_modules`) });
+        fs.cpSync(path.join(__dirname, '..', entry.name), path.join(dir, entry.name), {
+          recursive: true,
+          filter: (src) => !src.includes(`${path.sep}node_modules`) && src !== DATA_DIR && !src.startsWith(DATA_DIR + path.sep),
+        });
       }
       const g = (args) => spawnSync('git', args, { cwd: dir, encoding: 'utf8', env: Object.assign({}, process.env, { GIT_AUTHOR_NAME: 'validate', GIT_AUTHOR_EMAIL: 'validate@aura.local', GIT_COMMITTER_NAME: 'validate', GIT_COMMITTER_EMAIL: 'validate@aura.local' }) });
       g(['init', '-q']);
