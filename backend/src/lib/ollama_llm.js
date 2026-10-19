@@ -97,6 +97,7 @@ async function chat({ model, system, prompt, options }) {
 }
 
 // Installierte Modelle für Auswahllisten (Dropdown in Oberflächen).
+// ALLE Einträge aus Ollama /api/tags — ohne stille Filter (Runde 11).
 async function models() {
   const c = cfg();
   const probe = await status();
@@ -106,6 +107,7 @@ async function models() {
     endpoint: c.base,
     default: c.model,
     models: Array.isArray(probe.models) ? probe.models.slice() : [],
+    embedding_models: Array.isArray(probe.models) ? probe.models.filter((n) => require('./ollama_manager').isEmbeddingModel(n)) : [],
     model_present: probe.model_present === true,
   };
 }
@@ -119,7 +121,7 @@ async function status() {
     const t = await request(c.base, '/api/tags', null, 3000);
     const names = (t.models || []).map((m) => m.name);
     const present = names.some((n) => n === c.model || n.startsWith(c.model + ':'));
-    return { configured: true, reachable: true, model: c.model, model_present: present, models: names.slice(0, 20) };
+    return { configured: true, reachable: true, model: c.model, model_present: present, models: names };
   } catch (e) {
     return { configured: true, reachable: false, model: c.model, error: e.message };
   }

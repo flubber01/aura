@@ -15,7 +15,11 @@ const BASE = process.env.AURA_URL || 'http://127.0.0.1:8080';
 // alle Admin-POSTs. Ohne ihn bewertet Validate Admin-Schreibprüfungen defensiv
 // als „401 — Gate greift (Gate engages)" — kein TypeError, kein Crash.
 const VALIDATE_TOKEN = process.env.AURA_VALIDATE_TOKEN || '';
-const results = { pass: 0, fail: 0, items: [] };
+// Owner-Zugangsdaten NUR lokal setzen (nie im Repo): mit ihnen prüft Validate
+// den Formular-Login (E-Mail + Passwort) und Cookie-Admin-POSTs ehrlich.
+const VALIDATE_OWNER_EMAIL = process.env.AURA_VALIDATE_OWNER_EMAIL || '';
+const VALIDATE_OWNER_PASSWORD = process.env.AURA_VALIDATE_OWNER_PASSWORD || '';
+const results = { pass: 0, fail: 0, skip: 0, items: [] };
 
 function get(p, timeout = 20000) {
   return new Promise((resolve) => {
@@ -89,6 +93,12 @@ async function checkPage(p) {
     ok = ok && ready;
     detail += ready ? ' · Diff-Ansicht, Prüfliste und Klick-Buttons' : ' · Diff-Ansicht/Buttons fehlen';
   }
+  if (p === '/login') {
+    // JavaScript-freies Anmeldeformular ODER ehrlicher Einrichtungs-Hinweis — serverseitig gerendert.
+    const ready = /action="\/api\/auth\/login-form"/.test(r.body) && /ANMELDEN/.test(r.body) && /create-owner\.js/.test(r.body);
+    ok = ok && ready;
+    detail += ready ? ' · Formular (ohne JS) + Einrichtungs-Hinweis' : ' · Formular/Einrichtungs-Hinweis fehlt';
+  }
   if (p === '/containers') {
     const ready = /Dritt-Modul importieren/.test(r.body) && /\/api\/modulehub\/import/.test(r.body) && /id="impQueue"/.test(r.body);
     ok = ok && ready;
@@ -117,10 +127,27 @@ function post(p, body, timeout = 20000, opts = {}) {
     const u = new URL(BASE + p);
     const headers = { 'content-type': 'application/json', 'content-length': Buffer.byteLength(data) };
     if (VALIDATE_TOKEN && !opts.noToken) headers['x-aura-token'] = VALIDATE_TOKEN; // Admin-Token für Gate-Routen
+    if (opts.cookie) headers['cookie'] = opts.cookie; // Runde 11: Sitzungs-Cookie ODER Token
     const req = http.request({ hostname: u.hostname, port: u.port, path: p, method: 'POST', timeout, headers },
-      (res) => { let d = ''; res.on('data', (c) => { d += c; }); res.on('end', () => resolve({ status: res.statusCode, body: d, type: res.headers['content-type'] || '' })); });
-    req.on('error', (e) => resolve({ status: 0, body: String(e.message), type: '' }));
-    req.on('timeout', () => { req.destroy(); resolve({ status: 0, body: 'timeout', type: '' }); });
+      (res) => { let d = ''; res.on('data', (c) => { d += c; }); res.on('end', () => resolve({ status: res.statusCode, body: d, type: res.headers['content-type'] || '', setCookie: res.headers['set-cookie'] || null, location: res.headers.location || null })); });
+    req.on('error', (e) => resolve({ status: 0, body: String(e.message), type: '', setCookie: null })); 
+    req.on('timeout', () => { req.destroy(); resolve({ status: 0, body: 'timeout', type: '', setCookie: null }); });
+    req.write(data); req.end();
+  });
+}
+
+// Formular-POST (application/x-www-form-urlencoded) — der JavaScript-freie
+// Anmelde-Weg von /login. Liefert auch set-cookie und Location zurück.
+function postForm(p, fields, timeout = 20000, opts = {}) {
+  return new Promise((resolve) => {
+    const data = new URLSearchParams(fields).toString();
+    const u = new URL(BASE + p);
+    const headers = { 'content-type': 'application/x-www-form-urlencoded', 'content-length': Buffer.byteLength(data) };
+    if (opts.cookie) headers['cookie'] = opts.cookie;
+    const req = http.request({ hostname: u.hostname, port: u.port, path: p, method: 'POST', timeout, headers },
+      (res) => { let d = ''; res.on('data', (c) => { d += c; }); res.on('end', () => resolve({ status: res.statusCode, body: d, type: res.headers['content-type'] || '', setCookie: res.headers['set-cookie'] || null, location: res.headers.location || null })); });
+    req.on('error', (e) => resolve({ status: 0, body: String(e.message), type: '', setCookie: null }));
+    req.on('timeout', () => { req.destroy(); resolve({ status: 0, body: 'timeout', type: '', setCookie: null }); });
     req.write(data); req.end();
   });
 }
@@ -257,7 +284,7 @@ async function main() {
   await post('/api/config/reset', {});
 
   // ---- AURA OS Intelligence + Admin Copilot ----
-  await checkApi('/api/admin-copilot/status', j((d) => d.local_only === true && typeof d.model === 'string' && Array.isArray(d.shortcuts) && d.shortcuts.some((x) => x.href === '/today') && Array.isArray(d.recommended_models) ? true : 'admin copilot local status missing'));
+  await checkApi('/api/admin-copilot/status', j((d) => d.local_only === true && typeof d.model === 'string' && typeof d.standard_model === 'string' && Array.isArray(d.available_models) && Array.isArray(d.embedding_models) && Array.isArray(d.shortcuts) && d.shortcuts.some((x) => x.href === '/today') && Array.isArray(d.recommended_models) ? true : 'admin copilot local status missing'));
   await checkApi('/api/cluster/status', j((d) => d.mode === 'LOCAL_INFRASTRUCTURE_INVENTORY' && d.main_core && d.main_core.protected === true && d.arms && typeof d.declared_capacity?.cores === 'number' && Array.isArray(d.interfaces) ? true : 'infrastructure control room status missing'));
   await checkApi('/api/cluster/preflight', j((d) => d.mode === 'LOCAL_PREFLIGHT_ONLY' && Array.isArray(d.checks) && d.checks.some((x) => x.id === 'remote_boundary' && x.pass === true) ? true : 'infrastructure preflight boundary missing'));
   await checkApi('/api/repair/status', j((d) => d.mode === 'READ_ONLY_LOCAL_REPAIR_STATUS' && d.log && Array.isArray(d.log.lines) && d.validate && d.incidents && d.ollama && Array.isArray(d.ollama.models) && d.configuration?.ollama_url && d.configuration?.ollama_model && Array.isArray(d.runbooks) ? true : 'repair status fields missing'));
@@ -310,6 +337,69 @@ async function main() {
       gateOk = false; gateDetail = 'status ' + probe.status + ' · unerwartete Antwort (erwartet 401/403)';
     }
     results.items.push({ kind: 'gate', path: '/api/modulehub/scan (POST ohne Token)', ok: gateOk, detail: gateDetail });
+  }
+
+  // ---- Runde 11 · Admin-Login per Formular (ohne JavaScript) + Cookie-Gate ----
+  {
+    const skipItem = (p, detail) => results.items.push({ kind: 'owner', path: p, ok: null, detail: detail || 'SKIP' });
+    if (!VALIDATE_OWNER_EMAIL || !VALIDATE_OWNER_PASSWORD) {
+      skipItem('/api/auth/login-form (falsches Passwort)', 'SKIP — AURA_VALIDATE_OWNER_EMAIL + AURA_VALIDATE_OWNER_PASSWORD nicht gesetzt (nur lokal setzen, nie im Repo)');
+      skipItem('/api/auth/login-form (richtige Zugangsdaten → set-cookie + 302)', 'SKIP — AURA_VALIDATE_OWNER_EMAIL + AURA_VALIDATE_OWNER_PASSWORD nicht gesetzt');
+      skipItem('Admin-POST nur mit Cookie (ohne x-aura-token)', 'SKIP — keine Owner-Zugangsdaten zum Einloggen');
+    } else {
+      // 1) falsches Passwort → KEIN set-cookie + ehrliche serverseitige Fehlerseite
+      const wrong = await postForm('/api/auth/login-form', { email: VALIDATE_OWNER_EMAIL, password: VALIDATE_OWNER_PASSWORD + '-falsch', next: '/hub' });
+      const wrongOk = (wrong.status === 401 || wrong.status === 200) && !wrong.setCookie
+        && /Falsche E-Mail oder falsches Passwort/.test(wrong.body) && /Zurück zur Anmeldung/.test(wrong.body);
+      results.items.push({ kind: 'owner', path: '/api/auth/login-form (falsches Passwort)', ok: wrongOk, detail: 'status ' + wrong.status + ' · set-cookie: ' + (wrong.setCookie ? 'JA (darf nicht sein!)' : 'nein') + ' · Fehlerseite ehrlich + Zurück-Link' });
+
+      // 2) richtige Zugangsdaten → set-cookie + 302 auf ?next=…
+      const right = await postForm('/api/auth/login-form', { email: VALIDATE_OWNER_EMAIL, password: VALIDATE_OWNER_PASSWORD, next: '/ops' });
+      const cookiePair = String((right.setCookie || []).find((c) => c.startsWith('aura_admin_session=')) || '').split(';')[0];
+      const rightOk = right.status === 302 && Boolean(cookiePair) && right.location === '/ops';
+      results.items.push({ kind: 'owner', path: '/api/auth/login-form (richtige Zugangsdaten → set-cookie + 302)', ok: rightOk, detail: 'status ' + right.status + ' · set-cookie: ' + (cookiePair ? 'ja' : 'nein') + ' · location: ' + (right.location || '—') });
+
+      if (rightOk) {
+        // 3) Admin-POST NUR mit Cookie (ohne x-aura-token) → 200/201
+        const cookieOnly = await post('/api/modulehub/scan', {}, 20000, { noToken: true, cookie: cookiePair });
+        const cookieOk = cookieOnly.status === 200 || cookieOnly.status === 201;
+        results.items.push({ kind: 'owner', path: 'Admin-POST nur mit Cookie (ohne x-aura-token)', ok: cookieOk, detail: 'status ' + cookieOnly.status + (cookieOk ? ' · Sitzung trägt Admin-Rechte' : ' · Cookie wurde nicht als Admin-Recht akzeptiert') });
+
+        // 4) Admin-POST ohne Cookie und ohne Token → 401 (Gate-Check; defensiv wie oben)
+        const bare = await post('/api/modulehub/scan', {}, 20000, { noToken: true });
+        let bareOk; let bareDetail;
+        if (bare.status === 401 || bare.status === 403) { bareOk = true; bareDetail = 'status ' + bare.status + ' — Gate greift (Gate engages)'; }
+        else if (bare.status === 200 || bare.status === 201) {
+          bareOk = !VALIDATE_TOKEN;
+          bareDetail = 'status ' + bare.status + (VALIDATE_TOKEN ? ' · Gate greift NICHT — AURA_VALIDATE_TOKEN gesetzt, Server aber ohne/mit anderem Token' : ' · Gate inaktiv (kein AURA_ADMIN_TOKEN auf dem Server — lokaler Betrieb)');
+        } else { bareOk = false; bareDetail = 'status ' + bare.status + ' · unerwartete Antwort (erwartet 401/403)'; }
+        results.items.push({ kind: 'owner', path: 'Admin-POST ohne Cookie und ohne Token', ok: bareOk, detail: bareDetail });
+      } else {
+        skipItem('Admin-POST nur mit Cookie (ohne x-aura-token)', 'SKIP — Login schlug fehl, kein Sitzungs-Cookie zum Prüfen');
+      }
+    }
+  }
+
+  // ---- Runde 11 · JARVIS-Modellgesetz: ALLE /api-tags-Modelle auswählbar ----
+  {
+    const jarvisPage = await get('/jarvis');
+    const titleOk = /<title>[^<]*JARVIS/.test(jarvisPage.body);
+    const listOk = /id="model"/.test(jarvisPage.body) && /<option/.test(jarvisPage.body);
+    results.items.push({ kind: 'jarvis', path: '/jarvis (JARVIS-Titel + Auswahlliste im HTML)', ok: jarvisPage.status === 200 && titleOk && listOk, detail: jarvisPage.status + ' · Titel JARVIS: ' + titleOk + ' · Auswahlliste: ' + listOk });
+
+    let serverStatus = {};
+    try { serverStatus = JSON.parse((await get('/api/admin-copilot/status')).body); } catch { serverStatus = {}; }
+    const tagsUrl = String(serverStatus.endpoint || 'http://127.0.0.1:11434').replace(/\/$/, '') + '/api/tags';
+    const tagsRes = await fetchRaw(tagsUrl, 4000);
+    if (tagsRes.status !== 200) {
+      results.items.push({ kind: 'jarvis', path: 'JARVIS-Modelliste == Anzahl /api/tags (ohne stille Filter)', ok: null, detail: 'SKIP/NOT-CONNECTED — Ollama nicht erreichbar (' + tagsUrl + ', HTTP ' + tagsRes.status + ')' });
+    } else {
+      let names = [];
+      try { names = (JSON.parse(tagsRes.body.toString('utf8')).models || []).map((m) => m.name || m.model); } catch { names = []; }
+      const list = Array.isArray(serverStatus.available_models) ? serverStatus.available_models : [];
+      const same = list.length === names.length && names.every((n) => list.includes(n));
+      results.items.push({ kind: 'jarvis', path: 'JARVIS-Modelliste == Anzahl /api/tags (ohne stille Filter)', ok: same, detail: 'Liste: ' + list.length + ' · /api/tags: ' + names.length + (same ? ' · alle Einträge auswählbar' : ' · Abweichung!') });
+    }
   }
 
   // ---- Area 70: central module system (manifest loader, lifecycle, security) ----
@@ -1523,15 +1613,16 @@ async function main() {
   }
 
   for (const it of results.items) {
+    if (it.ok === null) { results.skip++; console.log('SKIP' + ' [' + it.kind + '] ' + it.path + ' — ' + it.detail); continue; }
     if (it.ok) results.pass++; else results.fail++;
     console.log((it.ok ? 'PASS' : 'FAIL') + ' [' + it.kind + '] ' + it.path + ' — ' + it.detail);
   }
   try {
     const resultFile = path.join(__dirname, '..', 'backend', 'src', 'data', 'validate-result.json');
     fs.mkdirSync(path.dirname(resultFile), { recursive: true });
-    fs.writeFileSync(resultFile, JSON.stringify({ at: new Date().toISOString(), pass: results.pass, fail: results.fail }, null, 2) + String.fromCharCode(10));
+    fs.writeFileSync(resultFile, JSON.stringify({ at: new Date().toISOString(), pass: results.pass, fail: results.fail, skip: results.skip }, null, 2) + String.fromCharCode(10));
   } catch {}
-  console.log('\n=== VALIDATION: ' + results.pass + ' pass / ' + results.fail + ' fail ===');
+  console.log('\n=== VALIDATION: ' + results.pass + ' pass / ' + results.fail + ' fail / ' + results.skip + ' skip ===');
   process.exit(results.fail ? 1 : 0);
 }
 main();

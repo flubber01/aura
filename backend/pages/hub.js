@@ -97,7 +97,7 @@ ${nav.html('/hub')}
  <h2 class="scr" style="color:#ffcf7d">AURA OS INTELLIGENCE · LIVE BRIEFINGS <span class="state live">LIVE</span></h2>
  <div class="reactor"><div class="ar a1"></div><div class="ar a2"></div><div class="ar a3"></div><div class="ar a4"></div></div>
  <div class="jdials" id="jdials"></div>
- <p style="text-align:center"><a href="/aura-os#intelligence" style="color:#ffcf7d;text-decoration:none;border:1px solid #5c4a1e;border-radius:10px;padding:8px 18px;font-size:12px;letter-spacing:2px">→ AURA OS INTELLIGENCE ÖFFNEN</a> <a href="/jarvis" style="color:#8fe6ff;text-decoration:none;border:1px solid #28546b;border-radius:10px;padding:8px 18px;font-size:12px;letter-spacing:2px">ADMIN COPILOT</a></p>
+ <p style="text-align:center"><a href="/aura-os#intelligence" style="color:#ffcf7d;text-decoration:none;border:1px solid #5c4a1e;border-radius:10px;padding:8px 18px;font-size:12px;letter-spacing:2px">→ AURA OS INTELLIGENCE ÖFFNEN</a> <a href="/jarvis" style="color:#8fe6ff;text-decoration:none;border:1px solid #28546b;border-radius:10px;padding:8px 18px;font-size:12px;letter-spacing:2px">JARVIS</a></p>
 </section>
 
 <section id="s-cmd">
@@ -146,7 +146,7 @@ ${nav.html('/hub')}
   <a class="ccard" href="/api/sentinel/scan"><h3>🛡 Sentinel-Wache<span class="state live">LIVE</span></h3><p>Area 86 · Live-Scanner: offene Ports, Verbindungen, Anomalien · Trace-first-Quarantäne · Rate-Limit gegen DDoS</p></a>
   <a class="ccard" href="/export.html"><h3>💾 AURA EXPORT<span class="state live">DOWNLOAD</span></h3><p>Komplett-Stand als ZIP (86 Areas, alle Daten, Doku, Tests) — anklicken, dann auf den grünen Button</p></a>
   <a class="ccard" href="/config"><h3>⚙ Config<span class="state live">LIVE</span></h3><p>globale Konfiguration · Hot-Reload · schema-validiert</p></a>
-  <a class="ccard" href="/jarvis"><h3>🎙 Admin Copilot<span class="state live">LOCAL</span></h3><p>lokales Ollama-Gespräch · Owner-Workflow-Shortcuts · keine Aktionswerkzeuge</p></a>
+  <a class="ccard" href="/jarvis"><h3>🎙 JARVIS<span class="state live">LOCAL</span></h3><p>lokales Ollama-Gespräch · Owner-Workflow-Shortcuts · keine Aktionswerkzeuge</p></a>
   <a class="ccard" href="/terminal"><h3>⌨ Terminal<span class="state live">LIVE</span></h3><p>sandboxed, non-root (root refused)</p></a>
   <a class="ccard" href="/minibot"><h3>🤖 MiniBot<span class="state sim">SIM</span></h3><p>BotFather-Wizard · Bot selbst wartet auf Token</p></a>
   <a class="ccard" href="/cluster"><h3>🖧 Cluster<span class="state off">NOT-CONNECTED</span></h3><p>k3s-Kit ready · 4 Server stehen aus</p></a>

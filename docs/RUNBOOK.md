@@ -101,4 +101,50 @@ quarantined-Container, Kill-Switch-Stand. Ideal als Anhang an jedes Incident-Tic
 3. Kill-Switch → Ursache fixen, dann revive.
 4. Server tot → §2; wenn Vault intakt: kein Datenverlust.
 
+## 9. Admin-Token im Browser war gestern — Anmeldung per E-Mail+Passwort
+
+Der Betreiber meldet sich auf `/login` mit E-Mail + Passwort an (HTML-Formular,
+funktioniert auch ohne JavaScript). Gültige Sitzung = Admin-Rechte für alle
+Routen, die früher `x-aura-token` verlangten — `/board`, `/upload` & Co. fragen
+den Token nicht mehr ab, solange das Sitzungs-Cookie gilt.
+
+```bash
+# Owner einrichten (einmalig, per Terminal — Datei wird nie committet):
+node backend/src/scripts/create-owner.js
+
+# Owner-Datensatz prüfen (Pfad per AURA_AUTH_FILE umlenkbar):
+cat backend/src/data/auth_owner.json        # nur E-Mail + scrypt-Hash, chmod 600
+
+# Anmeldung händisch testen (ohne Browser):
+curl -i -X POST http://127.0.0.1:8080/api/auth/login-form \
+  -d 'email=DIR@EXAMPLE.DE&password=DEIN_PASSWORT&next=/hub'   # 302 + Set-Cookie
+curl -i -X POST http://127.0.0.1:8080/api/auth/login-form \
+  -d 'email=DIR@EXAMPLE.DE&password=FALSCH&next=/hub'          # 401, KEIN Cookie
+```
+
+- **Sitzungen sind prozess-lokal** (12 h): nach Server-Neustart neu anmelden.
+- Der Admin-Token (`x-aura-token`, `AURA_ADMIN_TOKEN`) bleibt der Notfallweg für
+  CLI/validate (`AURA_VALIDATE_TOKEN`) — nicht mehr der Alltag im Browser.
+- **AURA_AUTH_REQUIRED=true** (Vollsperrung aller Seiten) bleibt Standard-AUS und
+  kommt erst NACH dem HTTPS-Dach: TLS-Reverse-Proxy → Owner-Login prüfen → dann
+  die Vollsperrung setzen.
+
+## 10. Modell fehlt in der Liste
+
+Auf `/jarvis` (und `/selfwork`) erscheint jedes lokale Modell aus Ollama
+`/api/tags` — ohne Filter, ohne Qualitäts-Schranken. Embedding-Modelle bleiben
+sichtbar und sind markiert („Embedding — für Chat ungeeignet").
+
+```bash
+ollama list                 # was Ollama wirklich hat
+curl -s http://127.0.0.1:11434/api/tags   # dieselbe Liste roh
+```
+
+1. Modell in `ollama list`, aber nicht im Dropdown? → **Seite neu laden** (die
+   Liste wird zum Seitenaufruf und bei jedem JS-Refresh frisch vom Server geholt).
+2. Modell fehlt auch in `ollama list`? → `ollama pull <modell>` auf dem Host,
+   dann Seite neu laden.
+3. Standard ist `OLLAMA_MODEL` (auf dem VPS: `phi3:mini` · Standard) — als
+   „· Standard" in der Liste gekennzeichnet, nie still vorausgewählt.
+
 **Eherne Regel:** erst `api/repro` + `api/logs` sammeln, dann handeln.

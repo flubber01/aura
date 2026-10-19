@@ -41,7 +41,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .roles{margin-top:16px;font-size:11px;color:#7d94ad}
 .roles b{color:#9cc4ff}
 </style></head><body><main>
-<nav><a href="/hub">Hub</a><a href="/hierarchy">Hierarchie</a><a href="/skills">Skills</a><a href="/jarvis">J.A.R.V.I.S.</a><a href="/ops">Ops</a></nav>
+<nav><a href="/hub">Hub</a><a href="/hierarchy">Hierarchie</a><a href="/skills">Skills</a><a href="/jarvis">JARVIS</a><a href="/ops">Ops</a></nav>
 <h1>AGENT BOARD</h1>
 <p class="sub">Aufgabe rein, Agenten nach Fähigkeit zuweisen, Hilfe von anderen Abteilungen anfordern, am Ende gibt ein Mensch frei.</p>
 <ul class="note" id="rules"></ul>

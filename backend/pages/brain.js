@@ -94,7 +94,7 @@ nav{position:fixed;top:10px;right:14px;display:flex;gap:8px}
 nav a{color:var(--cy);text-decoration:none;font-size:11.5px;background:#0b1526;border:1px solid var(--line);border-radius:8px;padding:5px 10px}
 @media(max-width:900px){#hub{height:auto;padding:10px}.dim{position:static;transform:none;width:auto;margin:10px 0}#hub svg{display:none}}
 </style></head><body>
-<nav><a href="/index.html">UI</a><a href="/console">Console</a><a href="/downloads">Downloads</a><a href="/hub">Multi-Screen Hub</a><a href="/master">Master HUD</a><a href="/jarvis">Admin Copilot</a><a href="/ignition">Ignition</a></nav>
+<nav><a href="/index.html">UI</a><a href="/console">Console</a><a href="/downloads">Downloads</a><a href="/hub">Multi-Screen Hub</a><a href="/master">Master HUD</a><a href="/jarvis">JARVIS</a><a href="/ignition">Ignition</a></nav>
 <header><h1><b>BRAIN 2.0</b> · AURA AGENTIC CORE</h1>
 <p class="sub">5-dimensional modular layout — every node is a real backend module <span class="livepill" id="live">LIVE</span></p></header>
 <div id="hub">
