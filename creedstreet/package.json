@@ -6,5 +6,8 @@
     "build": "node export-static.cjs",
     "test": "node --test site.test.cjs",
     "start": "node server.js"
+  },
+  "dependencies": {
+    "@vercel/speed-insights": "^2.0.0"
   }
 }
