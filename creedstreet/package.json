@@ -1,0 +1,10 @@
+{
+  "name": "creedstreetstudios47",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node export-static.cjs",
+    "test": "node --test site.test.cjs",
+    "start": "node server.js"
+  }
+}

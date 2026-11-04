@@ -31,3 +31,7 @@ _uploads/
 # Installationsprotokoll des Startskripts (deploy/master-install.sh)
 aura-backend.log
 /aura-backend.log
+
+# CreedStreet static deploy output
+creedstreet/dist/
+creedstreet/.vercel/

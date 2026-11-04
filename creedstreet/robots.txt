@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /
+# Vorschau: erst nach verifiziertem Domain-Setup indexieren.
