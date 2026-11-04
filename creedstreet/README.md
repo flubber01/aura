@@ -64,7 +64,7 @@ Standard ist eine nicht indexierbare Vorschau. Nach Bestätigung einer echten HT
 PUBLIC_SITE_URL=https://deine-bestaetigte-domain.de python creedstreet/build.py
 ```
 
-Erzeugt Canonicals und Sitemap für die fünf inhaltlichen Hauptseiten. Rechtliche Seiten und reine Werbefläche bleiben noindex. Dies deployt nichts automatisch. Die vom Nutzer genannte Zieladresse ist `creedstreetstudios47.de`; eine tatsächliche dogado-Zuordnung oder Veröffentlichung wurde noch nicht ausgeführt.
+Erzeugt Canonicals und Sitemap für die fünf inhaltlichen Hauptseiten. Rechtliche Seiten und reine Werbefläche bleiben noindex. Dies deployt nichts automatisch. Die Website wurde am 04.11.2026 als separates Vercel-Projekt veröffentlicht: **https://creedstreetstudios47.vercel.app** (Deployment-Status READY). `creedstreetstudios47.de` ist dem Projekt bei Vercel zugeordnet; die DNS-Einträge bei dogado müssen noch angepasst werden. Die Veröffentlichung behält vorerst die noindex-Konfiguration des Konzeptauftritts bei.
 
 Der Vorschau-Server liefert nur freigegebene Dateien aus, verwendet `Cache-Control: no-cache` und erlaubt ausschließlich die bereitgestellte Hintergrundmusik vom eigenen Ursprung. Styles/Connector-Script tragen zusätzlich eine Versionskennung, um veraltete Player-Ansichten zu vermeiden.
 
@@ -78,3 +78,24 @@ Der Vorschau-Server liefert nur freigegebene Dateien aus, verwendet `Cache-Contr
 6. AdSense erst nach Publisher-Freigabe, passenden IDs, geeigneter zertifizierter CMP, Datenschutzprüfung, CSP-Anpassung und gegebenenfalls `ads.txt` aktivieren. Der Platzhalter lädt keine Werbeskripte.
 
 Das Vinyl-Hauptmotiv ist KI-generiert. Die Studio-Galerie enthält die fünf vom Auftraggeber bereitgestellten Dateien.
+
+## Vercel-Deployment
+
+- Projekt: `creedstreetstudios47` (`prj_78MWyFzwudWhnCJGWATSCUSCnmVR`)
+- Team: `flubber01s-projects`
+- Produktionslink: https://creedstreetstudios47.vercel.app
+- Veröffentlichtes Deployment: `dpl_AEEUbQpkQUybUfGFqPhySsf6fExH` (READY)
+- Git-Quelle: ausschließlich Branch `arena/1015642b-aura`, Commit `173eb1983e22cc6a8cc42a5a0836177765a4826d`
+- Root Directory: `creedstreet`, Build: `npm run build`, Output: `dist`
+- Der Vercel-Framework-Preset ist Vite, mit explizit überschriebenem Build-Befehl. Die Website selbst bleibt frameworkfrei.
+- `export-static.cjs` kopiert nur freigegebene Seiten, Skripte und Assets in `dist/`; Backend, Servercode, Tests, Cloud-Downloads und Build-Werkzeuge werden nicht mit ausgeliefert.
+- `vercel.json` setzt Sicherheitsheader einschließlich Same-Origin-Medienfreigabe.
+- Kein Token in Repository oder Website-Dateien. Git-Auto-Deployments sind für dieses Projekt derzeit nicht aktiviert; Veröffentlichung erfolgte ausdrücklich über den Vercel-Connector.
+
+### dogado
+
+Bei URL-Weiterleitung kann der Produktionslink als Ziel verwendet werden. Für eine echte Domain-Anbindung mit beibehaltener eigener Adresse muss stattdessen das DNS-Ziel geändert werden. Laut Vercel-Konfigurationsabruf vom 04.11.2026 zeigt die Apex-Domain noch auf `195.34.83.112` und ist dadurch `misconfigured`.
+
+Vercel empfiehlt aktuell IPv4-Ziele `216.198.79.1` bzw. `64.29.17.1` (Priorität 1). Für die Apex-Domain kann beispielsweise ein A-Eintrag `@ → 216.198.79.1` gesetzt werden; widersprechende alte Web-A-Einträge sind zu ersetzen. Mail-/MX-Einträge nicht verändern. Die empfohlene CNAME-Adresse für kompatible Subdomains lautet `2fdcca7ca982488a.vercel-dns-017.com.`. Es wurde keine zusätzliche, nicht angeforderte Subdomain zu Vercel hinzugefügt.
+
+Der dogado-Kundenbereich wurde nicht verändert. DNS- und Zertifikatsstatus nach dem Umstellen erneut prüfen. Diese Werte sind der damalige Vercel-Stand, keine dauerhaft unveränderlichen Infrastrukturwerte.
